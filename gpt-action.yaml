@@ -68,7 +68,7 @@ paths:
       description: |
         Creates an immutable deployment from inline files and returns the live URL on
         `*.shipstatic.com`. Anonymous deploys also include a one-time `claim` URL in the
-        response — always show both to the user.
+        response — always surface both the live URL and the claim URL to the user.
       security: []
       requestBody:
         required: true
@@ -101,8 +101,9 @@ paths:
       operationId: listDeployments
       summary: List deployments on the configured account
       description: |
-        Lists deployments owned by the account behind the configured API key. Not usable with
-        the unauth agent token flow.
+        Lists deployments owned by the account whose API key is configured at the action
+        level, newest first. Returns 401 if no API key is configured (the anonymous
+        agent-token flow does not include a listing operation).
       security:
         - BearerAuth: []
       parameters:
@@ -200,7 +201,10 @@ components:
             properties:
               path:
                 type: string
-                description: Relative path. Use forward slashes.
+                description: |
+                  Forward-slash relative path that becomes the URL path on the live site
+                  (e.g. `index.html` is served at the site root, `assets/style.css` at
+                  `/assets/style.css`).
                 example: index.html
               content:
                 type: string
@@ -238,7 +242,7 @@ components:
           description: Deployment hostname, e.g. `happy-cat-abc1234.shipstatic.com`.
         url:
           type: string
-          description: Full URL to the deployment.
+          description: Full URL to the live deployment, e.g. `https://happy-cat-abc1234.shipstatic.com`.
         claim:
           type: string
           description: |
@@ -291,7 +295,7 @@ components:
       properties:
         deployments:
           type: array
-          description: Page of deployments, newest first, scoped to the configured account.
+          description: Page of deployments, newest first.
           items:
             $ref: '#/components/schemas/Deployment'
         cursor:
@@ -345,7 +349,10 @@ components:
       properties:
         token:
           type: string
-          description: Management identifier (7 chars).
+          description: |
+            Short public identifier for this token (7 chars). Used for management
+            operations (listing, revocation). The actual deploy credential is `secret`
+            below — never confuse the two.
         secret:
           type: string
           description: |
