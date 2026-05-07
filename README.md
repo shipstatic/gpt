@@ -94,8 +94,9 @@ If editing an action that previously used **API Key** auth, switch it to **None*
 - ❌ Web Browsing
 - ❌ DALL-E Image Generation
 - ❌ Code Interpreter & Data Analysis
+- ❌ Canvas
 
-The GPT only deploys what the user describes in chat. Web Browsing and Code Interpreter add nothing here. DALL-E is a trap: generated images are short-lived ChatGPT-hosted URLs that can't be embedded in static deploys without re-encoding to base64, so the GPT will produce broken `<img>` tags.
+The GPT only deploys what the user describes in chat. Web Browsing and Code Interpreter add nothing here. DALL-E is a trap: generated images are short-lived ChatGPT-hosted URLs that can't be embedded in static deploys without re-encoding to base64, so the GPT will produce broken `<img>` tags. Canvas inverts the flow — the model writes HTML into a side-panel editor and waits for review instead of calling `deploy` — defeating the "ship first" UX the prompt is calibrated for.
 
 **Configure → Conversation starters** — add 4 prompts that showcase what the GPT does best:
 
