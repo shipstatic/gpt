@@ -1,0 +1,309 @@
+openapi: 3.1.0
+info:
+  title: ShipStatic
+  description: Deploy static websites instantly. No account, no signup, no configuration.
+  version: 1.0.0
+servers:
+  - url: https://api.shipstatic.com
+    description: ShipStatic production API
+
+paths:
+  /tokens/agent:
+    post:
+      operationId: createAgentToken
+      summary: Create a short-lived deploy token (no account required)
+      description: |
+        Returns a single-use, IP-locked deploy token valid for 60 seconds. Use it as the
+        Bearer credential for the immediately following `deploy` call. Do not cache or reuse.
+      security: []
+      requestBody:
+        required: false
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                labels:
+                  type: array
+                  description: Optional labels (max 10) attached to the token for grouping.
+                  items:
+                    type: string
+              additionalProperties: false
+      responses:
+        '201':
+          description: Token created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TokenCreateResponse'
+        '400':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+
+  /upload:
+    post:
+      operationId: deploy
+      summary: Deploy files as a new static site
+      description: |
+        Creates a new immutable deployment from inline file content. Returns the live deployment
+        URL. When deployed without an API key (i.e. using a token from `createAgentToken`), the
+        response also includes a `claim` URL the user can visit to take ownership permanently
+        — otherwise the site expires in 3 days.
+
+        JSON body is capped at 5 MB. For larger sites use the `multipart/form-data` form on
+        `POST /deployments` (not exposed to GPT actions).
+      security:
+        - BearerAuth: []
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/DeployRequest'
+      responses:
+        '201':
+          description: Deployment created
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Deployment'
+        '400':
+          $ref: '#/components/responses/Error'
+        '401':
+          $ref: '#/components/responses/Error'
+        '413':
+          $ref: '#/components/responses/Error'
+        '422':
+          $ref: '#/components/responses/Error'
+        '429':
+          $ref: '#/components/responses/Error'
+
+  /deployments:
+    get:
+      operationId: listDeployments
+      summary: List deployments on the configured account
+      description: |
+        Lists deployments owned by the account behind the configured API key. Not usable with
+        the unauth agent token flow.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: limit
+          in: query
+          required: false
+          schema:
+            type: integer
+            minimum: 1
+            maximum: 100
+        - name: cursor
+          in: query
+          required: false
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Deployment list
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  deployments:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/Deployment'
+                  cursor:
+                    type: string
+                    nullable: true
+                  total:
+                    type: integer
+        '401':
+          $ref: '#/components/responses/Error'
+
+  /domains/{name}:
+    get:
+      operationId: getDomain
+      summary: Get a custom domain on the configured account
+      description: Returns the domain record including DNS verification status. Requires an API key.
+      security:
+        - BearerAuth: []
+      parameters:
+        - name: name
+          in: path
+          required: true
+          schema:
+            type: string
+      responses:
+        '200':
+          description: Domain record
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/Domain'
+        '401':
+          $ref: '#/components/responses/Error'
+        '404':
+          $ref: '#/components/responses/Error'
+
+components:
+  securitySchemes:
+    BearerAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: ship-... or token-...
+
+  schemas:
+    DeployRequest:
+      type: object
+      required: [files]
+      properties:
+        files:
+          type: array
+          minItems: 1
+          description: |
+            Files in the deployment. Paths are relative — `index.html` is the site root.
+            Default encoding is `utf-8`. Use `base64` for binary files (images, fonts).
+          items:
+            type: object
+            required: [path, content]
+            properties:
+              path:
+                type: string
+                description: Relative path. Use forward slashes.
+                example: index.html
+              content:
+                type: string
+                description: File content. UTF-8 text by default; base64 string when encoding is `base64`.
+              encoding:
+                type: string
+                enum: [utf-8, base64]
+                default: utf-8
+        labels:
+          type: array
+          description: Optional labels (max 10) for grouping deployments.
+          items:
+            type: string
+        spa:
+          type: boolean
+          description: When true, auto-detects single-page-app routing and injects `ship.json`. Skipped if `ship.json` is already in the upload.
+        password:
+          type: string
+          description: Optional 6–128 character password to protect the deployment.
+        via:
+          type: string
+          description: Origin tag for analytics. GPT Actions should always send `"gpt"`.
+          enum: [gpt]
+      additionalProperties: false
+
+    Deployment:
+      type: object
+      required: [deployment, url, files, size, status, config, password, labels, via, created, expires, screenshot]
+      properties:
+        deployment:
+          type: string
+          description: Deployment hostname, e.g. `happy-cat-abc1234.shipstatic.com`.
+        url:
+          type: string
+          description: Full URL to the deployment.
+        claim:
+          type: string
+          description: |
+            Claim URL — present only on unauthenticated (agent/public) deployments.
+            Visiting this URL within 3 days transfers ownership to a real account so the site
+            never expires. Always show this URL to the user when present.
+        files:
+          type: integer
+        size:
+          type: integer
+          description: Total deployment size in bytes.
+        status:
+          type: string
+        config:
+          type: boolean
+        password:
+          type: boolean
+        labels:
+          type: array
+          items:
+            type: string
+        via:
+          type: string
+          nullable: true
+        created:
+          type: integer
+          description: Unix timestamp (seconds).
+        expires:
+          type: integer
+          nullable: true
+          description: Unix timestamp (seconds) when the deployment expires; null when permanent.
+        screenshot:
+          type: string
+
+    Domain:
+      type: object
+      properties:
+        domain:
+          type: string
+        url:
+          type: string
+        deployment:
+          type: string
+          nullable: true
+        status:
+          type: string
+          enum: [pending, partial, success, paused]
+        labels:
+          type: array
+          items:
+            type: string
+        created:
+          type: integer
+        verified:
+          type: integer
+          nullable: true
+
+    TokenCreateResponse:
+      type: object
+      required: [token, secret, labels, expires]
+      properties:
+        token:
+          type: string
+          description: Management identifier (7 chars).
+        secret:
+          type: string
+          description: |
+            The bearer credential to send as `Authorization: Bearer <secret>` on the next
+            `deploy` call. Format is `token-` followed by 64 hex characters. Single-use,
+            IP-locked, expires in 60 seconds.
+        labels:
+          type: array
+          items:
+            type: string
+        expires:
+          type: integer
+          nullable: true
+          description: Unix timestamp (seconds) when the token expires.
+
+    Error:
+      type: object
+      required: [error, message]
+      properties:
+        error:
+          type: string
+        message:
+          type: string
+        status:
+          type: integer
+        details:
+          description: Optional context (validation issues, etc).
+
+  responses:
+    Error:
+      description: Error response
+      content:
+        application/json:
+          schema:
+            $ref: '#/components/schemas/Error'
+
+security: []
