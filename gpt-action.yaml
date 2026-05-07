@@ -3,7 +3,7 @@ info:
   title: ShipStatic
   description: |
     Deploy static websites instantly. No account, no signup, no configuration —
-    pages go live on `*.shipstatic.com` in seconds.
+    your site is live in seconds.
 
     Anonymous deployments are public and expire in 3 days unless claimed; the response
     includes a one-time claim URL that links the site to a free account to keep
