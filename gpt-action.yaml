@@ -1,8 +1,25 @@
 openapi: 3.1.0
 info:
   title: ShipStatic
-  description: Deploy static websites instantly. No account, no signup, no configuration.
+  description: |
+    Deploy static websites instantly. No account, no signup, no configuration —
+    pages go live on `*.shipstatic.com` in seconds.
+
+    Anonymous deploys are public and expire in 3 days unless claimed; the response
+    includes a one-time claim URL that links the site to a free account to keep
+    it permanently.
+
+    A free API key from [my.shipstatic.com/api-key](https://my.shipstatic.com/api-key)
+    is optional and unlocks permanent deployments to a personal account, plus read
+    access to past deploys and custom domains.
+
+    Anonymous deployments are AI-moderated and manually reviewed against ShipStatic's
+    [Platform Rules](https://shipstatic.com/rules/) — abusive content is removed quickly.
   version: 1.0.0
+  termsOfService: https://shipstatic.com/terms/
+externalDocs:
+  description: ShipStatic Platform Rules and abuse reporting
+  url: https://shipstatic.com/rules/
 servers:
   - url: https://api.shipstatic.com
     description: ShipStatic production API
@@ -13,8 +30,10 @@ paths:
       operationId: createAgentToken
       summary: Create a short-lived deploy token (no account required)
       description: |
-        Returns a single-use, IP-locked deploy token valid for 60 seconds. Use it as the
-        Bearer credential for the immediately following `deploy` call. Do not cache or reuse.
+        Returns a single-use, IP-locked deploy token valid for 60 seconds. Pass the returned
+        `secret` as the `token` field in the body of the immediately following `deploy` call
+        (ChatGPT cannot dynamically inject a header from a prior response, so the credential
+        travels in the body). Do not cache or reuse — single-use is enforced atomically.
       security: []
       requestBody:
         required: false
@@ -25,10 +44,10 @@ paths:
               properties:
                 labels:
                   type: array
+                  maxItems: 10
                   description: Optional labels (max 10) attached to the token for grouping.
                   items:
                     type: string
-              additionalProperties: false
       responses:
         '201':
           description: Token created
@@ -40,6 +59,8 @@ paths:
           $ref: '#/components/responses/Error'
         '429':
           $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Error'
 
   /upload:
     post:
@@ -48,8 +69,13 @@ paths:
       description: |
         Creates an immutable deployment from inline files and returns the live URL. When called
         with an agent token, the response also includes a `claim` URL — show both to the user.
-      security:
-        - BearerAuth: []
+
+        Authentication: when no account is configured, send the `secret` returned by
+        `createAgentToken` as the `token` field in this request body. ChatGPT cannot
+        dynamically set the Authorization header from a prior response, so the deploy
+        credential travels in the body. If an API key is configured at the action level,
+        it is sent as `Authorization: Bearer <key>` automatically and `token` is ignored.
+      security: []
       requestBody:
         required: true
         content:
@@ -73,6 +99,8 @@ paths:
           $ref: '#/components/responses/Error'
         '429':
           $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Error'
 
   /deployments:
     get:
@@ -87,6 +115,7 @@ paths:
         - name: limit
           in: query
           required: false
+          description: Maximum number of deployments to return per page (1–100).
           schema:
             type: integer
             minimum: 1
@@ -94,6 +123,7 @@ paths:
         - name: cursor
           in: query
           required: false
+          description: Pagination cursor from a prior `listDeployments` response.
           schema:
             type: string
       responses:
@@ -102,18 +132,10 @@ paths:
           content:
             application/json:
               schema:
-                type: object
-                properties:
-                  deployments:
-                    type: array
-                    items:
-                      $ref: '#/components/schemas/Deployment'
-                  cursor:
-                    type: string
-                    nullable: true
-                  total:
-                    type: integer
+                $ref: '#/components/schemas/DeploymentListResponse'
         '401':
+          $ref: '#/components/responses/Error'
+        default:
           $ref: '#/components/responses/Error'
 
   /domains/{name}:
@@ -127,8 +149,10 @@ paths:
         - name: name
           in: path
           required: true
+          description: The custom domain (FQDN), e.g. `www.example.com`.
           schema:
             type: string
+            example: www.example.com
       responses:
         '200':
           description: Domain record
@@ -140,13 +164,14 @@ paths:
           $ref: '#/components/responses/Error'
         '404':
           $ref: '#/components/responses/Error'
+        default:
+          $ref: '#/components/responses/Error'
 
 components:
   securitySchemes:
     BearerAuth:
       type: http
       scheme: bearer
-      bearerFormat: ship-... or token-...
 
   schemas:
     DeployRequest:
@@ -154,12 +179,21 @@ components:
       required: [files]
       example:
         via: gpt
+        token: token-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
         files:
           - path: index.html
-            content: "<!DOCTYPE html><html><head><link rel=\"stylesheet\" href=\"assets/style.css\"></head><body><h1>Hello</h1></body></html>"
+            content: "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>Hello</title><link rel=\"stylesheet\" href=\"assets/style.css\"></head><body><h1>Hello</h1></body></html>"
           - path: assets/style.css
             content: "body{font-family:system-ui;margin:2rem}"
       properties:
+        token:
+          type: string
+          description: |
+            Deploy credential. Paste the `secret` returned by `createAgentToken` here when no
+            API key is configured at the action level. ChatGPT cannot inject a value from one
+            action's response into another action's Authorization header, so the credential
+            travels in the body for the unauthenticated flow. When an API key is configured,
+            it's sent as `Authorization: Bearer <key>` automatically and this field is ignored.
         files:
           type: array
           minItems: 1
@@ -181,8 +215,10 @@ components:
                 type: string
                 enum: [utf-8, base64]
                 default: utf-8
+                description: Content encoding. `utf-8` (default) for text; `base64` for binary files.
         labels:
           type: array
+          maxItems: 10
           description: Optional labels (max 10) for grouping deployments.
           items:
             type: string
@@ -191,12 +227,13 @@ components:
           description: When true, auto-detects single-page-app routing and injects `ship.json`. Skipped if `ship.json` is already in the upload.
         password:
           type: string
+          minLength: 6
+          maxLength: 128
           description: Optional 6–128 character password to protect the deployment.
         via:
           type: string
           description: Origin tag for analytics. GPT Actions should always send `"gpt"`.
           enum: [gpt]
-      additionalProperties: false
 
     Deployment:
       type: object
@@ -211,59 +248,102 @@ components:
         claim:
           type: string
           description: |
-            Claim URL — present only on unauthenticated (agent/public) deployments.
-            Visiting this URL within 3 days transfers ownership to a real account so the site
-            never expires. Always show this URL to the user when present.
+            Claim URL — present only on unauthenticated (agent/public) deployments. The
+            deployment expires in 3 days unless claimed. Visiting this URL transfers
+            ownership to a free account so the site never expires. Always surface this URL
+            to the user *together with* an explicit expiry warning when present.
         files:
           type: integer
+          description: Number of files in the deployment.
         size:
           type: integer
           description: Total deployment size in bytes.
         status:
           type: string
+          enum: [pending, success, failed, deleting]
+          description: Deployment lifecycle state. `success` means the site is live.
         config:
           type: boolean
+          description: True if the deployment includes a `ship.json` routing config.
         password:
           type: boolean
+          description: True if the deployment is password-protected.
         labels:
           type: array
+          description: Labels attached to the deployment for grouping and filtering.
           items:
             type: string
         via:
           type: string
           nullable: true
+          description: |
+            Origin tag indicating which client created the deployment (`gpt`, `cli`, `web`,
+            `mcp`, `n8n`, `vsc`, `git`, `sdk`). Set by the deploy call's `via` field. Null
+            on legacy deployments uploaded before tagging existed.
         created:
           type: integer
-          description: Unix timestamp (seconds).
+          description: Unix timestamp (seconds) when the deployment was created.
         expires:
           type: integer
           nullable: true
           description: Unix timestamp (seconds) when the deployment expires; null when permanent.
         screenshot:
           type: string
+          description: Full URL to the deployment screenshot image (auto-captured post-deploy).
+
+    DeploymentListResponse:
+      type: object
+      required: [deployments, cursor, total]
+      properties:
+        deployments:
+          type: array
+          description: Page of deployments, newest first, scoped to the configured account.
+          items:
+            $ref: '#/components/schemas/Deployment'
+        cursor:
+          type: string
+          nullable: true
+          description: Pagination cursor; null when no more pages.
+        total:
+          type: integer
+          description: Total number of deployments in the account.
 
     Domain:
       type: object
+      required: [domain, url, status, labels, created]
       properties:
         domain:
           type: string
+          description: The custom domain (FQDN), e.g. `www.example.com`.
         url:
           type: string
+          description: Full URL to the domain, e.g. `https://www.example.com`.
         deployment:
           type: string
           nullable: true
+          description: |
+            Hostname/ID of the linked deployment (e.g. `happy-cat-abc1234.shipstatic.com`,
+            same shape as `Deployment.deployment`); null if the domain is reserved without
+            a target.
         status:
           type: string
           enum: [pending, partial, success, paused]
+          description: |
+            DNS verification state. `pending` = no DNS configured. `partial` = some records
+            present. `success` = fully verified and serving. `paused` = paused by the
+            platform (typically a billing-related downgrade).
         labels:
           type: array
+          description: Labels attached to the domain for grouping and filtering.
           items:
             type: string
         created:
           type: integer
+          description: Unix timestamp (seconds) when the domain was added.
         verified:
           type: integer
           nullable: true
+          description: Unix timestamp (seconds) when DNS was first verified; null if not yet verified.
 
     TokenCreateResponse:
       type: object
@@ -275,11 +355,14 @@ components:
         secret:
           type: string
           description: |
-            The bearer credential to send as `Authorization: Bearer <secret>` on the next
-            `deploy` call. Format is `token-` followed by 64 hex characters. Single-use,
-            IP-locked, expires in 60 seconds.
+            The deploy credential to send in the next `deploy` request body, as the `token`
+            field. Format is `token-` followed by 64 hex characters. Single-use, IP-locked,
+            expires in 60 seconds. Not a header bearer — ChatGPT cannot inject a value from
+            one action's response into another action's Authorization header, so the
+            credential travels in the body for this flow.
         labels:
           type: array
+          description: Labels attached to the token at creation, for grouping and filtering.
           items:
             type: string
         expires:
@@ -293,11 +376,16 @@ components:
       properties:
         error:
           type: string
+          description: Error type code, e.g. `validation_failed`, `authentication_failed`, `rate_limit_exceeded`.
         message:
           type: string
+          description: Human-readable error message safe to surface to the user.
         status:
           type: integer
+          description: HTTP status code, mirrors the response status.
         details:
+          type: object
+          additionalProperties: true
           description: Optional context (validation issues, etc).
 
   responses:
