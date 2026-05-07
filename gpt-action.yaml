@@ -152,6 +152,13 @@ components:
     DeployRequest:
       type: object
       required: [files]
+      example:
+        via: gpt
+        files:
+          - path: index.html
+            content: "<!DOCTYPE html><html><head><link rel=\"stylesheet\" href=\"assets/style.css\"></head><body><h1>Hello</h1></body></html>"
+          - path: assets/style.css
+            content: "body{font-family:system-ui;margin:2rem}"
       properties:
         files:
           type: array
