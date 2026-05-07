@@ -35,7 +35,9 @@ The official store-published GPT is anonymous-only. To deploy to your own accoun
 3. **Configure → Actions → Create new action** — paste [`gpt-action.yaml`](./gpt-action.yaml).
 4. **Authentication → API Key → Auth Type: Bearer** — paste your `ship-...` key. Save.
 
-**Optional optimization for forkers:** to skip the unused `createAgentToken` round-trip on every deploy, delete the `createAgentToken` step (and the `token` field from the deploy body example) in [`system-prompt.md`](./system-prompt.md) before pasting. With an API key configured, ChatGPT auto-injects the header and the body `token` is ignored anyway — the prompt works either way, but skipping the mint saves one API call per deploy.
+With an API key configured, ChatGPT auto-injects the header and the GPT skips
+`createAgentToken`; it deploys directly with the authenticated `deploy` call. This avoids
+the anonymous token endpoint and its IP-based rate limit.
 
 Deployments now land in your account, never expire, and don't include a `claim` URL. The GPT can also call:
 
@@ -115,15 +117,17 @@ In the right-hand chat preview, run something **different** from the conversatio
 
 Expected — within ~10 seconds:
 
-1. The GPT calls `createAgentToken` (collapse the action card to confirm).
-2. It calls `deploy` with `token` in the body and `via: gpt`.
-3. The reply shows **both** a deployment URL (`https://*.shipstatic.com`) and a **claim URL** (`https://my.shipstatic.com/claim/...`).
-4. Visiting the deployment URL renders the site.
+1. The GPT drafts the page first and has the final files ready before any action call.
+2. It calls `createAgentToken` only after the files are ready (collapse the action card to confirm).
+3. It immediately calls `deploy` with `token` in the body and `via: gpt`.
+4. The reply shows **both** a deployment URL (`https://*.shipstatic.com`) and a **claim URL** (`https://my.shipstatic.com/claim/...`).
+5. Visiting the deployment URL renders the site.
 
-If any of those four don't happen, the spec or prompt is wrong — fix the source files in this repo and re-paste, don't tweak inside the GPT Builder. The artifacts in this repo are the source of truth.
+If any of those five don't happen, the spec or prompt is wrong — fix the source files in this repo and re-paste, don't tweak inside the GPT Builder. The artifacts in this repo are the source of truth.
 
 Smoke checks worth running once before publishing:
 
+- Ask for a trivial page ("deploy a hello world HTML page") → confirm the GPT prepares the final `files[]` payload before the first `createAgentToken` call, then deploys immediately after minting.
 - Ask for a change ("make the background dark") → confirm a fresh deploy + new URL each time (each iteration mints a new token).
 - Ask the GPT to set a password → deploys with `password` field, deployment URL prompts for unlock.
 - Force a 401 (e.g. wait more than 60 seconds between token mint and deploy) → GPT mints a fresh token and retries once.
@@ -136,12 +140,14 @@ In the GPT Builder header: **Save** → **Share** → **Anyone with the link** f
 
 The GPT Store listing description (a separate, character-limited field) should be the **first paragraph** of `info.description` from the spec — the spec's longer multi-paragraph version stays put so OpenAI's reviewer and the GPT planner have full context. OpenAI's review can reject for description mismatches between the listing and the spec, so paste-from-spec keeps them aligned.
 
-## Known Constraints
+## Production Constraints
 
-- **`/tokens/agent` is rate-limited per source IP at 5 requests/hour.** ChatGPT's outbound egress is shared across all GPT users, so this limit will throttle quickly under public-launch volume — every ChatGPT user looks like the same IP to our API. Before public launch, the platform side needs an IP allowlist (or equivalent identity signal) for ChatGPT's egress ranges. Tracked separately; do not work around it inside the spec/prompt.
-- **JSON deploy body is capped at 5 MB** (`DEPLOYMENT.MAX_JSON_BODY_SIZE`). Binary assets are base64-inflated ~33%, so the effective binary budget is ~3.7 MB. The system prompt nudges toward inline SVG / CSS gradients for that reason. Larger deploys must use multipart, which GPT Actions can't construct — so this is a hard ceiling for the GPT path.
+- **Launch blocker for public Store volume: `/tokens/agent` is rate-limited per source IP at 5 requests/hour.** ChatGPT calls actions from documented egress CIDR ranges, but many users can still share outbound infrastructure. Before public launch, the platform side needs an allowlist or equivalent identity signal for ChatGPT action traffic. Do not work around it inside the spec/prompt.
+- **GPT Actions request and response payloads must stay under 100,000 characters.** ShipStatic's API JSON body cap is higher at 5 MB (`DEPLOYMENT.MAX_JSON_BODY_SIZE`), but the OpenAI Actions limit is lower and controls this GPT path. Keep generated sites compact; avoid base64-heavy assets.
 - **Agent tokens are single-use and expire in 60 seconds.** A retried `deploy` after a successful first call will 401 — the GPT must mint a fresh token. The 401-retry rule in the system prompt covers this.
-- **GPT Action calls have a 30-second hard timeout** (OpenAI's enforcement). Anonymous deploys typically take 2–5 seconds; binary-heavy deploys near the 5 MB cap can approach the timeout. On timeout, ChatGPT shows a generic error and the deploy may have actually succeeded server-side — a retry could create a duplicate.
+- **GPT Action calls time out after 45 seconds.** Anonymous deploys typically take 2–5 seconds; oversized or asset-heavy deploys can approach the timeout. On timeout, ChatGPT shows a generic error and the deploy may have actually succeeded server-side — a retry could create a duplicate.
+- **Custom GPTs can use apps or actions, but not both at the same time.** This GPT must remain action-only.
+- **Actions are not available in Pro mode.** GPTs with custom actions are limited to the model choices the GPT Builder exposes for action-enabled GPTs.
 
 ## License
 

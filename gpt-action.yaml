@@ -30,9 +30,9 @@ paths:
       operationId: createAgentToken
       summary: Create a short-lived deploy token (no account required)
       description: |
-        Returns a single-use, IP-locked deploy token (60s TTL). Pass the returned `secret` as
-        the `token` field in the next `deploy` call's body. Do not cache or reuse — single-use
-        is enforced atomically.
+        For anonymous deploys only. Call after deploy files are complete. Returns a
+        single-use, IP-locked token with a 60s TTL. Pass `secret` as the `token` field in
+        the immediately following `deploy` call. Do not cache or reuse.
       security: []
       requestBody:
         required: false
@@ -65,17 +65,38 @@ paths:
     post:
       operationId: deploy
       summary: Deploy files as a new static site
+      x-openai-isConsequential: true
       description: |
         Creates an immutable deployment from inline files and returns the live URL on
         `*.shipstatic.com`. Anonymous deployments also include a one-time `claim` URL in
         the response — always surface both the live URL and the claim URL to the user.
-      security: []
+      security:
+        - BearerAuth: []
+        - {}
       requestBody:
         required: true
         content:
           application/json:
             schema:
               $ref: '#/components/schemas/DeployRequest'
+            examples:
+              anonymous:
+                summary: Anonymous deploy using a freshly minted agent token
+                value:
+                  via: gpt
+                  token: token-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
+                  files:
+                    - path: index.html
+                      content: "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>Hello</title><link rel=\"stylesheet\" href=\"assets/style.css\"></head><body><h1>Hello</h1></body></html>"
+                    - path: assets/style.css
+                      content: "body{font-family:system-ui;margin:2rem}"
+              apiKey:
+                summary: API-key deploy using the GPT Action Authorization header
+                value:
+                  via: gpt
+                  files:
+                    - path: index.html
+                      content: "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>Hello</title></head><body><h1>Hello</h1></body></html>"
       responses:
         '201':
           description: Deployment created
@@ -171,15 +192,7 @@ components:
   schemas:
     DeployRequest:
       type: object
-      required: [files]
-      example:
-        via: gpt
-        token: token-0123456789abcdef0123456789abcdef0123456789abcdef0123456789abcdef
-        files:
-          - path: index.html
-            content: "<!DOCTYPE html><html lang=\"en\"><head><meta charset=\"utf-8\"><title>Hello</title><link rel=\"stylesheet\" href=\"assets/style.css\"></head><body><h1>Hello</h1></body></html>"
-          - path: assets/style.css
-            content: "body{font-family:system-ui;margin:2rem}"
+      required: [files, via]
       properties:
         token:
           type: string
@@ -187,8 +200,8 @@ components:
             Deploy credential. Paste the `secret` returned by `createAgentToken` here when no
             API key is configured at the action level. ChatGPT cannot inject a value from one
             action's response into another action's Authorization header, so the credential
-            travels in the body for the anonymous flow. When an API key is configured, it's
-            sent as `Authorization: Bearer <key>` automatically and this field is ignored.
+            travels in the body for the anonymous flow. When an API key is configured, omit
+            this field; ChatGPT sends `Authorization: Bearer <key>` automatically.
         files:
           type: array
           minItems: 1
@@ -272,8 +285,7 @@ components:
           items:
             type: string
         via:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: |
             Origin tag indicating which client created the deployment (`gpt`, `cli`, `web`,
             `mcp`, `n8n`, `vsc`, `git`, `sdk`). Set by the deploy call's `via` field. Null
@@ -282,8 +294,7 @@ components:
           type: integer
           description: Unix timestamp (seconds) when the deployment was created.
         expires:
-          type: integer
-          nullable: true
+          type: [integer, 'null']
           description: Unix timestamp (seconds) when the deployment expires; null when permanent.
         screenshot:
           type: string
@@ -299,8 +310,7 @@ components:
           items:
             $ref: '#/components/schemas/Deployment'
         cursor:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: Pagination cursor; null when no more pages.
         total:
           type: integer
@@ -317,8 +327,7 @@ components:
           type: string
           description: Full URL to the domain, e.g. `https://www.example.com`.
         deployment:
-          type: string
-          nullable: true
+          type: [string, 'null']
           description: |
             Hostname/ID of the linked deployment (e.g. `happy-cat-abc1234.shipstatic.com`,
             same shape as `Deployment.deployment`); null if the domain is reserved without
@@ -339,8 +348,7 @@ components:
           type: integer
           description: Unix timestamp (seconds) when the domain was added.
         verified:
-          type: integer
-          nullable: true
+          type: [integer, 'null']
           description: Unix timestamp (seconds) when DNS was first verified; null if not yet verified.
 
     TokenCreateResponse:
@@ -367,8 +375,7 @@ components:
           items:
             type: string
         expires:
-          type: integer
-          nullable: true
+          type: [integer, 'null']
           description: Unix timestamp (seconds) when the token expires.
 
     Error:
