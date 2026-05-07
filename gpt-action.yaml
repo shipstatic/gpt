@@ -30,10 +30,9 @@ paths:
       operationId: createAgentToken
       summary: Create a short-lived deploy token (no account required)
       description: |
-        Returns a single-use, IP-locked deploy token valid for 60 seconds. Pass the returned
-        `secret` as the `token` field in the body of the immediately following `deploy` call
-        (ChatGPT cannot dynamically inject a header from a prior response, so the credential
-        travels in the body). Do not cache or reuse — single-use is enforced atomically.
+        Returns a single-use, IP-locked deploy token (60s TTL). Pass the returned `secret` as
+        the `token` field in the next `deploy` call's body. Do not cache or reuse — single-use
+        is enforced atomically.
       security: []
       requestBody:
         required: false
@@ -67,14 +66,9 @@ paths:
       operationId: deploy
       summary: Deploy files as a new static site
       description: |
-        Creates an immutable deployment from inline files and returns the live URL. When called
-        with an agent token, the response also includes a `claim` URL — show both to the user.
-
-        Authentication: when no account is configured, send the `secret` returned by
-        `createAgentToken` as the `token` field in this request body. ChatGPT cannot
-        dynamically set the Authorization header from a prior response, so the deploy
-        credential travels in the body. If an API key is configured at the action level,
-        it is sent as `Authorization: Bearer <key>` automatically and `token` is ignored.
+        Creates an immutable deployment from inline files and returns the live URL on
+        `*.shipstatic.com`. Anonymous deploys also include a one-time `claim` URL in the
+        response — always show both to the user.
       security: []
       requestBody:
         required: true
