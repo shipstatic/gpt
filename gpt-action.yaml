@@ -46,13 +46,8 @@ paths:
       operationId: deploy
       summary: Deploy files as a new static site
       description: |
-        Creates a new immutable deployment from inline file content. Returns the live deployment
-        URL. When deployed without an API key (i.e. using a token from `createAgentToken`), the
-        response also includes a `claim` URL the user can visit to take ownership permanently
-        — otherwise the site expires in 3 days.
-
-        JSON body is capped at 5 MB. For larger sites use the `multipart/form-data` form on
-        `POST /deployments` (not exposed to GPT actions).
+        Creates an immutable deployment from inline files and returns the live URL. When called
+        with an agent token, the response also includes a `claim` URL — show both to the user.
       security:
         - BearerAuth: []
       requestBody:
