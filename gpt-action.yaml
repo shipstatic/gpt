@@ -5,13 +5,13 @@ info:
     Deploy static websites instantly. No account, no signup, no configuration —
     pages go live on `*.shipstatic.com` in seconds.
 
-    Anonymous deploys are public and expire in 3 days unless claimed; the response
+    Anonymous deployments are public and expire in 3 days unless claimed; the response
     includes a one-time claim URL that links the site to a free account to keep
     it permanently.
 
     A free API key from [my.shipstatic.com/api-key](https://my.shipstatic.com/api-key)
     is optional and unlocks permanent deployments to a personal account, plus read
-    access to past deploys and custom domains.
+    access to past deployments and custom domains.
 
     Anonymous deployments are AI-moderated and manually reviewed against ShipStatic's
     [Platform Rules](https://shipstatic.com/rules/) — abusive content is removed quickly.
@@ -67,8 +67,8 @@ paths:
       summary: Deploy files as a new static site
       description: |
         Creates an immutable deployment from inline files and returns the live URL on
-        `*.shipstatic.com`. Anonymous deploys also include a one-time `claim` URL in the
-        response — always surface both the live URL and the claim URL to the user.
+        `*.shipstatic.com`. Anonymous deployments also include a one-time `claim` URL in
+        the response — always surface both the live URL and the claim URL to the user.
       security: []
       requestBody:
         required: true
@@ -187,8 +187,8 @@ components:
             Deploy credential. Paste the `secret` returned by `createAgentToken` here when no
             API key is configured at the action level. ChatGPT cannot inject a value from one
             action's response into another action's Authorization header, so the credential
-            travels in the body for the unauthenticated flow. When an API key is configured,
-            it's sent as `Authorization: Bearer <key>` automatically and this field is ignored.
+            travels in the body for the anonymous flow. When an API key is configured, it's
+            sent as `Authorization: Bearer <key>` automatically and this field is ignored.
         files:
           type: array
           minItems: 1
@@ -230,7 +230,7 @@ components:
           description: Optional 6–128 character password to protect the deployment.
         via:
           type: string
-          description: Origin tag for analytics. GPT Actions should always send `"gpt"`.
+          description: Origin tag for analytics. GPT Actions should always send `gpt`.
           enum: [gpt]
 
     Deployment:
@@ -246,10 +246,10 @@ components:
         claim:
           type: string
           description: |
-            Claim URL — present only on unauthenticated (agent/public) deployments. The
-            deployment expires in 3 days unless claimed. Visiting this URL transfers
-            ownership to a free account so the site never expires. Always surface this URL
-            to the user *together with* an explicit expiry warning when present.
+            Claim URL — present only on anonymous deployments. The deployment expires in
+            3 days unless claimed. Visiting this URL transfers ownership to a free account
+            so the site never expires. Always surface this URL to the user *together with*
+            an explicit expiry warning when present.
         files:
           type: integer
           description: Number of files in the deployment.
