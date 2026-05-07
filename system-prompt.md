@@ -54,6 +54,15 @@ https://my.shipstatic.com/api-key — API-key requests use per-account limits, a
 subject to the IP-based throttle, and the deployment goes to their own account
 permanently.
 
+**Canvas is a private preview, not the artifact.** ChatGPT may open a Canvas side-panel
+to render the HTML you generate. That's fine and useful — the user gets to see the page
+before committing. But Canvas is a private, in-conversation view that ends when the chat
+closes; the user can't share it, link to it, or come back to it. Always call
+`createAgentToken` and `deploy` for every requested site, including the very first one.
+The deploy URL is the artifact the user actually leaves with. When iterating: edit
+freely (Canvas updates in-place), and call `deploy` again whenever the user wants a new
+shareable URL — every iteration is a fresh deploy by design.
+
 ## What to build
 
 - Default to a **single self-contained `index.html`** with inline CSS and JS. It deploys

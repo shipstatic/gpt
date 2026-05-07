@@ -89,14 +89,16 @@ If editing an action that previously used **API Key** auth, switch it to **None*
 
 ### 3. Set capabilities and conversation starters
 
-**Configure → Capabilities** — leave all toggles **off**:
+**Configure → Capabilities:**
 
-- ❌ Web Browsing
-- ❌ DALL-E Image Generation
-- ❌ Code Interpreter & Data Analysis
-- ❌ Canvas
+- ❌ Web Browsing — off
+- ❌ DALL-E Image Generation — off
+- ❌ Code Interpreter & Data Analysis — off
+- ✅ **Canvas — on**
 
-The GPT only deploys what the user describes in chat. Web Browsing and Code Interpreter add nothing here. DALL-E is a trap: generated images are short-lived ChatGPT-hosted URLs that can't be embedded in static deploys without re-encoding to base64, so the GPT will produce broken `<img>` tags. Canvas inverts the flow — the model writes HTML into a side-panel editor and waits for review instead of calling `deploy` — defeating the "ship first" UX the prompt is calibrated for.
+Web Browsing and Code Interpreter add nothing here. DALL-E is a trap: generated images are short-lived ChatGPT-hosted URLs that can't be embedded in static deploys without re-encoding to base64, so the GPT will produce broken `<img>` tags.
+
+Canvas, on the other hand, is **complementary** to ShipStatic and worth enabling: ChatGPT will render the generated HTML in a live side-panel preview as the GPT builds it, while ShipStatic hands the user the actual shareable URL. The system prompt has explicit guidance that Canvas is a private preview and the `deploy` call must still run — so users get both in-context preview *and* a real public URL. Without Canvas, users only see the URL after deploy; with Canvas, they see the page *forming* and then get the URL.
 
 **Configure → Conversation starters** — add 4 prompts that showcase what the GPT does best:
 
