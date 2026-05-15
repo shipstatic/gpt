@@ -1,98 +1,87 @@
-# ShipStatic for ChatGPT
+# ShipStatic ChatGPT App — Submission Orchestration
 
-ShipStatic as an app inside ChatGPT — ask, and your site is live.
+This repo prepares everything we need to submit ShipStatic to the
+ChatGPT App directory. The actual submission happens on OpenAI's
+dashboard at `https://platform.openai.com/apps-manage` — this repo
+just makes sure we walk in with everything ready.
 
-> One URL. Your agent ships.
-> Free, no install, no signup, no API key.
+## Quick start
 
-This repository hosts the public-facing artifacts for the ShipStatic ChatGPT
-App: README, license, icon, screenshots, and submission materials. The app
-itself is powered by [ShipStatic's hosted MCP server][mcp] — connected at
-`https://mcp.shipstatic.com/gpt` — which exposes a single
-`deployments_upload` tool and an inline result card. The bare
-`https://mcp.shipstatic.com` URL is the same server for any other MCP
-client (Claude, Cursor, n8n, …); the `/gpt` suffix only changes the
-analytics tag on the resulting deploy.
+If you've never opened this repo before:
 
-The previous Custom GPT (GPT Actions + OpenAPI) is preserved on the
-[`old` branch](https://github.com/shipstatic/gpt/tree/old) for reference.
-This `main` branch tracks the Apps SDK successor.
+```bash
+pnpm preflight    # Verify our half is ready — must be all-green
+pnpm checklist    # See the human steps for the OpenAI dashboard
+```
 
-## What it does
-
-Ask ChatGPT to build any static site — a portfolio, a landing page, a
-résumé, a coming-soon page — and the ShipStatic app deploys it instantly.
-You get back a live `*.shipstatic.com` URL and a claim link to keep the
-site permanently if you want.
-
-- **Anonymous by default.** No account, no API key. Public deploys expire
-  in 3 days unless claimed.
-- **Inline result card.** Live URL, screenshot, claim link, and a copy
-  button rendered directly in the chat.
-- **Password protection.** Ask for a password and the deployment is gated
-  behind an unlock prompt — on the deploy URL and on any custom domains
-  pointing at it.
-
-## How to add it
-
-*Listing in OpenAI's app directory is pending submission.* When the app is
-live, you'll be able to add it from the directory in ChatGPT in one click.
-
-In the meantime, the same flow works in any MCP-capable client today —
-including [ChatGPT's developer mode connectors][devmode]:
-
-| Client | Setup |
-|---|---|
-| ChatGPT (developer mode connectors) | Add an MCP server pointing at `https://mcp.shipstatic.com` |
-| Claude Desktop / Claude.ai | Add a custom connector with the same URL |
-| Claude Code | `claude mcp add --transport http shipstatic https://mcp.shipstatic.com` |
-| Cursor, Antigravity, Windsurf, n8n, anywhere with `mcp.json` | `{ "mcpServers": { "shipstatic": { "url": "https://mcp.shipstatic.com" } } }` |
+Then open `manifest.md` and `tests/prompts.md` side-by-side with the
+dashboard. Every dashboard field maps to a labelled section in
+`manifest.md`; the dashboard's "test prompts" field gets each block
+from `tests/prompts.md`.
 
 ## What lives where
 
-| Concern | Location |
+| Path | Purpose |
 |---|---|
-| MCP server (protocol, widget resource, defensive caps) | [`shipstatic/monorepo` — `cloudflare/mcp/`][mcp] *(private)* |
-| Inline deploy-card widget (HTML/CSS/JS) | [`shipstatic/monorepo` — `cloudflare/mcp/src/widget.ts`][mcp] *(private)* |
-| Public stdio MCP for power users (15 tools, account-tied) | [`@shipstatic/mcp`][stdio] *(npm + MCP Registry)* |
-| App directory listing artifacts (this repo) | README, LICENSE, icon, screenshots |
-| Privacy policy | <https://shipstatic.com/privacy/> |
-| Terms of service | <https://shipstatic.com/terms/> |
-| Platform rules + abuse reporting | <https://shipstatic.com/rules/> |
-| Previous Custom GPT (GPT Actions) | [`old` branch](https://github.com/shipstatic/gpt/tree/old) |
+| `manifest.md` | Every text field the dashboard asks for — App name, descriptions, category, localization, URLs, support contact, connector URL, version, tool surface, OAuth status. |
+| `tests/prompts.md` | Test prompts with expected responses. OpenAI's review team runs these against the live App — they're reproducible test cases, not marketing examples. |
+| `policy/` | Drafts for `shipstatic.com/privacy`, `/terms`, and our content-moderation stance. The live pages exist; these drafts are proposed updates that add the anonymous-deploy disclosures. Publishing them happens in `web/www/` — separate engineering. |
+| `assets/` | App icon (multiple sizes) + widget screenshots. `assets/in-context/` is where the human drops conversation-screenshots captured from ChatGPT dev mode. |
+| `scripts/` | `preflight.mjs` runs every automated check against the live MCP and the policy URLs. `checklist.mjs` prints the human-only steps and pulls open decisions from `docs/decisions.md`. |
+| `docs/` | `decisions.md` is the canonical record of choices made and open. `submission-history.md` logs each submission's Case ID and reviewer feedback. |
 
-## Trust & safety
+## Why this shape
 
-Anonymous public deployments are governed by ShipStatic's
-[Platform Rules](https://shipstatic.com/rules/) and actively moderated:
+- **One product, two doors in.** Public-facing artifacts here describe
+  ShipStatic MCP as a single product with two ways to use it: the
+  hosted endpoint (no install) and the `@shipstatic/mcp` npm package
+  (full toolset). We don't mention the hosted MCP's implementation
+  repo, just the user-facing surface.
+- **Verify our half, don't automate theirs.** OpenAI's dashboard is
+  interactive and changes faster than we can keep up with. Building
+  automation around the dashboard would be brittle. Building
+  automation around what we control — MCP health, policy URLs,
+  manifest correctness — is durable.
+- **`manifest.md` is the only place to edit dashboard copy.** Single
+  source. No copy in scripts, no copy in this README. The two scripts
+  read from `manifest.md` and `docs/decisions.md` to stay in sync.
 
-- **Automated AI moderation** reviews deployments against the platform
-  policy (no malware, phishing, brand impersonation, hate speech, sexual
-  content, or illegal content).
-- **Manual review** on flagged or reported deployments.
-- **Fast takedown.** Violating deployments are removed; repeat abusers
-  blocked at IP and account level.
-- **Limited exposure window.** Unclaimed deploys expire after 3 days,
-  capping how long any abuse that slips past automated moderation stays
-  live.
+## Submission flow
 
-Report abuse to **abuse@shipstatic.com**.
+1. **Run `pnpm preflight`.** All green = our half is ready. Any red
+   blocks submission.
+2. **Run `pnpm checklist`.** This prints the human steps grouped as
+   *before opening the dashboard*, *in the dashboard*, and *after
+   clicking Submit*. Work through it top-to-bottom.
+3. **Open `manifest.md` + `tests/prompts.md`** side-by-side with the
+   dashboard. Paste each section into the matching dashboard field.
+4. **Click "Submit for review"** in the dashboard.
+5. **Record the Case ID** (from OpenAI's confirmation email) in
+   `docs/submission-history.md`.
 
-## Also available
+## Voice canon (verbatim phrases)
 
-| Integration | Install |
-|---|---|
-| **[CLI & SDK](https://github.com/shipstatic/ship)** | `npm install -g @shipstatic/ship` |
-| **[MCP Server](https://github.com/shipstatic/mcp)** | `npx @shipstatic/mcp` |
-| **[VS Code Extension](https://marketplace.visualstudio.com/items?itemName=shipstatic.shipstatic)** | Search "ShipStatic" in the VS Code Marketplace |
-| **[GitHub Action](https://github.com/shipstatic/action)** | `shipstatic/action@v1` |
-| **[Gemini Plugin](https://github.com/shipstatic/plugin)** | `gemini extensions install https://github.com/shipstatic/plugin` |
-| **[n8n Node](https://github.com/shipstatic/n8n)** | Install `n8n-nodes-shipstatic` from n8n's Community Nodes |
+When editing `manifest.md` long-form copy, these phrases echo
+unchanged from `integrations/mcp/CLAUDE.md`:
 
-## License
+- "One URL. Your agent ships."
+- "Drop `https://mcp.shipstatic.com` into any MCP client."
+- "No install, no signup, no API key."
+- "Install the @shipstatic/mcp package for the full toolset (custom
+  domains, listing, account-tied ops)."
 
-[MIT](./LICENSE).
+## Out of scope (handled elsewhere)
 
-[mcp]: https://mcp.shipstatic.com
-[stdio]: https://www.npmjs.com/package/@shipstatic/mcp
-[devmode]: https://platform.openai.com/docs/guides/developer-mode
+- Modifying the hosted MCP worker. The widget is final at v0.6.0.
+- Deploying the policy pages to `shipstatic.com` — that's `web/www/`
+  engineering, separate from this repo.
+- Stripping internal fields (`via`, `status`) from the Deployment
+  response — flagged in `docs/decisions.md` for the human; execution
+  would happen on the API side, not here.
+
+---
+
+*This repo orchestrates the ChatGPT App submission. The live MCP is
+in production at `https://mcp.shipstatic.com` (`/gpt` for ChatGPT
+traffic). The widget is final at v0.6.0. Submission-ready pending the
+human-only items surfaced by `pnpm checklist`.*
