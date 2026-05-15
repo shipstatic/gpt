@@ -74,54 +74,49 @@ manifest's Localization section updated.
 
 ---
 
-## 2026-05-15 — Pending: strip `via` and `status` from Deployment response?
+## 2026-05-15 — Resolved: `via` and `status` are functional metadata, retained
 
-**Context:** OpenAI's submission docs require: *"Remove unnecessary
-PII, telemetry identifiers, timestamps, and auth secrets… ensure
-tools return only what's strictly necessary for the user's request."*
+**Original concern:** OpenAI's submission docs say *"Remove unnecessary
+PII, telemetry identifiers, timestamps, and auth secrets… ensure tools
+return only what's strictly necessary for the user's request."* The
+Deployment response includes `via` and `status` — a reviewer skimming
+the JSON might initially read these as telemetry.
 
-The Deployment response shape includes two fields that may read as
-telemetry to a reviewer inspecting the JSON the tool returns:
+**Resolution: keep both. They are functional, user-visible metadata,
+not platform telemetry.**
 
-- **`via`** — internal analytics tag (`'mcp'`, `'gpt'`, `'cli'`,
-  `'web'`, `'action'`, `'vsc'`, etc.). The agent has no use for it;
-  the widget doesn't render it. **Strong candidate for removal on the
-  anonymous path.** Querying analytics happens directly against the
-  database, not the tool response — so removing it from the response
-  is operationally lossless.
-- **`status`** — typically `'success'` at response time (responses
-  for failed deploys go through a different envelope via `isError`).
-  Has some conceivable forward-looking utility (queued / partial /
-  failed states) but currently always succeeds when present.
-  Weaker case for removal; could be documented as "API contract"
-  rather than "telemetry."
+- **`via`** — the **creation-method tag**. Users who own deploys (the
+  authenticated path) see this in the ShipStatic web app alongside
+  file count, size, and creation time. It tells them *where the
+  deploy came from*: `'gpt'` (this ChatGPT App), `'mcp'` (generic MCP
+  client), `'cli'`, `'web'`, `'action'` (GitHub Action), `'vsc'` (VS
+  Code extension). This is the same shape as Git showing
+  `via: GitHub Actions` on a commit, or Vercel showing
+  `Source: CLI` on a deploy. It supports user workflows around
+  filtering, attribution, and provenance — explicitly *not*
+  analytics-only.
+- **`status`** — the deploy state. Currently always `'success'` when
+  the response is sent (failures route through `isError`), but the
+  field exists as the API contract for future queued/partial states.
 
-**Recommended execution path** (when the human decides to act):
+For anonymous deploys (the hosted-MCP path), the user can convert to
+an account-tied deploy via the claim URL and then sees both fields
+in their dashboard — so even on the anonymous path the fields have
+user-visible meaning, not just "platform-internal."
 
-1. Edit `cloudflare/api/src/routes/deployments.ts`
-   `toDeploymentResponse()` — strip `via` (and optionally `status`)
-   universally; the field stays write-only.
-2. Update `npm/types` `Deployment` shape — make those fields absent
-   from the response type.
-3. Update `cloudflare/mcp/smoke.mjs` outputSchema check (line ~131)
-   to drop the removed fields from the expected list.
-4. Update `cloudflare/mcp/tests/server.test.ts` and
-   `cloudflare/mcp/tests/widget.test.ts` if either references the
-   removed fields.
-5. Update `cloudflare/mcp/CLAUDE.md` "What renders from
-   structuredContent" table accordingly.
-6. Bump `cloudflare/mcp/src/version.ts` per the doc's Path A workflow
-   (agent-facing change — schema shape affects the model).
-7. Bump `integrations/mcp/package.json` to match (Path A requires
-   both sides bump together).
-8. `pnpm preflight` from `integrations/gpt/` — the advisory warning
-   for `via`/`status` disappears.
+**Disclosure to OpenAI reviewers (if asked during review):** `via`
+identifies the creation method so users can distinguish their
+ChatGPT deploys from their CLI deploys in the ShipStatic web app.
+It's not used for cross-user analytics, ad targeting, or any data
+ShipStatic doesn't already disclose in its privacy policy.
 
-**Blocking?** Yes. Submission should not happen with `via` in the
-schema unless we deliberately document it as "API contract, not
-telemetry" — and that argument is weak.
+**No code changes required.** The original execution path (strip
+from `toDeploymentResponse()`, bump versions, redeploy) is
+**cancelled**.
 
-**Owner:** human.
+**Preflight** still surfaces `via` and `status` informationally so
+anyone running the script can verify they're present as expected;
+it no longer flags them as a blocker.
 
 ---
 
@@ -169,10 +164,8 @@ submission flow.
       orgs are auto-rejected.
 - [ ] **OpenAI project data residency** — must be Global, not EU.
 - [ ] **Submitting account permissions** — `api.apps.write` +
-      `api.apps.read`.
-- [ ] **Strip `via` (and possibly `status`) from Deployment response**
-      on the anonymous path. See the entry above for the execution
-      path. **Real submission risk if left as-is.**
+      `api.apps.read`. Implicitly verified by being able to create
+      an App draft in the dashboard.
 - [ ] **Deploy updated `/privacy` and `/terms` pages** with the
       anonymous-deploy disclosures from `policy/privacy.md` and
       `policy/terms.md`. Until this happens, the live pages disclose

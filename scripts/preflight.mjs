@@ -27,6 +27,7 @@ const fail = (label, detail) => {
   console.log(`  \x1b[31m✗\x1b[0m ${label}${detail ? ' — ' + detail : ''}`);
   failed += 1;
 };
+const info = (label) => console.log(`  \x1b[33mℹ\x1b[0m ${label}`);
 const section = (title) => console.log(`\n${title}`);
 
 console.log('\n\x1b[1mShipStatic submission preflight\x1b[0m');
@@ -98,10 +99,16 @@ let liveVersion = null;
     ? pass('  Output schema includes every field the widget renders')
     : fail('  Output schema missing fields', missing.join(','));
 
-  // Telemetry-leaning fields — flag them for the data-minimization decision.
-  const flagged = ['via', 'status'].filter(k => k in out);
-  if (flagged.length > 0) {
-    console.log(`  \x1b[33m⚠\x1b[0m  Heads up: output schema still includes ${flagged.join(', ')} — open decision in docs/decisions.md`);
+  // via + status are functional metadata (creation method, deploy state)
+  // surfaced in the ShipStatic web app — not telemetry. Resolved in
+  // docs/decisions.md; we only verify they're present here.
+  const extras = ['via', 'status'].filter(k => k in out);
+  if (extras.length === 2) {
+    pass('  Output schema includes via + status (creation method + deploy state — functional, not telemetry)');
+  } else if (extras.length > 0) {
+    info(`  Output schema includes ${extras.join(', ')} — expected both via and status`);
+  } else {
+    fail('  Output schema missing via or status', 'these are user-visible metadata fields');
   }
 }
 
