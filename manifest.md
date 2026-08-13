@@ -54,7 +54,7 @@ added.
 The `/gpt` path is deliberately distinct from `/` so deploys tag
 `via: 'gpt'` for analytics. Same MCP server impl on both paths.
 
-## Version: `0.6.0`
+## Version: `1.2.0`
 
 Tracked by `cloudflare/mcp/src/version.ts` `VERSION` constant. The live
 endpoint reports this value on `initialize`. `pnpm preflight` enforces
@@ -62,10 +62,13 @@ this match.
 
 ## Tool surface
 
-A single tool: **`deployments_upload`** — anonymous-only on this
-endpoint, by design.
+Fifteen tools. **`deployments_upload`** is the one that needs no account
+— it is what the review team exercises, and it works with no credentials,
+no MFA and no setup. The other fourteen (listing, custom domains, account
+operations) answer once an account is connected over OAuth, which the
+client initiates from a `401` challenge.
 
-Annotations (review team checks these):
+Annotations below describe `deployments_upload`, the tool a reviewer runs:
 - `readOnlyHint: false` — creates a deployment
 - `destructiveHint: false` — outcomes are reversible (the deploy can
   be left to expire)
@@ -73,8 +76,15 @@ Annotations (review team checks these):
 
 ## OAuth credentials
 
-None. The hosted endpoint is anonymous by design. The review team can
-connect without credentials, MFA, or setup.
+**None are required, and none need to be issued to the review team.**
+Publishing — the App's whole purpose — works with no account at all, so a
+reviewer connects and deploys without credentials, MFA, or setup.
+
+The endpoint does support OAuth for the account tools, and a client
+starts that flow itself from a `401` challenge; there is nothing for us
+to hand over, because registration is dynamic. Stated rather than
+omitted, because a reviewer who probes the other fourteen tools will
+meet that challenge and should not be surprised by it.
 
 ---
 

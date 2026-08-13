@@ -93,7 +93,7 @@ const PHASES = [
       { title: 'Support contact', detail: 'support@shipstatic.com' },
       { title: 'MCP server URL', detail: 'https://mcp.shipstatic.com/gpt (the /gpt path tags deploys via:gpt for analytics)' },
       { title: 'OAuth credentials', detail: 'None — endpoint is anonymous by design.' },
-      { title: 'Tool(s) exposed', detail: 'deployments_upload (single tool, by design)' },
+      { title: 'Tool(s) exposed', detail: 'Fifteen; deployments_upload needs no account and is what a reviewer exercises' },
       { title: 'Screenshots', detail: 'Upload assets/widget-light.png, assets/widget-dark.png, plus the in-context captures from assets/in-context/' },
       { title: 'Test prompts + expected responses', detail: 'tests/prompts.md — paste each prompt block. The review team runs these against the live App; they must reproducibly succeed.' },
     ],
@@ -104,7 +104,7 @@ const PHASES = [
     items: [
       {
         title: 'Record the Case ID',
-        detail: 'Append an entry to docs/submission-history.md with the Case ID, the date, the App version submitted (currently 0.6.0), and any notes.',
+        detail: 'Append an entry to docs/submission-history.md with the Case ID, the date, the App version submitted (currently 1.2.0), and any notes.',
       },
       {
         title: 'Wait for review',
