@@ -46,6 +46,23 @@ from `tests/prompts.md`.
   source. No copy in scripts, no copy in this README. The two scripts
   read from `manifest.md` and `docs/decisions.md` to stay in sync.
 
+## When to run `pnpm preflight`
+
+**Two moments, and the second one is why this heading exists.**
+
+1. **Before every submission** — the flow below opens with it.
+2. **After every hosted MCP version flip**, which happens in the monorepo
+   (`cloudflare/mcp/CLAUDE.md`, "Version bump workflow", step 6) rather
+   than here. The manifest states a version and preflight compares it to
+   what the live `/gpt` endpoint reports, so a release elsewhere makes
+   this repo wrong without anyone touching it.
+
+That second trigger was missing until 2026-08-14, and the cost was
+exactly what its absence predicts: the manifest read `0.6.0` against a
+live `1.2.0` and preflight had been red for however many releases it
+took, because nobody submits a listing between them. **A check that only
+runs when someone is about to submit is a check that runs once.**
+
 ## Submission flow
 
 1. **Run `pnpm preflight`.** All green = our half is ready. Any red
