@@ -32,11 +32,12 @@ from `tests/prompts.md`.
 
 ## Why this shape
 
-- **One product, two doors in.** Public-facing artifacts here describe
-  ShipStatic MCP as a single product with two ways to use it: the
-  hosted endpoint (no install) and the `@shipstatic/mcp` npm package
-  (full toolset). We don't mention the hosted MCP's implementation
-  repo, just the user-facing surface.
+- **One product, and the hosted endpoint is the door.** Public-facing
+  artifacts here lead with the hosted endpoint — no install, no signup, no
+  API key — and present the `@shipstatic/mcp` npm package as the local
+  alternative for a different need, never as a bigger feature set. Both
+  carry the same fifteen tools. We don't mention the hosted MCP's
+  implementation repo, just the user-facing surface.
 - **Verify our half, don't automate theirs.** OpenAI's dashboard is
   interactive and changes faster than we can keep up with. Building
   automation around the dashboard would be brittle. Building
@@ -84,8 +85,16 @@ unchanged from `integrations/mcp/CLAUDE.md`:
 - "One URL. Your agent ships."
 - "Drop `https://mcp.shipstatic.com` into any MCP client."
 - "No install, no signup, no API key."
-- "Install the @shipstatic/mcp package for the full toolset (custom
-  domains, listing, account-tied ops)."
+- "the same fifteen tools, reached the other way" — the local package's
+  positioning, and the reasons for it are a NEED (a folder on your own
+  machine, a token instead of a sign-in, a client without OAuth), never a
+  capability.
+
+A fourth anchor used to read "Install the @shipstatic/mcp package for the
+full toolset". It died on 2026-08-13 when the hosted door gained OAuth and
+the other fourteen tools, and it survived here until 2026-08-15 because
+prose has no compiler. **An anchor phrase that states a CAPABILITY has a
+shelf life; one that states a NEED does not.**
 
 ## Out of scope (handled elsewhere)
 
