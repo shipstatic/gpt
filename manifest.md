@@ -26,10 +26,11 @@ portfolio, a single-file demo, a generated doc — and this App
 publishes it instantly. You get a real `*.shipstatic.com` URL you
 can share immediately.
 
-Free and anonymous, with a 3-day window to claim ownership and keep
-the site permanently. No install, no signup, no API key. For custom
-domains and longer-lived sites, install the `@shipstatic/mcp` package
-for the full toolset (custom domains, listing, account-tied ops).
+Free and anonymous: no install, no signup, no API key, with 3 days
+to claim ownership and keep the site permanently. Connect a
+ShipStatic account when you want the rest — custom domains, listing
+everything you have published, and sites that never expire — and the
+App starts that sign-in for you.
 
 ## Category
 
@@ -54,7 +55,7 @@ added.
 The `/gpt` path is deliberately distinct from `/` so deploys tag
 `via: 'gpt'` for analytics. Same MCP server impl on both paths.
 
-## Version: `1.2.0`
+## Version: `1.3.1`
 
 Tracked by `cloudflare/mcp/src/version.ts` `VERSION` constant. The live
 endpoint reports this value on `initialize`. `pnpm preflight` enforces
@@ -96,7 +97,7 @@ meet that challenge and should not be surprised by it.
 
 `https://shipstatic.com/privacy`
 
-Disclosure covers: anonymous deploys, 3-day expiry, screenshot capture
+Disclosure covers: anonymous deploys, expiry after 3 days, screenshot capture
 and retention, claim-flow account creation, no PII collection on the
 anonymous path. Draft source: `policy/privacy.md`.
 
