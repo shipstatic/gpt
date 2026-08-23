@@ -44,8 +44,10 @@ went with them (files, screenshot, metadata) are permanently deleted.
 
 ## Payments
 
-Payments are handled entirely by Creem.io as Merchant of Record. We
-do not collect or store any payment data.
+Paid plans are sold through Stripe, which is the merchant of record.
+Stripe collects your payment details and billing address, issues your
+receipt and invoice, and gives you a Link account to manage the
+subscription. We never see or store card details.
 
 ## Cookies
 
@@ -64,8 +66,8 @@ yours, not ours.
 
 Google (authentication and analytics), Cloudflare (infrastructure,
 including R2 storage and Browser Rendering for screenshots), Sentry
-(error tracking), and Creem.io (name and email for billing). We do
-not sell your data.
+(error tracking), and Stripe (payments, invoicing and tax, as merchant
+of record). We do not sell your data.
 
 Google, Cloudflare, and Sentry operate outside the EEA under Standard
 Contractual Clauses.
