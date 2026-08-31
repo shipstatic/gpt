@@ -55,7 +55,7 @@ added.
 The `/gpt` path is deliberately distinct from `/` so deploys tag
 `via: 'gpt'` for analytics. Same MCP server impl on both paths.
 
-## Version: `1.3.1`
+## Version: `1.8.0`
 
 Tracked by `cloudflare/mcp/src/version.ts` `VERSION` constant. The live
 endpoint reports this value on `initialize`. `pnpm preflight` enforces
