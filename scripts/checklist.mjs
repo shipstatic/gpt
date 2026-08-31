@@ -90,7 +90,7 @@ const PHASES = [
       { title: 'Company URL', detail: 'https://shipstatic.com' },
       { title: 'Privacy policy URL', detail: 'https://shipstatic.com/privacy (required by OpenAI)' },
       { title: 'Terms of service URL', detail: 'https://shipstatic.com/terms (provide if the dashboard requests it; not required by the submission spec we read)' },
-      { title: 'Support contact', detail: 'support@shipstatic.com' },
+      { title: 'Support contact', detail: 'hello@shipstatic.com' },
       { title: 'MCP server URL', detail: 'https://mcp.shipstatic.com/gpt (the /gpt path tags deploys via:gpt for analytics)' },
       { title: 'OAuth credentials', detail: 'None — endpoint is anonymous by design.' },
       { title: 'Tool(s) exposed', detail: 'Fifteen; deployments_upload needs no account and is what a reviewer exercises' },

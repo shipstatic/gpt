@@ -112,9 +112,9 @@ stance and takedown process: `policy/content-moderation.md`.
 
 ## Support contact
 
-`support@shipstatic.com`
+`hello@shipstatic.com`
 
-Confirmed via the live `https://shipstatic.com/terms` page. Privacy
-inquiries route to `privacy@shipstatic.com`; abuse reports route to
-`abuse@shipstatic.com`. All three aliases are operated by Enhanced
-SRL (Romania, EU), the data controller.
+Aligned with the support contact on `https://shipstatic.com/terms`.
+Privacy inquiries route to `privacy@shipstatic.com`; abuse reports
+route to `abuse@shipstatic.com`. All three addresses are operated by
+Enhanced SRL (Romania, EU), the data controller.

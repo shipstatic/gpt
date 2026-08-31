@@ -84,4 +84,4 @@ requires otherwise.
 
 ## Contact
 
-Questions? `support@shipstatic.com`.
+Questions? `hello@shipstatic.com`.
