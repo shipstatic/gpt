@@ -154,19 +154,85 @@ distinct.
 
 ---
 
+## 2026-09-12 — The listing is a snapshot, and it is part of the release
+
+**Decision:** treat OpenAI's published plugin as a PIN held by a registry
+we do not control. OpenAI's docs: "Published plugins with MCP use reviewed
+metadata snapshots. To change a remote snapshot, scan the MCP server,
+submit a new version for review, and publish the approved version." So a
+hosted MCP release is not done until the plugin is rescanned, resubmitted
+and republished, and the last step of the version bump workflow in
+`cloudflare/mcp/CLAUDE.md` now says so.
+
+**Why:** the directory was found serving a 1.0.0 snapshot (scanned before
+the door had OAuth) while the server reported 1.10.2. Every "Connect" in
+ChatGPT died inside ChatGPT for twelve days; the tails showed OpenAI never
+contacting us, which is exactly what a no-auth snapshot predicts.
+
+**Locks in:** `docs/submission-history.md` records every PUBLISH (its
+latest `Published` entry is what the directory serves); preflight reads
+it and reports the gap; `.github/workflows/ci.yml` runs preflight weekly
+and on push so a version flip in the other repo is noticed without a
+runbook step being remembered.
+
+---
+
+## 2026-09-12 — Authentication posture has two wire halves
+
+**Decision:** the "partial auth" posture (the server starts without
+authentication; individual tools prompt on demand) is stated ON THE WIRE,
+in the two places OpenAI's auth guide names, and the manifest's
+§Authentication describes exactly that: every tool declares
+`securitySchemes` (`noauth` + `oauth2` on `deployments_upload`, `oauth2`
+on the fourteen account tools), and a credential refusal on `/gpt` is an
+error result carrying `_meta["mcp/www_authenticate"]`. Preflight holds
+both, so a scan cannot be taken against a server that would repeat the
+1.0.0 record.
+
+**Why:** OpenAI: "Without both halves ChatGPT will not show the linking UI
+for that tool." Until 2026-09-12 the door emitted neither; it answered the
+MCP specification's HTTP 401, which Claude and Cursor act on and ChatGPT
+does not. The server-side design (a per-door challenge carrier, and a
+derived catalogue declaration) is `cloudflare/mcp/CLAUDE.md`, "The door
+model".
+
+**Resolves:** the old checklist line "OAuth credentials: None, endpoint is
+anonymous by design", which is plausibly how a no-auth record was born.
+
+---
+
+## 2026-09-12 — Vocabulary follows the vendor: plugin, not App
+
+**Decision:** this repo says plugin, plugin submission portal, Plugins
+Directory, MCP server URL, wherever it names OpenAI's things, because
+OpenAI renamed them (the `/apps-sdk/` docs redirect to `/plugins/`). The
+repo name `gpt` and the door `/gpt` are ours and stay.
+
+**Why:** the same rule the estate applies to Stripe's vocabulary: a
+synonym for a vendor's noun is a translation every reader has to hold.
+
+---
+
+## 2026-09-12 — Resolved: the first-submission prerequisites
+
+Org identity verification, Global data residency, and the submitter's
+permissions were open items for the first submission; that submission
+happened and 1.0.0 was published, so all three are satisfied. The
+`/privacy` and `/terms` updates shipped before the first submission too
+(`submission-history.md`, 2026-05-15). The checklist keeps the identity
+and permission checks as pre-portal reminders, since a role can change.
+
+---
+
 ## Pending decisions (require human input)
 
 The blocking ones flow through to `scripts/checklist.mjs` for the
 submission flow.
 
-- [ ] **OpenAI org identity verification** — Individual or Business
-      verification status in `https://platform.openai.com`. Unverified
-      orgs are auto-rejected.
-- [ ] **OpenAI project data residency** — must be Global, not EU.
-- [ ] **Submitting account permissions** — `api.apps.write` +
-      `api.apps.read`. Implicitly verified by being able to create
-      an App draft in the dashboard.
-- [ ] **Deploy updated `/privacy` and `/terms` pages** with the
-      anonymous-deploy disclosures from `policy/privacy.md` and
-      `policy/terms.md`. Until this happens, the live pages disclose
-      only the authenticated flow.
+- [ ] **Republish the plugin at the live version** — Scan Tools, submit
+      1.10.2, publish on approval, record a `Published` entry. Until then
+      the directory serves the 1.0.0 snapshot and ChatGPT cannot start a
+      sign-in.
+- [ ] **In-context screenshots for the sign-in flow** — the connected
+      flow now exists (account tools over OAuth); capture it once the
+      republished plugin can be added, for the next listing update.

@@ -1,15 +1,25 @@
 # Submission Manifest
 
-The text you'll paste into the OpenAI dashboard. Every dashboard field
-maps to a labelled section here — App name, descriptions, category,
-URLs, support contact, connector URL, version, tool surface, OAuth
-status. Edit here, not in the dashboard, so the next submission can
-diff against this file. `pnpm preflight` reads this file to verify
-that the Connector URL and Version match what's actually live.
+The text you'll paste into OpenAI's plugin submission portal (OpenAI
+renamed Apps to plugins in 2026-09; the portal, the directory and the
+docs all say plugin now, and so does this file). Every portal field maps
+to a labelled section here: plugin name, descriptions, category, URLs,
+support contact, MCP server URL, version, tool surface, authentication,
+release notes. Edit here, not in the portal, so the next submission can
+diff against this file. `pnpm preflight` reads this file to verify that
+the MCP server URL and Version match what's actually live, and that the
+live server carries both halves of the authentication posture below.
+
+**A published plugin is a SNAPSHOT.** OpenAI scans the MCP server when a
+version is submitted and serves that reviewed metadata to every user;
+it never reads the live `tools/list` again. So every change to the tool
+surface is invisible to ChatGPT users until the plugin is rescanned,
+resubmitted and republished. `docs/submission-history.md` records what
+OpenAI holds; preflight reports how far behind live it is.
 
 ---
 
-## App name
+## Plugin name
 
 ShipStatic
 
@@ -50,12 +60,14 @@ added.
 
 ---
 
-## Connector URL: `https://mcp.shipstatic.com/gpt`
+## MCP server URL: `https://mcp.shipstatic.com/gpt`
 
 The `/gpt` path is deliberately distinct from `/` so deploys tag
-`via: 'gpt'` for analytics. Same MCP server impl on both paths.
+`via: 'gpt'` for analytics, and so the server can answer a credential
+refusal in the shape OpenAI's hosts read. Same MCP server impl on both
+paths. URL type: Universal (one fixed URL for every user).
 
-## Version: `1.9.0`
+## Version: `1.10.2`
 
 Tracked by `cloudflare/mcp/src/version.ts` `VERSION` constant. The live
 endpoint reports this value on `initialize`. `pnpm preflight` enforces
@@ -75,17 +87,39 @@ Annotations below describe `deployments_upload`, the tool a reviewer runs:
   be left to expire)
 - `openWorldHint: true` — writes to publicly-visible internet state
 
-## OAuth credentials
+## Authentication: partial (the server starts without authentication; individual tools prompt on demand)
 
-**None are required, and none need to be issued to the review team.**
-Publishing — the App's whole purpose — works with no account at all, so a
-reviewer connects and deploys without credentials, MFA, or setup.
+**No demo credentials are required, and none need to be issued to the
+review team.** Publishing, the plugin's whole purpose, works with no
+account at all, so a reviewer connects and deploys without credentials,
+MFA, or setup.
 
-The endpoint does support OAuth for the account tools, and a client
-starts that flow itself from a `401` challenge; there is nothing for us
-to hand over, because registration is dynamic. Stated rather than
-omitted, because a reviewer who probes the other fourteen tools will
-meet that challenge and should not be surprised by it.
+The other fourteen tools need a connected ShipStatic account, and the
+server states that in the two places OpenAI's auth guide names, both of
+which Scan Tools imports:
+
+- **Every tool declares `securitySchemes`.** `deployments_upload` is
+  `noauth` + `oauth2` (works without an account, does more with one); the
+  fourteen account tools are `oauth2`.
+- **A refusal carries the sign-in.** Calling an account tool without a
+  credential answers an error result whose `_meta["mcp/www_authenticate"]`
+  names the authorization server, and ChatGPT opens its sign-in from it.
+
+Registration is dynamic (DCR), the authorization server is
+`https://api.shipstatic.com/auth`, and the protected-resource document is
+`https://mcp.shipstatic.com/.well-known/oauth-protected-resource/gpt`. A
+reviewer who signs in gets a magic link to the address they enter; nothing
+to hand over.
+
+## Release notes
+
+Paste for the version above, then keep this section current:
+
+> Update to 1.10.2. Since the published 1.0.0: account features over OAuth
+> (listing and managing deployments, custom domains with DNS guidance,
+> account details), optional expiry (`ttl`) on a deploy, build settings,
+> and per-tool authentication metadata so ChatGPT can offer sign-in only
+> where an account is needed. Anonymous deploys are unchanged.
 
 ---
 

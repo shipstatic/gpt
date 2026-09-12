@@ -1,0 +1,48 @@
+# The listing's clock.
+#
+# This repo holds no code: it holds the text pasted into OpenAI's plugin
+# submission portal, and `scripts/preflight.mjs` compares that text (and the
+# live `/gpt` door) to what the portal will scan. The live door moves in
+# ANOTHER repo (`cloudflare/mcp`), on its own cadence, and a published plugin
+# is a snapshot taken at scan time, so a release there makes this repo wrong
+# without anyone touching it. Twice that was found late: 2026-08-14 (manifest
+# 0.6.0 against live 1.2.0) and 2026-09-12 (the 09-07 convoy never ran the
+# runbook step; the directory was still serving a 1.0.0 snapshot taken before
+# the door had OAuth). A check that only runs when somebody is about to submit
+# is a check that runs once. So it runs on a schedule as well as on push.
+#
+# Tests-only, main-only: nothing here publishes anything, and the repo keeps
+# its `main`-only exemption from the development-branch model (root
+# CLAUDE.md, "Branch & CI Model"). GitHub-hosted on purpose: the checks reach
+# the public production door from an outside vantage point, the same reason
+# `edge-reachability.yml` stays hosted.
+#
+# No pnpm setup step: the manifest declares no dependencies and no
+# packageManager, and preflight is a plain Node script, so `node` runs it
+# directly. Adding pnpm here would install nothing and pin nothing.
+name: CI
+
+on:
+  push:
+    branches: [main]
+  schedule:
+    # Weekly, Monday 07:00 UTC: often enough that a flip is noticed within
+    # the week it happens, rare enough that the notice is not noise.
+    - cron: '0 7 * * 1'
+  workflow_dispatch:
+
+permissions: {}
+
+jobs:
+  preflight:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v7
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v7
+        with:
+          node-version: 22
+      - name: Preflight against production
+        run: node scripts/preflight.mjs
