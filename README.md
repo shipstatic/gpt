@@ -1,9 +1,12 @@
-# ShipStatic ChatGPT App — Submission Orchestration
+# ShipStatic ChatGPT plugin: submission orchestration
 
-This repo prepares everything we need to submit ShipStatic to the
-ChatGPT App directory. The actual submission happens on OpenAI's
-dashboard at `https://platform.openai.com/apps-manage` — this repo
-just makes sure we walk in with everything ready.
+This repo prepares everything we need to submit ShipStatic to OpenAI's
+Plugins Directory (OpenAI renamed Apps to plugins in 2026-09; the
+directory is shared by ChatGPT and Codex). The actual submission happens
+in OpenAI's plugin submission portal. This repo makes sure we walk in
+with everything ready, and it keeps watch afterwards: a published plugin
+is a snapshot of the live tool surface taken at scan time, so it goes
+stale every time the hosted MCP releases.
 
 ## Quick start
 
@@ -15,20 +18,21 @@ pnpm checklist    # See the human steps for the OpenAI dashboard
 ```
 
 Then open `manifest.md` and `tests/prompts.md` side-by-side with the
-dashboard. Every dashboard field maps to a labelled section in
-`manifest.md`; the dashboard's "test prompts" field gets each block
-from `tests/prompts.md`.
+portal. Every portal field maps to a labelled section in
+`manifest.md`; the portal's test-case fields get each block from
+`tests/prompts.md`.
 
 ## What lives where
 
 | Path | Purpose |
 |---|---|
-| `manifest.md` | Every text field the dashboard asks for — App name, descriptions, category, localization, URLs, support contact, connector URL, version, tool surface, OAuth status. |
+| `manifest.md` | Every text field the portal asks for: plugin name, descriptions, category, localization, URLs, support contact, MCP server URL, version, tool surface, authentication posture, release notes. |
 | `tests/prompts.md` | Test prompts with expected responses. OpenAI's review team runs these against the live App — they're reproducible test cases, not marketing examples. |
-| `policy/` | Drafts for `shipstatic.com/privacy`, `/terms`, and our content-moderation stance. The live pages exist; these drafts are proposed updates that add the anonymous-deploy disclosures. Publishing them happens in `web/www/` — separate engineering. |
+| `policy/` | Drafts for `shipstatic.com/privacy`, `/terms`, and our content-moderation stance. The live pages carry the anonymous-deploy disclosures since the first submission; the drafts stay as the record of what was added. |
 | `assets/` | App icon (multiple sizes) + widget screenshots. `assets/in-context/` is where the human drops conversation-screenshots captured from ChatGPT dev mode. |
-| `scripts/` | `preflight.mjs` runs every automated check against the live MCP and the policy URLs. `checklist.mjs` prints the human-only steps and pulls open decisions from `docs/decisions.md`. |
-| `docs/` | `decisions.md` is the canonical record of choices made and open. `submission-history.md` logs each submission's Case ID and reviewer feedback. |
+| `scripts/` | `preflight.mjs` runs every automated check against the live MCP and the policy URLs: the tool surface, both halves of the authentication posture, the manifest's pins, and how far the published snapshot is behind. `checklist.mjs` prints the human-only steps, reading the manifest's pins and the open decisions from `docs/decisions.md`. |
+| `docs/` | `decisions.md` is the canonical record of choices made and open. `submission-history.md` logs each submission and each PUBLISH; its latest `Published` entry is what the directory serves, and preflight reads it. |
+| `.github/workflows/ci.yml` | Preflight on every push and weekly on a schedule, against production. The clock that makes a stale snapshot loud without anyone remembering. |
 
 ## Why this shape
 
@@ -38,44 +42,61 @@ from `tests/prompts.md`.
   alternative for a different need, never as a bigger feature set. Both
   carry the same fifteen tools. We don't mention the hosted MCP's
   implementation repo, just the user-facing surface.
-- **Verify our half, don't automate theirs.** OpenAI's dashboard is
+- **Verify our half, don't automate theirs.** OpenAI's portal is
   interactive and changes faster than we can keep up with. Building
-  automation around the dashboard would be brittle. Building
-  automation around what we control — MCP health, policy URLs,
-  manifest correctness — is durable.
-- **`manifest.md` is the only place to edit dashboard copy.** Single
-  source. No copy in scripts, no copy in this README. The two scripts
-  read from `manifest.md` and `docs/decisions.md` to stay in sync.
+  automation around the portal would be brittle. Building automation
+  around what we control (MCP health, the auth posture on the wire,
+  policy URLs, manifest correctness) is durable.
+- **`manifest.md` is the only place to edit portal copy.** Single
+  source. No copy in scripts, no copy in this README. The checklist reads
+  the manifest's pins and the decisions file; it restates nothing (it
+  used to, and the restated version sat two releases stale).
 
-## When to run `pnpm preflight`
+## When `pnpm preflight` runs
 
-**Two moments, and the second one is why this heading exists.**
+**Three moments, and the third is why this heading exists.**
 
-1. **Before every submission** — the flow below opens with it.
+1. **Before every submission**: the flow below opens with it.
 2. **After every hosted MCP version flip**, which happens in the monorepo
    (`cloudflare/mcp/CLAUDE.md`, "Version bump workflow", step 6) rather
    than here. The manifest states a version and preflight compares it to
    what the live `/gpt` endpoint reports, so a release elsewhere makes
    this repo wrong without anyone touching it.
+3. **On a schedule**, weekly and on every push (`.github/workflows/ci.yml`),
+   against production. Moment 2 is a runbook step in another repo, and a
+   runbook step is a check that runs when somebody remembers: it was
+   missed on 2026-08-14 (manifest `0.6.0` against a live `1.2.0`) and
+   again on 2026-09-12, when the directory turned out to be serving a
+   `1.0.0` snapshot taken before the door had OAuth, so every "Connect" in
+   ChatGPT failed for twelve days. **A check that only runs when someone
+   is about to submit is a check that runs once.** The schedule is what
+   makes the drift loud.
 
-That second trigger was missing until 2026-08-14, and the cost was
-exactly what its absence predicts: the manifest read `0.6.0` against a
-live `1.2.0` and preflight had been red for however many releases it
-took, because nobody submits a listing between them. **A check that only
-runs when someone is about to submit is a check that runs once.**
+What preflight holds, beyond the manifest's pins: the tool surface and
+widget metadata a reviewer sees, **both halves of the authentication
+posture** OpenAI's scan imports (per-tool `securitySchemes`, and a
+credential refusal answered as an error result carrying
+`_meta["mcp/www_authenticate"]`), the resource document naming the
+authorization server's issuer exactly, and the gap between the latest
+`Published` entry in `docs/submission-history.md` and the live version
+(a notice, never a failure: being behind is the reason to submit).
 
 ## Submission flow
 
 1. **Run `pnpm preflight`.** All green = our half is ready. Any red
    blocks submission.
 2. **Run `pnpm checklist`.** This prints the human steps grouped as
-   *before opening the dashboard*, *in the dashboard*, and *after
-   clicking Submit*. Work through it top-to-bottom.
+   *before opening the portal*, *in the portal*, and *after clicking
+   Submit for Review*. Work through it top-to-bottom.
 3. **Open `manifest.md` + `tests/prompts.md`** side-by-side with the
-   dashboard. Paste each section into the matching dashboard field.
-4. **Click "Submit for review"** in the dashboard.
-5. **Record the Case ID** (from OpenAI's confirmation email) in
-   `docs/submission-history.md`.
+   portal. Paste each section into the matching portal field. **Scan
+   Tools, and read what it imported**: fifteen tools, sign-in optional on
+   `deployments_upload` and required on the other fourteen.
+4. **Click "Submit for Review"** in the portal.
+5. **Record the Case ID** in `docs/submission-history.md`.
+6. **After approval, publish from the portal**, and record a `Published`
+   entry. Until it is recorded, preflight keeps reporting the previous
+   snapshot as what the directory serves, which is the truth.
 
 ## Voice canon (verbatim phrases)
 
@@ -98,16 +119,16 @@ shelf life; one that states a NEED does not.**
 
 ## Out of scope (handled elsewhere)
 
-- Modifying the hosted MCP worker. The widget is final at v0.6.0.
-- Deploying the policy pages to `shipstatic.com` — that's `web/www/`
+- Modifying the hosted MCP worker (`cloudflare/mcp/`). What the portal
+  scans is decided there; this repo only checks it.
+- Deploying the policy pages to `shipstatic.com`: that is `web/www/`
   engineering, separate from this repo.
 - Stripping internal fields (`via`, `status`) from the Deployment
-  response — flagged in `docs/decisions.md` for the human; execution
-  would happen on the API side, not here.
+  response: resolved in `docs/decisions.md` (kept, they are functional).
 
 ---
 
-*This repo orchestrates the ChatGPT App submission. The live MCP is
+*This repo orchestrates the ChatGPT plugin submission. The live MCP is
 in production at `https://mcp.shipstatic.com` (`/gpt` for ChatGPT
-traffic). The widget is final at v0.6.0. Submission-ready pending the
+traffic). Submission-ready when `pnpm preflight` is green, pending the
 human-only items surfaced by `pnpm checklist`.*
