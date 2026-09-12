@@ -193,6 +193,59 @@ let liveTools = [];
     : fail('  Resource document / issuer', `authorization_servers[0]=${issuer} issuer=${as?.issuer}`);
 }
 
+// The catalogue's truth, as the 1.11.0 generation states it. Restated here
+// as a literal table because this repo imports nothing from the server; the
+// server's registry owns the values and this compares the live door to what
+// the listing promises a reviewer. A red here means the listing and the
+// door disagree, which is a stale snapshot waiting to happen.
+{
+  const read = { readOnlyHint: true, destructiveHint: false, openWorldHint: false };
+  const remove = { readOnlyHint: false, destructiveHint: true, idempotentHint: true, openWorldHint: true };
+  const expected = {
+    deployments_upload: { readOnlyHint: false, destructiveHint: false, openWorldHint: true },
+    deployments_list: read, deployments_get: read,
+    deployments_set: { readOnlyHint: false, destructiveHint: true, openWorldHint: false },
+    deployments_delete: remove,
+    domains_set: { readOnlyHint: false, destructiveHint: true, openWorldHint: true },
+    domains_list: read, domains_get: read, domains_records: read, domains_dns: read,
+    domains_share: read, domains_validate: read,
+    domains_verify: { readOnlyHint: false, destructiveHint: false, openWorldHint: true },
+    domains_delete: remove,
+    whoami: read,
+  };
+  const hints = (t) => {
+    const { title, ...rest } = t.annotations ?? {};
+    return JSON.stringify(rest, Object.keys(rest).sort());
+  };
+  const wrong = liveTools.filter((t) => hints(t) !== JSON.stringify(expected[t.name] ?? {}, Object.keys(expected[t.name] ?? {}).sort()));
+  wrong.length === 0 && liveTools.length === Object.keys(expected).length
+    ? pass('Every tool carries the hints the listing justifies (ten closed-world reads, four destructive, two idempotent removes)')
+    : fail('Tool hints', wrong.map((t) => `${t.name}=${hints(t)}`).join(' ') || `expected ${Object.keys(expected).length} tools, live ${liveTools.length}`);
+
+  // A description describes the tool; both listing reviews reject one that
+  // tells the model how to behave. The same phrase set the server's own
+  // suites sweep with.
+  const INSTRUCTS = /you must|always show|share the link|to the user|with the user/i;
+  const instructing = liveTools.filter((t) => INSTRUCTS.test(t.description ?? '')).map((t) => t.name);
+  instructing.length === 0
+    ? pass('No tool description instructs the model')
+    : fail('Instructing descriptions', instructing.join(', '));
+
+  // The /gpt upload collects no visitor password: OpenAI lists passwords
+  // among the data a plugin must not collect. Three places name the input
+  // and all three must be silent; the result's `password` boolean (a
+  // protection state, collected from nobody) is deliberately not checked.
+  const upload = liveTools.find((t) => t.name === EXPECTED_TOOL);
+  const inputs = Object.keys(upload?.inputSchema?.properties ?? {});
+  const { body: init } = await rpc('/gpt', 'initialize', {
+    protocolVersion: '2025-03-26', capabilities: {}, clientInfo: { name: 'preflight', version: '1' },
+  }, 6);
+  const instructions = init?.result?.instructions ?? '';
+  !inputs.includes('password') && !/password/i.test(upload?.description ?? '') && !/password/i.test(instructions)
+    ? pass('The /gpt upload collects no password (absent from its input, its description and the instructions)')
+    : fail('/gpt password', `inputs=${inputs.join(',')} description=${/password/i.test(upload?.description ?? '')} instructions=${/password/i.test(instructions)}`);
+}
+
 // ---------- 2. Policy URLs ----------
 section(`[2/3] Policy URLs on ${SITE.replace(/^https?:\/\//, '')}`);
 

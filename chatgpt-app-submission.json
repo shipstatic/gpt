@@ -17,43 +17,43 @@
       "justifications": {
         "read_only_justification": "Removes a deployment and its files from the connected account.",
         "open_world_justification": "Takes a publicly reachable site offline, which changes public internet state.",
-        "destructive_justification": "Permanently deletes the deployment and its files with no recovery; the tool description requires the model to confirm with the user first."
+        "destructive_justification": "Permanently deletes the deployment and its files with no recovery."
       }
     },
     "deployments_get": {
       "annotations": {
         "readOnlyHint": true,
-        "openWorldHint": true,
+        "openWorldHint": false,
         "destructiveHint": false
       },
       "justifications": {
         "read_only_justification": "Returns one deployment's details and changes nothing.",
-        "open_world_justification": "Reads from the public ShipStatic hosting platform, whose deployments are public internet state; the read itself changes nothing.",
-        "destructive_justification": "Retrieves a record only; nothing is deleted, overwritten or revoked."
+        "open_world_justification": "Reads from the connected ShipStatic account and nothing beyond it; the read changes no public state.",
+        "destructive_justification": "Retrieves records only; nothing is deleted, overwritten or revoked."
       }
     },
     "deployments_list": {
       "annotations": {
         "readOnlyHint": true,
-        "openWorldHint": true,
+        "openWorldHint": false,
         "destructiveHint": false
       },
       "justifications": {
         "read_only_justification": "Lists the connected account's deployments and changes nothing.",
-        "open_world_justification": "Reads from the public ShipStatic hosting platform, whose deployments are public internet state; the read itself changes nothing.",
+        "open_world_justification": "Reads from the connected ShipStatic account and nothing beyond it; the read changes no public state.",
         "destructive_justification": "Retrieves records only; nothing is deleted, overwritten or revoked."
       }
     },
     "deployments_set": {
       "annotations": {
         "readOnlyHint": false,
-        "openWorldHint": true,
-        "destructiveHint": false
+        "openWorldHint": false,
+        "destructiveHint": true
       },
       "justifications": {
         "read_only_justification": "Replaces the labels on one of the connected account's deployments.",
-        "open_world_justification": "Writes to the public ShipStatic hosting platform; labels are private account metadata and the served site is unchanged.",
-        "destructive_justification": "Changes organisational labels only; the deployment and its files are untouched and the labels can be set again."
+        "open_world_justification": "Labels are private account metadata; the served site and its public URL are unchanged.",
+        "destructive_justification": "Replaces the existing label set rather than adding to it, so a call can discard labels the user had set; the deployment and its files are untouched."
       }
     },
     "deployments_upload": {
@@ -77,54 +77,54 @@
       "justifications": {
         "read_only_justification": "Removes a custom domain from the connected account.",
         "open_world_justification": "Stops the public hostname from serving the site, which changes public internet state.",
-        "destructive_justification": "Permanently deletes the domain record; the tool description requires the model to confirm with the user first."
+        "destructive_justification": "Permanently deletes the domain record."
       }
     },
     "domains_dns": {
       "annotations": {
         "readOnlyHint": true,
-        "openWorldHint": true,
+        "openWorldHint": false,
         "destructiveHint": false
       },
       "justifications": {
-        "read_only_justification": "Looks up which DNS provider serves a domain and changes nothing.",
-        "open_world_justification": "Queries public DNS for the domain's provider; the lookup changes nothing.",
-        "destructive_justification": "Retrieves a lookup result only; nothing is deleted, overwritten or revoked."
+        "read_only_justification": "Returns the DNS provider ShipStatic recorded for the domain, if known, and changes nothing.",
+        "open_world_justification": "Reads a stored value from the connected account's domain record; nothing is looked up on call and nothing changes.",
+        "destructive_justification": "Retrieves records only; nothing is deleted, overwritten or revoked."
       }
     },
     "domains_get": {
       "annotations": {
         "readOnlyHint": true,
-        "openWorldHint": true,
+        "openWorldHint": false,
         "destructiveHint": false
       },
       "justifications": {
         "read_only_justification": "Returns one domain's details and changes nothing.",
-        "open_world_justification": "Reads from the public ShipStatic hosting platform, whose domains serve public sites; the read itself changes nothing.",
-        "destructive_justification": "Retrieves a record only; nothing is deleted, overwritten or revoked."
+        "open_world_justification": "Reads from the connected ShipStatic account and nothing beyond it; the read changes no public state.",
+        "destructive_justification": "Retrieves records only; nothing is deleted, overwritten or revoked."
       }
     },
     "domains_list": {
       "annotations": {
         "readOnlyHint": true,
-        "openWorldHint": true,
+        "openWorldHint": false,
         "destructiveHint": false
       },
       "justifications": {
         "read_only_justification": "Lists the connected account's domains and changes nothing.",
-        "open_world_justification": "Reads from the public ShipStatic hosting platform, whose domains serve public sites; the read itself changes nothing.",
+        "open_world_justification": "Reads from the connected ShipStatic account and nothing beyond it; the read changes no public state.",
         "destructive_justification": "Retrieves records only; nothing is deleted, overwritten or revoked."
       }
     },
     "domains_records": {
       "annotations": {
         "readOnlyHint": true,
-        "openWorldHint": true,
+        "openWorldHint": false,
         "destructiveHint": false
       },
       "justifications": {
-        "read_only_justification": "Returns the DNS records the user must configure at their DNS provider and changes nothing.",
-        "open_world_justification": "Reads from the public ShipStatic hosting platform; the records describe public DNS the user configures elsewhere, and the read changes nothing.",
+        "read_only_justification": "Returns the DNS records to configure at the domain's DNS provider and changes nothing.",
+        "open_world_justification": "Reads the connected account's domain record; the DNS records it returns are configured by the user elsewhere, and the read changes nothing.",
         "destructive_justification": "Retrieves records only; nothing is deleted, overwritten or revoked."
       }
     },
@@ -132,36 +132,36 @@
       "annotations": {
         "readOnlyHint": false,
         "openWorldHint": true,
-        "destructiveHint": false
+        "destructiveHint": true
       },
       "justifications": {
         "read_only_justification": "Creates a custom domain record or points an existing one at a different deployment in the connected account.",
         "open_world_justification": "Changes which site a public hostname serves once the user's DNS points at ShipStatic, which is public internet state.",
-        "destructive_justification": "Adds or re-points a domain; the previous deployment still exists and the domain can be pointed back."
+        "destructive_justification": "Re-pointing a domain replaces what that public hostname serves rather than adding to it; the previous deployment still exists and the domain can be pointed back."
       }
     },
     "domains_share": {
       "annotations": {
         "readOnlyHint": true,
-        "openWorldHint": true,
+        "openWorldHint": false,
         "destructiveHint": false
       },
       "justifications": {
         "read_only_justification": "Returns a shareable link to the domain's DNS setup page and changes nothing.",
-        "open_world_justification": "Reads from the public ShipStatic hosting platform; the link opens a public setup page and the read changes nothing.",
-        "destructive_justification": "Retrieves a link only; nothing is deleted, overwritten or revoked."
+        "open_world_justification": "Derives a link from the connected account's domain record; nothing is created and nothing changes.",
+        "destructive_justification": "Retrieves records only; nothing is deleted, overwritten or revoked."
       }
     },
     "domains_validate": {
       "annotations": {
         "readOnlyHint": true,
-        "openWorldHint": true,
+        "openWorldHint": false,
         "destructiveHint": false
       },
       "justifications": {
         "read_only_justification": "Checks whether a domain name is valid and available and changes nothing.",
-        "open_world_justification": "Reads from the public ShipStatic hosting platform to answer availability; the check changes nothing.",
-        "destructive_justification": "Retrieves a verdict only; nothing is deleted, overwritten or revoked."
+        "open_world_justification": "Answers from ShipStatic's own records; nothing is reserved and nothing changes.",
+        "destructive_justification": "Retrieves records only; nothing is deleted, overwritten or revoked."
       }
     },
     "domains_verify": {
@@ -179,12 +179,12 @@
     "whoami": {
       "annotations": {
         "readOnlyHint": true,
-        "openWorldHint": true,
+        "openWorldHint": false,
         "destructiveHint": false
       },
       "justifications": {
-        "read_only_justification": "Returns the connected account's email, plan and usage and changes nothing.",
-        "open_world_justification": "Reads from the public ShipStatic hosting platform; the account read changes nothing.",
+        "read_only_justification": "Returns the connected account's email, name, plan, current usage and plan caps, and changes nothing.",
+        "open_world_justification": "Reads from the connected ShipStatic account and nothing beyond it; the read changes no public state.",
         "destructive_justification": "Retrieves account details only; nothing is deleted, overwritten or revoked."
       }
     }
@@ -215,19 +215,19 @@
       "expected_output_url": null
     },
     {
-      "description": "Password-protected deploy. The model passes the password with the deploy and repeats it back to the user, since a password the user never sees locks them out. The card shows a lock chip and the site asks for the password before rendering.",
-      "user_prompt": "Deploy a one-page \"coming soon\" landing page and protect it with the password \"demo123\".",
+      "description": "Labels on a deploy. The model passes the two labels with the deploy call (labels are lowercase, 3 to 25 characters); the result lists them and the reply names them. No account is needed.",
+      "user_prompt": "Deploy a one-page \"coming soon\" placeholder and label the deployment \"draft\" and \"v1\".",
       "file_attachment_urls": null,
       "tools_triggered": "deployments_upload",
-      "expected_output": "A deploy card with a lock chip in its meta row, the password \"demo123\" confirmed in the reply, and a URL that prompts for the password before showing the page.",
+      "expected_output": "A deploy card for the placeholder page, and the reply confirms the deployment carries the labels draft and v1 (the tool result lists both under labels).",
       "expected_output_url": null
     },
     {
-      "description": "An account feature, exercising the sign-in the plugin offers on demand. Listing needs a connected ShipStatic account, so the first call prompts the user to connect; signing in sends a magic link to the address the reviewer enters (a free account is created on first sign-in). After connecting, the list returns.",
-      "user_prompt": "List my ShipStatic deployments.",
+      "description": "The anonymous lifetime and the claim link, explained. Without an account a deployment expires in 3 days unless claimed; the tool result carries a one-time claim URL and the server's instructions tell the model to show it. The reviewer sees the model relay both facts correctly.",
+      "user_prompt": "Deploy a page that says \"Keep me\" and explain how I can keep this site permanently.",
       "file_attachment_urls": null,
-      "tools_triggered": "deployments_list",
-      "expected_output": "Without a connected account, ChatGPT offers to connect ShipStatic and opens the sign-in. Once connected, the reply lists the account's deployments with their URLs (an empty list for a fresh account), and later deploys in the same conversation land in that account.",
+      "tools_triggered": "deployments_upload",
+      "expected_output": "A deploy card with the live URL and the claim link, and a reply that says the site expires in 3 days unless claimed and that opening the claim link (creating a free account if needed) keeps it permanently.",
       "expected_output_url": null
     }
   ],

@@ -80,3 +80,25 @@ Notes:
   in `oauthConsent` for the ChatGPT client, and a live tail showing
   OpenAI fetch `/.well-known/oauth-protected-resource/gpt` then the
   browser reach `/auth/oauth2/authorize`.
+
+## 2026-09-13 — v1.11.0 — Prepared
+
+**Case ID:** —
+**Submitted by:** —
+**Reviewer feedback:** —
+**Action taken:**
+- Supersedes the 1.10.2 `Prepared` entry above, which was never submitted:
+  the 1.11.0 catalogue landed on production the next day and the scan is
+  the listing, so the newer generation is what gets scanned.
+- What 1.11.0 changes for the reviewer: tool hints come from one registry
+  row per tool (ten closed-world reads, `deployments_set` and `domains_set`
+  destructive, only the two deletes idempotent); descriptions describe the
+  tools rather than instruct the model; `whoami` returns exactly email,
+  name, plan, usage and caps; the `/gpt` deploy takes no site password
+  (OpenAI's data rule); `Origin` is validated on every door.
+- No demo credentials, by OpenAI's own conditional rule
+  (`docs/decisions.md`, 2026-09-13); all five positive test cases are
+  anonymous. Preflight now asserts the full hint table, the absence of
+  instructing descriptions, and the password-free `/gpt` upload.
+- Preflight all green against production before the portal is opened;
+  `manifest.md` at 1.11.0. Flip this entry to `Submitted` with the Case ID.

@@ -1,5 +1,5 @@
 {
-  "$comment": "The review team runs these against the live plugin, so every positive case must reproducibly succeed and every negative case must reproducibly NOT invoke the plugin. Exactly five positive and three negative, the portal's minimum. `tools_triggered` is the exact MCP tool name. Descriptions and expected outputs are review-facing: what the reviewer sees, never how the server does it. Reviewer notes that used to live in a separate prompts file are folded into the descriptions here, because this file is what the portal imports.",
+  "$comment": "The review team runs these against the live plugin, so every positive case must reproducibly succeed and every negative case must reproducibly NOT invoke the plugin. Exactly five positive and three negative, the portal's minimum. Every positive case is ANONYMOUS by design: OpenAI asks for demo credentials only if the server requires sign-in, and this one does not, so no case needs an account, a fixture or a password (the /gpt deploy takes none). `tools_triggered` is the exact MCP tool name. Descriptions and expected outputs are review-facing: what the reviewer sees, never how the server does it.",
   "positive": [
     {
       "description": "Single-file deploy, the simplest path. The model writes one index.html and deploys it with no account, no confirmation gate and no setup; the deploy card renders inline. The screenshot tile may read \"Preview loading\" for up to about thirty seconds while the capture lands.",
@@ -20,16 +20,16 @@
       "expected_output": "A deploy card and the URL repeated in the reply. Fetching the URL returns HTML containing exactly <h1>Hello reviewer</h1> and <title>ShipStatic test</title>."
     },
     {
-      "description": "Password-protected deploy. The model passes the password with the deploy and repeats it back to the user, since a password the user never sees locks them out. The card shows a lock chip and the site asks for the password before rendering.",
-      "user_prompt": "Deploy a one-page \"coming soon\" landing page and protect it with the password \"demo123\".",
+      "description": "Labels on a deploy. The model passes the two labels with the deploy call (labels are lowercase, 3 to 25 characters); the result lists them and the reply names them. No account is needed.",
+      "user_prompt": "Deploy a one-page \"coming soon\" placeholder and label the deployment \"draft\" and \"v1\".",
       "tools_triggered": "deployments_upload",
-      "expected_output": "A deploy card with a lock chip in its meta row, the password \"demo123\" confirmed in the reply, and a URL that prompts for the password before showing the page."
+      "expected_output": "A deploy card for the placeholder page, and the reply confirms the deployment carries the labels draft and v1 (the tool result lists both under labels)."
     },
     {
-      "description": "An account feature, exercising the sign-in the plugin offers on demand. Listing needs a connected ShipStatic account, so the first call prompts the user to connect; signing in sends a magic link to the address the reviewer enters (a free account is created on first sign-in). After connecting, the list returns.",
-      "user_prompt": "List my ShipStatic deployments.",
-      "tools_triggered": "deployments_list",
-      "expected_output": "Without a connected account, ChatGPT offers to connect ShipStatic and opens the sign-in. Once connected, the reply lists the account's deployments with their URLs (an empty list for a fresh account), and later deploys in the same conversation land in that account."
+      "description": "The anonymous lifetime and the claim link, explained. Without an account a deployment expires in 3 days unless claimed; the tool result carries a one-time claim URL and the server's instructions tell the model to show it. The reviewer sees the model relay both facts correctly.",
+      "user_prompt": "Deploy a page that says \"Keep me\" and explain how I can keep this site permanently.",
+      "tools_triggered": "deployments_upload",
+      "expected_output": "A deploy card with the live URL and the claim link, and a reply that says the site expires in 3 days unless claimed and that opening the claim link (creating a free account if needed) keeps it permanently."
     }
   ],
   "negative": [

@@ -1,78 +1,213 @@
 {
-  "$comment": "One sentence per hint per tool, for the portal's justification fields. Each entry states the VALUE it justifies beside the sentence; `pnpm submission` reads the live catalogue and refuses to build if a live hint differs from the value written here, so a sentence can never justify a hint the server no longer declares. The MCP annotation classes are owned by @shipstatic/mcp (vocabulary.ts); this file explains them to a reviewer and owns nothing else.",
+  "$comment": "One sentence per hint per tool, for the portal's justification fields. Each entry states the VALUE it justifies beside the sentence; `pnpm submission` reads the live catalogue and refuses to build if a live hint differs from the value written here, so a sentence can never justify a hint the server no longer declares. The values are owned by the server's registry (@shipstatic/mcp, one row per tool: mutation × reach); this file explains them to a reviewer and owns nothing else.",
   "deployments_upload": {
-    "readOnlyHint": { "value": false, "why": "Creates a new deployment from the files the user provides and publishes it at a fresh URL." },
-    "openWorldHint": { "value": true, "why": "Publishes content to a publicly reachable shipstatic.com URL, which is public internet state." },
-    "destructiveHint": { "value": false, "why": "Only adds a new deployment; it never overwrites or removes an existing one, and an anonymous deployment simply expires." }
+    "readOnlyHint": {
+      "value": false,
+      "why": "Creates a new deployment from the files the user provides and publishes it at a fresh URL."
+    },
+    "openWorldHint": {
+      "value": true,
+      "why": "Publishes content to a publicly reachable shipstatic.com URL, which is public internet state."
+    },
+    "destructiveHint": {
+      "value": false,
+      "why": "Only adds a new deployment; it never overwrites or removes an existing one, and an anonymous deployment simply expires."
+    }
   },
   "deployments_list": {
-    "readOnlyHint": { "value": true, "why": "Lists the connected account's deployments and changes nothing." },
-    "openWorldHint": { "value": true, "why": "Reads from the public ShipStatic hosting platform, whose deployments are public internet state; the read itself changes nothing." },
-    "destructiveHint": { "value": false, "why": "Retrieves records only; nothing is deleted, overwritten or revoked." }
+    "readOnlyHint": {
+      "value": true,
+      "why": "Lists the connected account's deployments and changes nothing."
+    },
+    "openWorldHint": {
+      "value": false,
+      "why": "Reads from the connected ShipStatic account and nothing beyond it; the read changes no public state."
+    },
+    "destructiveHint": {
+      "value": false,
+      "why": "Retrieves records only; nothing is deleted, overwritten or revoked."
+    }
   },
   "deployments_get": {
-    "readOnlyHint": { "value": true, "why": "Returns one deployment's details and changes nothing." },
-    "openWorldHint": { "value": true, "why": "Reads from the public ShipStatic hosting platform, whose deployments are public internet state; the read itself changes nothing." },
-    "destructiveHint": { "value": false, "why": "Retrieves a record only; nothing is deleted, overwritten or revoked." }
+    "readOnlyHint": {
+      "value": true,
+      "why": "Returns one deployment's details and changes nothing."
+    },
+    "openWorldHint": {
+      "value": false,
+      "why": "Reads from the connected ShipStatic account and nothing beyond it; the read changes no public state."
+    },
+    "destructiveHint": {
+      "value": false,
+      "why": "Retrieves records only; nothing is deleted, overwritten or revoked."
+    }
   },
   "deployments_set": {
-    "readOnlyHint": { "value": false, "why": "Replaces the labels on one of the connected account's deployments." },
-    "openWorldHint": { "value": true, "why": "Writes to the public ShipStatic hosting platform; labels are private account metadata and the served site is unchanged." },
-    "destructiveHint": { "value": false, "why": "Changes organisational labels only; the deployment and its files are untouched and the labels can be set again." }
+    "readOnlyHint": {
+      "value": false,
+      "why": "Replaces the labels on one of the connected account's deployments."
+    },
+    "openWorldHint": {
+      "value": false,
+      "why": "Labels are private account metadata; the served site and its public URL are unchanged."
+    },
+    "destructiveHint": {
+      "value": true,
+      "why": "Replaces the existing label set rather than adding to it, so a call can discard labels the user had set; the deployment and its files are untouched."
+    }
   },
   "deployments_delete": {
-    "readOnlyHint": { "value": false, "why": "Removes a deployment and its files from the connected account." },
-    "openWorldHint": { "value": true, "why": "Takes a publicly reachable site offline, which changes public internet state." },
-    "destructiveHint": { "value": true, "why": "Permanently deletes the deployment and its files with no recovery; the tool description requires the model to confirm with the user first." }
+    "readOnlyHint": {
+      "value": false,
+      "why": "Removes a deployment and its files from the connected account."
+    },
+    "openWorldHint": {
+      "value": true,
+      "why": "Takes a publicly reachable site offline, which changes public internet state."
+    },
+    "destructiveHint": {
+      "value": true,
+      "why": "Permanently deletes the deployment and its files with no recovery."
+    }
   },
   "domains_set": {
-    "readOnlyHint": { "value": false, "why": "Creates a custom domain record or points an existing one at a different deployment in the connected account." },
-    "openWorldHint": { "value": true, "why": "Changes which site a public hostname serves once the user's DNS points at ShipStatic, which is public internet state." },
-    "destructiveHint": { "value": false, "why": "Adds or re-points a domain; the previous deployment still exists and the domain can be pointed back." }
+    "readOnlyHint": {
+      "value": false,
+      "why": "Creates a custom domain record or points an existing one at a different deployment in the connected account."
+    },
+    "openWorldHint": {
+      "value": true,
+      "why": "Changes which site a public hostname serves once the user's DNS points at ShipStatic, which is public internet state."
+    },
+    "destructiveHint": {
+      "value": true,
+      "why": "Re-pointing a domain replaces what that public hostname serves rather than adding to it; the previous deployment still exists and the domain can be pointed back."
+    }
   },
   "domains_list": {
-    "readOnlyHint": { "value": true, "why": "Lists the connected account's domains and changes nothing." },
-    "openWorldHint": { "value": true, "why": "Reads from the public ShipStatic hosting platform, whose domains serve public sites; the read itself changes nothing." },
-    "destructiveHint": { "value": false, "why": "Retrieves records only; nothing is deleted, overwritten or revoked." }
+    "readOnlyHint": {
+      "value": true,
+      "why": "Lists the connected account's domains and changes nothing."
+    },
+    "openWorldHint": {
+      "value": false,
+      "why": "Reads from the connected ShipStatic account and nothing beyond it; the read changes no public state."
+    },
+    "destructiveHint": {
+      "value": false,
+      "why": "Retrieves records only; nothing is deleted, overwritten or revoked."
+    }
   },
   "domains_get": {
-    "readOnlyHint": { "value": true, "why": "Returns one domain's details and changes nothing." },
-    "openWorldHint": { "value": true, "why": "Reads from the public ShipStatic hosting platform, whose domains serve public sites; the read itself changes nothing." },
-    "destructiveHint": { "value": false, "why": "Retrieves a record only; nothing is deleted, overwritten or revoked." }
+    "readOnlyHint": {
+      "value": true,
+      "why": "Returns one domain's details and changes nothing."
+    },
+    "openWorldHint": {
+      "value": false,
+      "why": "Reads from the connected ShipStatic account and nothing beyond it; the read changes no public state."
+    },
+    "destructiveHint": {
+      "value": false,
+      "why": "Retrieves records only; nothing is deleted, overwritten or revoked."
+    }
   },
   "domains_records": {
-    "readOnlyHint": { "value": true, "why": "Returns the DNS records the user must configure at their DNS provider and changes nothing." },
-    "openWorldHint": { "value": true, "why": "Reads from the public ShipStatic hosting platform; the records describe public DNS the user configures elsewhere, and the read changes nothing." },
-    "destructiveHint": { "value": false, "why": "Retrieves records only; nothing is deleted, overwritten or revoked." }
+    "readOnlyHint": {
+      "value": true,
+      "why": "Returns the DNS records to configure at the domain's DNS provider and changes nothing."
+    },
+    "openWorldHint": {
+      "value": false,
+      "why": "Reads the connected account's domain record; the DNS records it returns are configured by the user elsewhere, and the read changes nothing."
+    },
+    "destructiveHint": {
+      "value": false,
+      "why": "Retrieves records only; nothing is deleted, overwritten or revoked."
+    }
   },
   "domains_dns": {
-    "readOnlyHint": { "value": true, "why": "Looks up which DNS provider serves a domain and changes nothing." },
-    "openWorldHint": { "value": true, "why": "Queries public DNS for the domain's provider; the lookup changes nothing." },
-    "destructiveHint": { "value": false, "why": "Retrieves a lookup result only; nothing is deleted, overwritten or revoked." }
+    "readOnlyHint": {
+      "value": true,
+      "why": "Returns the DNS provider ShipStatic recorded for the domain, if known, and changes nothing."
+    },
+    "openWorldHint": {
+      "value": false,
+      "why": "Reads a stored value from the connected account's domain record; nothing is looked up on call and nothing changes."
+    },
+    "destructiveHint": {
+      "value": false,
+      "why": "Retrieves records only; nothing is deleted, overwritten or revoked."
+    }
   },
   "domains_share": {
-    "readOnlyHint": { "value": true, "why": "Returns a shareable link to the domain's DNS setup page and changes nothing." },
-    "openWorldHint": { "value": true, "why": "Reads from the public ShipStatic hosting platform; the link opens a public setup page and the read changes nothing." },
-    "destructiveHint": { "value": false, "why": "Retrieves a link only; nothing is deleted, overwritten or revoked." }
+    "readOnlyHint": {
+      "value": true,
+      "why": "Returns a shareable link to the domain's DNS setup page and changes nothing."
+    },
+    "openWorldHint": {
+      "value": false,
+      "why": "Derives a link from the connected account's domain record; nothing is created and nothing changes."
+    },
+    "destructiveHint": {
+      "value": false,
+      "why": "Retrieves records only; nothing is deleted, overwritten or revoked."
+    }
   },
   "domains_validate": {
-    "readOnlyHint": { "value": true, "why": "Checks whether a domain name is valid and available and changes nothing." },
-    "openWorldHint": { "value": true, "why": "Reads from the public ShipStatic hosting platform to answer availability; the check changes nothing." },
-    "destructiveHint": { "value": false, "why": "Retrieves a verdict only; nothing is deleted, overwritten or revoked." }
+    "readOnlyHint": {
+      "value": true,
+      "why": "Checks whether a domain name is valid and available and changes nothing."
+    },
+    "openWorldHint": {
+      "value": false,
+      "why": "Answers from ShipStatic's own records; nothing is reserved and nothing changes."
+    },
+    "destructiveHint": {
+      "value": false,
+      "why": "Retrieves records only; nothing is deleted, overwritten or revoked."
+    }
   },
   "domains_verify": {
-    "readOnlyHint": { "value": false, "why": "Queues a DNS verification for the domain, which can move it to verified and start serving the linked site." },
-    "openWorldHint": { "value": true, "why": "A successful verification puts the site live on the user's public hostname, which is public internet state." },
-    "destructiveHint": { "value": false, "why": "Only checks DNS the user configured and activates the domain; nothing is deleted or overwritten." }
+    "readOnlyHint": {
+      "value": false,
+      "why": "Queues a DNS verification for the domain, which can move it to verified and start serving the linked site."
+    },
+    "openWorldHint": {
+      "value": true,
+      "why": "A successful verification puts the site live on the user's public hostname, which is public internet state."
+    },
+    "destructiveHint": {
+      "value": false,
+      "why": "Only checks DNS the user configured and activates the domain; nothing is deleted or overwritten."
+    }
   },
   "domains_delete": {
-    "readOnlyHint": { "value": false, "why": "Removes a custom domain from the connected account." },
-    "openWorldHint": { "value": true, "why": "Stops the public hostname from serving the site, which changes public internet state." },
-    "destructiveHint": { "value": true, "why": "Permanently deletes the domain record; the tool description requires the model to confirm with the user first." }
+    "readOnlyHint": {
+      "value": false,
+      "why": "Removes a custom domain from the connected account."
+    },
+    "openWorldHint": {
+      "value": true,
+      "why": "Stops the public hostname from serving the site, which changes public internet state."
+    },
+    "destructiveHint": {
+      "value": true,
+      "why": "Permanently deletes the domain record."
+    }
   },
   "whoami": {
-    "readOnlyHint": { "value": true, "why": "Returns the connected account's email, plan and usage and changes nothing." },
-    "openWorldHint": { "value": true, "why": "Reads from the public ShipStatic hosting platform; the account read changes nothing." },
-    "destructiveHint": { "value": false, "why": "Retrieves account details only; nothing is deleted, overwritten or revoked." }
+    "readOnlyHint": {
+      "value": true,
+      "why": "Returns the connected account's email, name, plan, current usage and plan caps, and changes nothing."
+    },
+    "openWorldHint": {
+      "value": false,
+      "why": "Reads from the connected ShipStatic account and nothing beyond it; the read changes no public state."
+    },
+    "destructiveHint": {
+      "value": false,
+      "why": "Retrieves account details only; nothing is deleted, overwritten or revoked."
+    }
   }
 }
