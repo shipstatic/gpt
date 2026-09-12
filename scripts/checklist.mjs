@@ -92,7 +92,7 @@ const PHASES = [
   },
   {
     when: 'In the plugin submission portal',
-    why:  'Open the plugin, or create one "With MCP". For each item below, paste from the matching section in manifest.md or upload the matching asset.',
+    why:  'Open the plugin, or create one "With MCP". Import chatgpt-app-submission.json where the form offers it; for everything else, paste from the matching section in manifest.md or upload the matching asset.',
     items: [
       { title: 'Plugin name', detail: 'manifest.md → §Plugin name' },
       { title: 'Logo', detail: 'Upload assets/icon-1024.png (the 1024×1024 master). assets/icon-480.png is for the MCP Registry, not this submission.' },
@@ -107,7 +107,7 @@ const PHASES = [
       { title: 'Version', detail: `${pins.version} (manifest.md → §Version, held to the live server by preflight)` },
       { title: 'Release notes', detail: 'manifest.md → §Release notes' },
       { title: 'Screenshots', detail: 'Upload assets/widget-light.png, assets/widget-dark.png, plus the in-context captures from assets/in-context/' },
-      { title: 'Test cases', detail: 'tests/prompts.md: five positive and three negative. The review team runs these against the live plugin; they must reproducibly succeed.' },
+      { title: 'Import chatgpt-app-submission.json', detail: 'Built by pnpm submission (preflight refuses a stale one). It fills App Info, every tool\'s hint justifications, and the five positive and three negative test cases. Review what it filled; the review team runs the cases against the live plugin.' },
     ],
   },
   {

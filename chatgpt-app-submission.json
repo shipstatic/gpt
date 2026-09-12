@@ -1,0 +1,260 @@
+{
+  "$schema": "https://developers.openai.com/plugins/schemas/chatgpt-app-submission.v1.json",
+  "schema_version": 1,
+  "app_info": {
+    "display_name": "ShipStatic",
+    "subtitle": "Deploy static sites instantly",
+    "description": "One URL. Your agent ships.\n\nAsk ChatGPT to build something for the web (a landing page, a\nportfolio, a single-file demo, a generated doc) and this plugin\npublishes it instantly. You get a real `*.shipstatic.com` URL you\ncan share immediately.\n\nFree and anonymous: no install, no signup, no API key, with 3 days\nto claim ownership and keep the site permanently. Connect a\nShipStatic account when you want the rest: custom domains, listing\neverything you have published, and sites that never expire. The\nplugin starts that sign-in for you.",
+    "category": "DEVELOPER_TOOLS"
+  },
+  "tools": {
+    "deployments_delete": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": true,
+        "destructiveHint": true
+      },
+      "justifications": {
+        "read_only_justification": "Removes a deployment and its files from the connected account.",
+        "open_world_justification": "Takes a publicly reachable site offline, which changes public internet state.",
+        "destructive_justification": "Permanently deletes the deployment and its files with no recovery; the tool description requires the model to confirm with the user first."
+      }
+    },
+    "deployments_get": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Returns one deployment's details and changes nothing.",
+        "open_world_justification": "Reads from the public ShipStatic hosting platform, whose deployments are public internet state; the read itself changes nothing.",
+        "destructive_justification": "Retrieves a record only; nothing is deleted, overwritten or revoked."
+      }
+    },
+    "deployments_list": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Lists the connected account's deployments and changes nothing.",
+        "open_world_justification": "Reads from the public ShipStatic hosting platform, whose deployments are public internet state; the read itself changes nothing.",
+        "destructive_justification": "Retrieves records only; nothing is deleted, overwritten or revoked."
+      }
+    },
+    "deployments_set": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Replaces the labels on one of the connected account's deployments.",
+        "open_world_justification": "Writes to the public ShipStatic hosting platform; labels are private account metadata and the served site is unchanged.",
+        "destructive_justification": "Changes organisational labels only; the deployment and its files are untouched and the labels can be set again."
+      }
+    },
+    "deployments_upload": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Creates a new deployment from the files the user provides and publishes it at a fresh URL.",
+        "open_world_justification": "Publishes content to a publicly reachable shipstatic.com URL, which is public internet state.",
+        "destructive_justification": "Only adds a new deployment; it never overwrites or removes an existing one, and an anonymous deployment simply expires."
+      }
+    },
+    "domains_delete": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": true,
+        "destructiveHint": true
+      },
+      "justifications": {
+        "read_only_justification": "Removes a custom domain from the connected account.",
+        "open_world_justification": "Stops the public hostname from serving the site, which changes public internet state.",
+        "destructive_justification": "Permanently deletes the domain record; the tool description requires the model to confirm with the user first."
+      }
+    },
+    "domains_dns": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Looks up which DNS provider serves a domain and changes nothing.",
+        "open_world_justification": "Queries public DNS for the domain's provider; the lookup changes nothing.",
+        "destructive_justification": "Retrieves a lookup result only; nothing is deleted, overwritten or revoked."
+      }
+    },
+    "domains_get": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Returns one domain's details and changes nothing.",
+        "open_world_justification": "Reads from the public ShipStatic hosting platform, whose domains serve public sites; the read itself changes nothing.",
+        "destructive_justification": "Retrieves a record only; nothing is deleted, overwritten or revoked."
+      }
+    },
+    "domains_list": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Lists the connected account's domains and changes nothing.",
+        "open_world_justification": "Reads from the public ShipStatic hosting platform, whose domains serve public sites; the read itself changes nothing.",
+        "destructive_justification": "Retrieves records only; nothing is deleted, overwritten or revoked."
+      }
+    },
+    "domains_records": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Returns the DNS records the user must configure at their DNS provider and changes nothing.",
+        "open_world_justification": "Reads from the public ShipStatic hosting platform; the records describe public DNS the user configures elsewhere, and the read changes nothing.",
+        "destructive_justification": "Retrieves records only; nothing is deleted, overwritten or revoked."
+      }
+    },
+    "domains_set": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Creates a custom domain record or points an existing one at a different deployment in the connected account.",
+        "open_world_justification": "Changes which site a public hostname serves once the user's DNS points at ShipStatic, which is public internet state.",
+        "destructive_justification": "Adds or re-points a domain; the previous deployment still exists and the domain can be pointed back."
+      }
+    },
+    "domains_share": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Returns a shareable link to the domain's DNS setup page and changes nothing.",
+        "open_world_justification": "Reads from the public ShipStatic hosting platform; the link opens a public setup page and the read changes nothing.",
+        "destructive_justification": "Retrieves a link only; nothing is deleted, overwritten or revoked."
+      }
+    },
+    "domains_validate": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Checks whether a domain name is valid and available and changes nothing.",
+        "open_world_justification": "Reads from the public ShipStatic hosting platform to answer availability; the check changes nothing.",
+        "destructive_justification": "Retrieves a verdict only; nothing is deleted, overwritten or revoked."
+      }
+    },
+    "domains_verify": {
+      "annotations": {
+        "readOnlyHint": false,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Queues a DNS verification for the domain, which can move it to verified and start serving the linked site.",
+        "open_world_justification": "A successful verification puts the site live on the user's public hostname, which is public internet state.",
+        "destructive_justification": "Only checks DNS the user configured and activates the domain; nothing is deleted or overwritten."
+      }
+    },
+    "whoami": {
+      "annotations": {
+        "readOnlyHint": true,
+        "openWorldHint": true,
+        "destructiveHint": false
+      },
+      "justifications": {
+        "read_only_justification": "Returns the connected account's email, plan and usage and changes nothing.",
+        "open_world_justification": "Reads from the public ShipStatic hosting platform; the account read changes nothing.",
+        "destructive_justification": "Retrieves account details only; nothing is deleted, overwritten or revoked."
+      }
+    }
+  },
+  "test_cases": [
+    {
+      "description": "Single-file deploy, the simplest path. The model writes one index.html and deploys it with no account, no confirmation gate and no setup; the deploy card renders inline. The screenshot tile may read \"Preview loading\" for up to about thirty seconds while the capture lands.",
+      "user_prompt": "Deploy a single-page website that says \"Hello world\" in big bold text.",
+      "file_attachment_urls": null,
+      "tools_triggered": "deployments_upload",
+      "expected_output": "A deploy card with a live *.shipstatic.com URL, \"1 file\" and a small byte count, a screenshot of the page, and a \"Claim to keep forever\" link. Opening the URL shows the Hello world page.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Multi-file site with cross-links. The model generates index.html, styles.css and about.html and sends all three in ONE deploy call; the stylesheet applies and the about link works on the live site.",
+      "user_prompt": "Build me a landing page for a fictional coffee shop called \"Blackbird Coffee\" with an index.html, a styles.css file, and a small about.html page. Deploy it.",
+      "file_attachment_urls": null,
+      "tools_triggered": "deployments_upload",
+      "expected_output": "A deploy card showing \"3 files\". The URL opens a styled landing page and its About link opens /about.html.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Deterministic content the reviewer can verify with a single fetch of the URL. The model must use the exact heading and title text and must echo the deployment URL in its reply.",
+      "user_prompt": "Deploy an HTML page whose <h1> reads exactly \"Hello reviewer\" and whose <title> reads \"ShipStatic test\". Then tell me the URL.",
+      "file_attachment_urls": null,
+      "tools_triggered": "deployments_upload",
+      "expected_output": "A deploy card and the URL repeated in the reply. Fetching the URL returns HTML containing exactly <h1>Hello reviewer</h1> and <title>ShipStatic test</title>.",
+      "expected_output_url": null
+    },
+    {
+      "description": "Password-protected deploy. The model passes the password with the deploy and repeats it back to the user, since a password the user never sees locks them out. The card shows a lock chip and the site asks for the password before rendering.",
+      "user_prompt": "Deploy a one-page \"coming soon\" landing page and protect it with the password \"demo123\".",
+      "file_attachment_urls": null,
+      "tools_triggered": "deployments_upload",
+      "expected_output": "A deploy card with a lock chip in its meta row, the password \"demo123\" confirmed in the reply, and a URL that prompts for the password before showing the page.",
+      "expected_output_url": null
+    },
+    {
+      "description": "An account feature, exercising the sign-in the plugin offers on demand. Listing needs a connected ShipStatic account, so the first call prompts the user to connect; signing in sends a magic link to the address the reviewer enters (a free account is created on first sign-in). After connecting, the list returns.",
+      "user_prompt": "List my ShipStatic deployments.",
+      "file_attachment_urls": null,
+      "tools_triggered": "deployments_list",
+      "expected_output": "Without a connected account, ChatGPT offers to connect ShipStatic and opens the sign-in. Once connected, the reply lists the account's deployments with their URLs (an empty list for a fresh account), and later deploys in the same conversation land in that account.",
+      "expected_output_url": null
+    }
+  ],
+  "negative_test_cases": [
+    {
+      "description": "An unrelated productivity request. Nothing about publishing a site; the plugin must not be invoked.",
+      "user_prompt": "What meetings do I have tomorrow?",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "ChatGPT answers from its own tools or says it cannot see a calendar. ShipStatic is not called and no deploy card appears.",
+      "expected_output_url": null
+    },
+    {
+      "description": "A nearby question that needs an explanation, not a deployment. The plugin's domain tools return DNS records for a domain the user owns on ShipStatic; a general question about DNS should be answered in prose without calling them.",
+      "user_prompt": "Can you explain what a CNAME record is and how it differs from an A record?",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "A plain explanation of the two record types. No ShipStatic tool is called and nothing is deployed.",
+      "expected_output_url": null
+    },
+    {
+      "description": "A hosting request the plugin cannot serve. ShipStatic hosts static sites only; a server process is out of scope, so the model should say so rather than deploy something that cannot run.",
+      "user_prompt": "Deploy my Node.js Express API server with its PostgreSQL database so it runs 24/7.",
+      "file_attachment_urls": null,
+      "tools_triggered": null,
+      "expected_output": "ChatGPT explains that ShipStatic hosts static sites (HTML, CSS, JavaScript and assets) and cannot run a server or a database, and suggests what would fit instead. No deploy is attempted and no card appears.",
+      "expected_output_url": null
+    }
+  ]
+}
