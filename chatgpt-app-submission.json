@@ -215,11 +215,11 @@
       "expected_output_url": null
     },
     {
-      "description": "Labels on a deploy. The model passes the two labels with the deploy call (labels are lowercase, 3 to 25 characters); the result lists them and the reply names them. No account is needed.",
-      "user_prompt": "Deploy a one-page \"coming soon\" placeholder and label the deployment \"draft\" and \"v1\".",
+      "description": "Password-protected deploy. The password option locks the published site behind a visitor unlock prompt; it is a setting for the site being published, not a credential of the reviewer's. The model passes it with the deploy and repeats it back, since a password the user never sees locks them out. The card shows a lock chip and the site asks for the password before rendering.",
+      "user_prompt": "Deploy a one-page \"coming soon\" landing page and protect it with the password \"demo123\".",
       "file_attachment_urls": null,
       "tools_triggered": "deployments_upload",
-      "expected_output": "A deploy card for the placeholder page, and the reply confirms the deployment carries the labels draft and v1 (the tool result lists both under labels).",
+      "expected_output": "A deploy card with a lock chip in its meta row, the password \"demo123\" confirmed in the reply, and a URL that prompts for the password before showing the page.",
       "expected_output_url": null
     },
     {
