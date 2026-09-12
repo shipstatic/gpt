@@ -14,6 +14,7 @@
 import { readFile } from 'node:fs/promises';
 import { fileURLToPath } from 'node:url';
 import { dirname, join } from 'node:path';
+import { buildSubmission, readSubmissionInputs, renderSubmission, SUBMISSION_FILE } from './lib/submission.mjs';
 
 const MCP = process.env.PREFLIGHT_MCP ?? process.env.PREFLIGHT_HOST ?? 'https://mcp.shipstatic.com';
 const SITE = process.env.PREFLIGHT_SITE ?? 'https://shipstatic.com';
@@ -62,6 +63,7 @@ async function rpc(path, method, params, id = 1) {
 }
 
 let liveVersion = null;
+let liveTools = [];
 {
   const { res, body } = await rpc('/gpt', 'initialize', {
     protocolVersion: '2025-03-26',
@@ -157,6 +159,7 @@ let liveVersion = null;
 {
   const { body } = await rpc('/gpt', 'tools/list', undefined, 4);
   const tools = body?.result?.tools ?? [];
+  liveTools = tools;
   const schemes = (t) => (t.securitySchemes ?? []).map((s) => s.type).join('+');
   const upload = tools.find((t) => t.name === EXPECTED_TOOL);
   schemes(upload) === 'noauth+oauth2'
@@ -229,6 +232,22 @@ try {
     : fail('Version in manifest.md', versionMatch ? `${versionMatch[1]} ≠ live ${liveVersion}` : 'header missing or malformed — expected "## Version: `<x.y.z>`"');
 } catch (err) {
   fail('manifest.md read', String(err.message));
+}
+
+// The portal's import file is DERIVED (scripts/lib/submission.mjs) and
+// committed, so the diff between submissions is the review record. A
+// committed file that is not the current build would hand the portal a
+// stale restatement of the hints or the copy, which is the drift the
+// derivation exists to end. The build itself refuses a justification that
+// names a hint the live server no longer declares.
+try {
+  const fresh = renderSubmission(buildSubmission(await readSubmissionInputs(), liveTools));
+  const committed = await readFile(SUBMISSION_FILE, 'utf8').catch(() => null);
+  committed === fresh
+    ? pass('chatgpt-app-submission.json is the current build (manifest, live hints, justifications, test cases)')
+    : fail('chatgpt-app-submission.json', committed === null ? 'missing; run pnpm submission' : 'stale; run pnpm submission and commit the result');
+} catch (err) {
+  fail('chatgpt-app-submission.json build', String(err.message));
 }
 
 // What OpenAI HOLDS, against what is live. A published plugin is a snapshot

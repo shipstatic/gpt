@@ -224,6 +224,52 @@ and permission checks as pre-portal reminders, since a role can change.
 
 ---
 
+## 2026-09-12 — The portal's import file is built, never drafted
+
+**Decision:** `chatgpt-app-submission.json` (the file the portal imports to
+fill App Info, tool hint justifications and test cases) is DERIVED by
+`pnpm submission` from the manifest's pinned headers, the live catalogue's
+three hints per tool, `submission/justifications.json` and
+`submission/test-cases.json`, and committed. OpenAI's Codex skill that
+drafts the same file from the source tree is not used.
+
+**Why:** the skill's output is a fourth copy of the tool hints kept in sync
+by review. Deriving it makes the hints impossible to misstate (the build
+refuses a justification bound to a value the live server no longer
+declares) and makes the copy impossible to stage stale (preflight refuses a
+committed file that is not the current build). The prose prompts file this
+replaced restated the test cases in a shape nothing could check.
+
+**Locks in:** the justification sentences and test cases are owned in
+`submission/`; App Info fields are owned by `manifest.md`; hints are owned
+by `@shipstatic/mcp` and read live.
+
+---
+
+## 2026-09-12 — Deferred: a plugin skill
+
+**Decision:** this submission is MCP-only; it carries no skill. The portal
+imports skills either as an uploaded bundle or from the MCP server through
+the draft SEP-2640 skills extension (`io.modelcontextprotocol/skills`,
+`skills/list`, `skills/get`, per-resource digests), which the hosted MCP
+does not implement.
+
+**Why:** a plugin skill is the workflow layer OVER the MCP tools (when to
+call them, in what order, what the answer should contain). The estate's
+existing `SKILL.md` (`npm/ship`, mirrored in the Gemini plugin) is a
+different artifact: it teaches an agent to run the `ship` CLI, which
+ChatGPT cannot do, so it must not be uploaded here. MCP-only plugins are
+listed in the directory, and the server's `initialize` instructions already
+carry the deploy and domain workflows the model needs.
+
+**Expiry event:** a measured need for a ChatGPT-specific workflow the
+instructions do not cover (a review note, or a user pattern the tool
+descriptions cannot express). Then: author the skill over the MCP tools
+and expose it from the hosted server through the extension, so it is
+versioned and scanned with the server rather than uploaded by hand.
+
+---
+
 ## Pending decisions (require human input)
 
 The blocking ones flow through to `scripts/checklist.mjs` for the

@@ -1,11 +1,12 @@
 {
   "name": "@shipstatic/gpt-submission",
   "private": true,
-  "description": "ShipStatic ChatGPT App — submission orchestration. The App version itself is tracked by cloudflare/mcp/src/version.ts; this package is internal tooling and is intentionally version-less.",
+  "description": "ShipStatic ChatGPT plugin: submission orchestration. The plugin version itself is tracked by cloudflare/mcp/src/version.ts; this package is internal tooling and is intentionally version-less.",
   "type": "module",
   "scripts": {
     "preflight": "node scripts/preflight.mjs",
-    "checklist": "node scripts/checklist.mjs"
+    "checklist": "node scripts/checklist.mjs",
+    "submission": "node scripts/submission.mjs"
   },
   "license": "MIT"
 }

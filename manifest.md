@@ -9,6 +9,9 @@ release notes. Edit here, not in the portal, so the next submission can
 diff against this file. `pnpm preflight` reads this file to verify that
 the MCP server URL and Version match what's actually live, and that the
 live server carries both halves of the authentication posture below.
+`pnpm submission` derives `chatgpt-app-submission.json`, the file the
+portal imports, from the pinned headers here, the live catalogue, and the
+two data files under `submission/`.
 
 **A published plugin is a SNAPSHOT.** OpenAI scans the MCP server when a
 version is submitted and serves that reviewed metadata to every user;
@@ -23,6 +26,11 @@ OpenAI holds; preflight reports how far behind live it is.
 
 ShipStatic
 
+## Subtitle: `Deploy static sites instantly`
+
+The portal's subtitle field (30 characters or fewer): one functional
+phrase, not marketing copy. Read by `pnpm submission`.
+
 ## Short description
 
 Deploy static websites instantly. No account, no API key, no setup.
@@ -31,22 +39,21 @@ Deploy static websites instantly. No account, no API key, no setup.
 
 **One URL. Your agent ships.**
 
-Ask ChatGPT to build something for the web — a landing page, a
-portfolio, a single-file demo, a generated doc — and this App
+Ask ChatGPT to build something for the web (a landing page, a
+portfolio, a single-file demo, a generated doc) and this plugin
 publishes it instantly. You get a real `*.shipstatic.com` URL you
 can share immediately.
 
 Free and anonymous: no install, no signup, no API key, with 3 days
 to claim ownership and keep the site permanently. Connect a
-ShipStatic account when you want the rest — custom domains, listing
-everything you have published, and sites that never expire — and the
-App starts that sign-in for you.
+ShipStatic account when you want the rest: custom domains, listing
+everything you have published, and sites that never expire. The
+plugin starts that sign-in for you.
 
-## Category
+## Category: `DEVELOPER_TOOLS`
 
-**Developer Tools**
-
-Single category. The App's identity is "deploy static sites from
+**Developer Tools**, in the portal's own enum so `pnpm submission` can
+state it. Single category. The App's identity is "deploy static sites from
 agents," which sits cleanly in developer tooling regardless of the
 exact taxonomy OpenAI's dashboard exposes.
 
