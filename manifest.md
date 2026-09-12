@@ -74,7 +74,7 @@ The `/gpt` path is deliberately distinct from `/` so deploys tag
 refusal in the shape OpenAI's hosts read. Same MCP server impl on both
 paths. URL type: Universal (one fixed URL for every user).
 
-## Version: `1.10.2`
+## Version: `1.11.0`
 
 Tracked by `cloudflare/mcp/src/version.ts` `VERSION` constant. The live
 endpoint reports this value on `initialize`. `pnpm preflight` enforces
@@ -82,24 +82,44 @@ this match.
 
 ## Tool surface
 
-Fifteen tools. **`deployments_upload`** is the one that needs no account
-— it is what the review team exercises, and it works with no credentials,
+Fifteen tools. **`deployments_upload`** is the one that needs no account:
+it is what the review team exercises, and it works with no credentials,
 no MFA and no setup. The other fourteen (listing, custom domains, account
-operations) answer once an account is connected over OAuth, which the
-client initiates from a `401` challenge.
+operations) answer once an account is connected over OAuth, which ChatGPT
+starts from the credential refusal described under Authentication.
 
-Annotations below describe `deployments_upload`, the tool a reviewer runs:
-- `readOnlyHint: false` — creates a deployment
-- `destructiveHint: false` — outcomes are reversible (the deploy can
-  be left to expire)
-- `openWorldHint: true` — writes to publicly-visible internet state
+Every tool's hints come from one registry row per tool in the server
+(`@shipstatic/mcp` 1.11.0), so they state what the platform measured:
+the ten reads are read-only and closed-world (they reach ShipStatic and
+nothing beyond it); `deployments_set` and `domains_set` replace state and
+are marked destructive; the two deletes are destructive and idempotent;
+only what changes public internet state (a deploy, a domain link, a
+verification, the deletes) is open-world. `submission/justifications.json`
+carries one sentence per hint per tool and the build refuses a sentence
+whose value the live server does not declare.
+
+Annotations of `deployments_upload`, the tool a reviewer runs:
+- `readOnlyHint: false`: creates a deployment
+- `destructiveHint: false`: outcomes are reversible (the deploy can be
+  left to expire)
+- `openWorldHint: true`: writes to publicly-visible internet state
+
+On this door the upload collects no visitor password: OpenAI's guidelines
+list passwords among the data a plugin must not collect, so the `/gpt`
+catalogue declares no such input and its descriptions and instructions do
+not mention one. (The site-password feature stays on every other ShipStatic
+surface; the result's `password` boolean only reports whether a deployment
+is protected.)
 
 ## Authentication: partial (the server starts without authentication; individual tools prompt on demand)
 
-**No demo credentials are required, and none need to be issued to the
-review team.** Publishing, the plugin's whole purpose, works with no
-account at all, so a reviewer connects and deploys without credentials,
-MFA, or setup.
+**No demo credentials are required, and none are issued to the review
+team.** OpenAI's rule is conditional, verbatim: "provide reviewer-ready
+demo credentials if the server requires sign-in." This server does not:
+publishing, the plugin's whole purpose, works with no account at all, so a
+reviewer connects and deploys without credentials, MFA, or setup, and every
+test case in the submission runs anonymously. The portal's demo-credentials
+field stays empty.
 
 The other fourteen tools need a connected ShipStatic account, and the
 server states that in the two places OpenAI's auth guide names, both of
@@ -114,19 +134,25 @@ which Scan Tools imports:
 
 Registration is dynamic (DCR), the authorization server is
 `https://api.shipstatic.com/auth`, and the protected-resource document is
-`https://mcp.shipstatic.com/.well-known/oauth-protected-resource/gpt`. A
-reviewer who signs in gets a magic link to the address they enter; nothing
-to hand over.
+`https://mcp.shipstatic.com/.well-known/oauth-protected-resource/gpt`.
+Account features are self-serve: a reviewer who chooses to try them signs
+in with a Google account or with any email address (a magic link to that
+inbox), and a free ShipStatic account is created on first sign-in. Nothing
+is provisioned and nothing is handed over.
 
 ## Release notes
 
 Paste for the version above, then keep this section current:
 
-> Update to 1.10.2. Since the published 1.0.0: account features over OAuth
+> Update to 1.11.0. Since the published 1.0.0: account features over OAuth
 > (listing and managing deployments, custom domains with DNS guidance,
-> account details), optional expiry (`ttl`) on a deploy, build settings,
-> and per-tool authentication metadata so ChatGPT can offer sign-in only
-> where an account is needed. Anonymous deploys are unchanged.
+> account details), optional expiry (`ttl`) on a deploy, and per-tool
+> authentication metadata so ChatGPT offers sign-in only where an account
+> is needed. Tool annotations now state each tool's real effect (reads are
+> read-only and closed-world; replacing and deleting are marked
+> destructive), descriptions describe the tools, the account tool returns
+> only email, name, plan, usage and caps, and this plugin's deploy does not
+> take a site password. Anonymous deploys are unchanged.
 
 ---
 

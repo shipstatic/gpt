@@ -270,6 +270,36 @@ versioned and scanned with the server rather than uploaded by hand.
 
 ---
 
+## 2026-09-13 — No reviewer credentials: OpenAI's rule is conditional
+
+**Decision:** The portal's demo-credentials field stays empty, every
+submitted test case is anonymous, and no reviewer account is provisioned
+(the plan had grown a Google reviewer account with a sign-in gate and a
+password-lane fallback; both are deleted).
+
+**Why:** OpenAI's submission page, verbatim: "Configure authentication and
+provide reviewer-ready demo credentials **if the server requires
+sign-in**." and "**If your plugin requires authentication**, make sure the
+provided demo credentials can complete each test without MFA, SMS, email
+confirmation, or private-network access." This server does not require
+sign-in: `deployments_upload` declares `noauth` beside `oauth2`, and
+publishing works with no account. Every hosted release ChatGPT is to see is
+a re-review, so a credential requirement would recur on every update; the
+durable answer is not to have one. The connected `deployments_list` test
+case was deleted for the same reason: a case that needs sign-in beside an
+empty credentials field is the one contradiction a reviewer could hold
+against the submission.
+
+**If asked:** a review reply asking for credentials is answered with a
+Google Workspace reviewer account provisioned at that moment, never
+pre-emptively and never as a password lane on the platform.
+
+**Locks in:** anonymous-only test cases; `manifest.md` §Authentication
+naming the self-serve sign-in (Google or any email) as a fact, not an
+offer.
+
+---
+
 ## Pending decisions (require human input)
 
 The blocking ones flow through to `scripts/checklist.mjs` for the
