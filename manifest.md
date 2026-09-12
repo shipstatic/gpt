@@ -104,12 +104,14 @@ Annotations of `deployments_upload`, the tool a reviewer runs:
   left to expire)
 - `openWorldHint: true`: writes to publicly-visible internet state
 
-On this door the upload collects no visitor password: OpenAI's guidelines
-list passwords among the data a plugin must not collect, so the `/gpt`
-catalogue declares no such input and its descriptions and instructions do
-not mention one. (The site-password feature stays on every other ShipStatic
-surface; the result's `password` boolean only reports whether a deployment
-is protected.)
+`deployments_upload` accepts an optional `password` that locks the
+published site behind a visitor unlock prompt. This is not the kind of
+value OpenAI's data rule names (a user's access credentials or
+authentication secrets to other systems, such as API keys, MFA codes or
+account passwords): it is a setting the user chooses for a site they are
+publishing, sent only to ShipStatic's own API, stored hashed, and shown back
+to the user so they can share it. The result's `password` boolean reports
+whether a deployment is protected.
 
 ## Authentication: partial (the server starts without authentication; individual tools prompt on demand)
 
@@ -150,9 +152,9 @@ Paste for the version above, then keep this section current:
 > authentication metadata so ChatGPT offers sign-in only where an account
 > is needed. Tool annotations now state each tool's real effect (reads are
 > read-only and closed-world; replacing and deleting are marked
-> destructive), descriptions describe the tools, the account tool returns
-> only email, name, plan, usage and caps, and this plugin's deploy does not
-> take a site password. Anonymous deploys are unchanged.
+> destructive), descriptions describe the tools, and the account tool
+> returns only email, name, plan, usage and caps. Anonymous deploys are
+> unchanged.
 
 ---
 

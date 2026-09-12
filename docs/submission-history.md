@@ -94,11 +94,13 @@ Notes:
   row per tool (ten closed-world reads, `deployments_set` and `domains_set`
   destructive, only the two deletes idempotent); descriptions describe the
   tools rather than instruct the model; `whoami` returns exactly email,
-  name, plan, usage and caps; the `/gpt` deploy takes no site password
-  (OpenAI's data rule); `Origin` is validated on every door.
+  name, plan, usage and caps; `Origin` is validated on every door. The
+  site password stays on every door: it is a setting for the site being
+  published, not a credential OpenAI's data rule names (`docs/decisions.md`,
+  2026-09-13).
 - No demo credentials, by OpenAI's own conditional rule
   (`docs/decisions.md`, 2026-09-13); all five positive test cases are
-  anonymous. Preflight now asserts the full hint table, the absence of
-  instructing descriptions, and the password-free `/gpt` upload.
+  anonymous. Preflight now asserts the full hint table and the absence of
+  instructing descriptions.
 - Preflight all green against production before the portal is opened;
   `manifest.md` at 1.11.0. Flip this entry to `Submitted` with the Case ID.

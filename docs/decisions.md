@@ -300,6 +300,28 @@ offer.
 
 ---
 
+## 2026-09-13 — The site password is not what OpenAI's data rule names
+
+**Decision:** `deployments_upload` on `/gpt` accepts `password` like every
+other door. The one-day exception (a door column withholding the input,
+the description sentence and the instructions sentence on `/gpt`) is
+removed from the server, and the submission's test cases include the
+password-protected deploy again.
+
+**Why:** OpenAI's rule forbids collecting "access credentials and
+authentication secrets (such as API keys, MFA/OTP codes, or passwords)":
+a user's own secrets to OTHER systems. A password the user chooses to lock
+a site they are publishing is a setting for that site, sent only to
+ShipStatic's own API, stored hashed, and shown back so the user can share
+it. Treating it as a credential would have removed a real product feature
+from the largest channel to satisfy a word. `manifest.md` §Tool surface
+states the distinction in words, where a reviewer reads it.
+
+**Residual:** a reviewer reading the word literally may ask; the manifest
+sentence is the answer. If a review reply insists, revisit then.
+
+---
+
 ## Pending decisions (require human input)
 
 The blocking ones flow through to `scripts/checklist.mjs` for the

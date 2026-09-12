@@ -231,19 +231,6 @@ let liveTools = [];
     ? pass('No tool description instructs the model')
     : fail('Instructing descriptions', instructing.join(', '));
 
-  // The /gpt upload collects no visitor password: OpenAI lists passwords
-  // among the data a plugin must not collect. Three places name the input
-  // and all three must be silent; the result's `password` boolean (a
-  // protection state, collected from nobody) is deliberately not checked.
-  const upload = liveTools.find((t) => t.name === EXPECTED_TOOL);
-  const inputs = Object.keys(upload?.inputSchema?.properties ?? {});
-  const { body: init } = await rpc('/gpt', 'initialize', {
-    protocolVersion: '2025-03-26', capabilities: {}, clientInfo: { name: 'preflight', version: '1' },
-  }, 6);
-  const instructions = init?.result?.instructions ?? '';
-  !inputs.includes('password') && !/password/i.test(upload?.description ?? '') && !/password/i.test(instructions)
-    ? pass('The /gpt upload collects no password (absent from its input, its description and the instructions)')
-    : fail('/gpt password', `inputs=${inputs.join(',')} description=${/password/i.test(upload?.description ?? '')} instructions=${/password/i.test(instructions)}`);
 }
 
 // ---------- 2. Policy URLs ----------
