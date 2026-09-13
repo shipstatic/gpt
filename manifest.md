@@ -105,12 +105,12 @@ Annotations of `deployments_upload`, the tool a reviewer runs:
 - `openWorldHint: true`: writes to publicly-visible internet state
 
 `deployments_upload` accepts an optional `password` that locks the
-published site behind a visitor unlock prompt. This is not the kind of
-value OpenAI's data rule names (a user's access credentials or
-authentication secrets to other systems, such as API keys, MFA codes or
-account passwords): it is a setting the user chooses for a site they are
-publishing, sent only to ShipStatic's own API, stored hashed, and shown back
-to the user so they can share it. The result's `password` boolean reports
+published site behind a visitor unlock prompt: the same site-protection
+feature Vercel and Netlify each call Password Protection, and Vercel's API
+takes as a `password` field. It is a setting the user chooses for a site
+they are publishing, sent only to ShipStatic's own API, stored hashed, and
+shown back to the user so they can share it; it is not a credential of the
+user's to any account or service. The result's `password` boolean reports
 whether a deployment is protected.
 
 ## Authentication: partial (the server starts without authentication; individual tools prompt on demand)
