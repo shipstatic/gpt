@@ -81,7 +81,7 @@ Notes:
   OpenAI fetch `/.well-known/oauth-protected-resource/gpt` then the
   browser reach `/auth/oauth2/authorize`.
 
-## 2026-09-13 — v1.12.0 — Prepared
+## 2026-09-13 — v1.12.1 — Prepared
 
 **Case ID:** —
 **Submitted by:** —
@@ -106,4 +106,4 @@ Notes:
   anonymous. Preflight now asserts the full hint table and the absence of
   instructing descriptions.
 - Preflight all green against production before the portal is opened;
-  `manifest.md` at 1.12.0. Flip this entry to `Submitted` with the Case ID.
+  `manifest.md` at 1.12.1. Flip this entry to `Submitted` with the Case ID.
