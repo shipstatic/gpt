@@ -328,9 +328,9 @@ The blocking ones flow through to `scripts/checklist.mjs` for the
 submission flow.
 
 - [ ] **Republish the plugin at the live version** — Scan Tools, submit
-      1.10.2, publish on approval, record a `Published` entry. Until then
-      the directory serves the 1.0.0 snapshot and ChatGPT cannot start a
-      sign-in.
+      1.11.0 (demo-credentials field empty), publish on approval, record a
+      `Published` entry. Until then the directory serves the 1.0.0 snapshot
+      and ChatGPT cannot start a sign-in.
 - [ ] **In-context screenshots for the sign-in flow** — the connected
       flow now exists (account tools over OAuth); capture it once the
       republished plugin can be added, for the next listing update.
