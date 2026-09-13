@@ -222,6 +222,18 @@ let liveTools = [];
     ? pass('Every tool carries the hints the listing justifies (ten closed-world reads, four destructive, two idempotent removes)')
     : fail('Tool hints', wrong.map((t) => `${t.name}=${hints(t)}`).join(' ') || `expected ${Object.keys(expected).length} tools, live ${liveTools.length}`);
 
+  // Every tool publishes an outputSchema with every property described: the
+  // portal advises one per tool, and since mcp 1.12.0 they are imported
+  // from the platform's shared type package, so a tool without one is a
+  // registration that dropped its import.
+  const bareSchema = liveTools.filter((t) => {
+    const props = t.outputSchema?.properties ?? {};
+    return Object.keys(props).length === 0 || Object.values(props).some((p) => !p.description?.trim());
+  }).map((t) => t.name);
+  bareSchema.length === 0
+    ? pass('Every tool publishes an outputSchema with every field described')
+    : fail('Output schemas', bareSchema.join(', '));
+
   // A description describes the tool; both listing reviews reject one that
   // tells the model how to behave. The same phrase set the server's own
   // suites sweep with.

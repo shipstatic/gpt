@@ -81,12 +81,15 @@ Notes:
   OpenAI fetch `/.well-known/oauth-protected-resource/gpt` then the
   browser reach `/auth/oauth2/authorize`.
 
-## 2026-09-13 — v1.11.0 — Prepared
+## 2026-09-13 — v1.12.0 — Prepared
 
 **Case ID:** —
 **Submitted by:** —
 **Reviewer feedback:** —
 **Action taken:**
+- Prepared as 1.11.0 first, then 1.12.0 the same day: every tool now publishes
+  an `outputSchema` (imported from the shared type package, every field
+  described), which removes the portal's per-tool advisory from the scan.
 - Supersedes the 1.10.2 `Prepared` entry above, which was never submitted:
   the 1.11.0 catalogue landed on production the next day and the scan is
   the listing, so the newer generation is what gets scanned.
@@ -103,4 +106,4 @@ Notes:
   anonymous. Preflight now asserts the full hint table and the absence of
   instructing descriptions.
 - Preflight all green against production before the portal is opened;
-  `manifest.md` at 1.11.0. Flip this entry to `Submitted` with the Case ID.
+  `manifest.md` at 1.12.0. Flip this entry to `Submitted` with the Case ID.
