@@ -74,7 +74,7 @@ The `/gpt` path is deliberately distinct from `/` so deploys tag
 refusal in the shape OpenAI's hosts read. Same MCP server impl on both
 paths. URL type: Universal (one fixed URL for every user).
 
-## Version: `1.11.0`
+## Version: `1.12.0`
 
 Tracked by `cloudflare/mcp/src/version.ts` `VERSION` constant. The live
 endpoint reports this value on `initialize`. `pnpm preflight` enforces
@@ -89,7 +89,7 @@ operations) answer once an account is connected over OAuth, which ChatGPT
 starts from the credential refusal described under Authentication.
 
 Every tool's hints come from one registry row per tool in the server
-(`@shipstatic/mcp` 1.11.0), so they state what the platform measured:
+(`@shipstatic/mcp` 1.12.0), so they state what the platform measured:
 the ten reads are read-only and closed-world (they reach ShipStatic and
 nothing beyond it); `deployments_set` and `domains_set` replace state and
 are marked destructive; the two deletes are destructive and idempotent;
@@ -97,6 +97,11 @@ only what changes public internet state (a deploy, a domain link, a
 verification, the deletes) is open-world. `submission/justifications.json`
 carries one sentence per hint per tool and the build refuses a sentence
 whose value the live server does not declare.
+
+Every tool publishes an `outputSchema`, imported from the platform's shared
+type package rather than written in the server, with every field described;
+every result carries `structuredContent` beside its text. The portal's
+"Recommended: add an outputSchema" advisory therefore applies to no tool.
 
 Annotations of `deployments_upload`, the tool a reviewer runs:
 - `readOnlyHint: false`: creates a deployment
@@ -146,14 +151,15 @@ is provisioned and nothing is handed over.
 
 Paste for the version above, then keep this section current:
 
-> Update to 1.11.0. Since the published 1.0.0: account features over OAuth
+> Update to 1.12.0. Since the published 1.0.0: account features over OAuth
 > (listing and managing deployments, custom domains with DNS guidance,
 > account details), optional expiry (`ttl`) on a deploy, and per-tool
 > authentication metadata so ChatGPT offers sign-in only where an account
 > is needed. Tool annotations now state each tool's real effect (reads are
 > read-only and closed-world; replacing and deleting are marked
-> destructive), descriptions describe the tools, and the account tool
-> returns only email, name, plan, usage and caps. Anonymous deploys are
+> destructive), descriptions describe the tools, the account tool
+> returns only email, name, plan, usage and caps, and every tool publishes
+> an output schema with every field described. Anonymous deploys are
 > unchanged.
 
 ---
