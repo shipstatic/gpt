@@ -317,8 +317,18 @@ it. Treating it as a credential would have removed a real product feature
 from the largest channel to satisfy a word. `manifest.md` §Tool surface
 states the distinction in words, where a reviewer reads it.
 
+**Precedent (checked 2026-09-13):** Vercel's feature is "Password
+Protection" and its API field is `password`; Netlify's is "Password
+Protection" with "Basic password protection"; Webflow, Squarespace, Wix and
+Framer all "password protect" a site. The word is the hosting industry's,
+and the Accidental Builder arrives knowing it. A platform-wide rename (to
+`passcode`, Zoom's 2020 precedent for disambiguating a guest code from an
+account password) was weighed and declined: four `latest` majors and a D1
+migration to depart from the vocabulary of every neighbouring product, for
+a reviewer risk the precedent already answers.
+
 **Residual:** a reviewer reading the word literally may ask; the manifest
-sentence is the answer. If a review reply insists, revisit then.
+sentence names the precedent. If a review reply insists, revisit then.
 
 ---
 
