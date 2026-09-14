@@ -111,8 +111,10 @@ Notes:
     (`review,welcome`)
   - `airy-bot-mv3w7z3.shipstatic.com`, locked with the site password
     `hello-reviewer` (`review,private`)
-  - `www.review-demo.example`, linked to the welcome site, DNS pending by
-    design
+  - `review-team.shipstatic.com`, a platform subdomain linked to the hello
+    page, live
+  - `www.review-demo.example`, a custom domain linked to the welcome site,
+    DNS pending by design
   All five positive test cases are still anonymous. Preflight now asserts the full hint table and the absence of
   instructing descriptions.
 - Preflight all green against production before the portal is opened;

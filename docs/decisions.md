@@ -351,8 +351,10 @@ identity OpenAI's reviewers can type.
 **Fixtures** (deployment hostnames are in `docs/submission-history.md`):
 `review,hello` a single page; `review,welcome` a two-page site with a
 stylesheet and a link between the pages; `review,private` a page locked with
-the site password `hello-reviewer`; `www.review-demo.example` linked to the
-welcome site and pending DNS by design (`.example` never resolves). All safe
+the site password `hello-reviewer`; `review-team.shipstatic.com`, a platform
+subdomain on the hello page, live; `www.review-demo.example`, a custom domain
+linked to the welcome site and pending DNS by design (`.example` never
+resolves). All safe
 to mutate or delete; the pages name no store, no host and no vendor.
 
 **Rotate on approval:** the Google password and the account's API key
