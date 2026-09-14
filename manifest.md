@@ -132,8 +132,7 @@ confirmation, already signed in to ShipStatic once, on a sponsored plan so
 every tool succeeds against paid-tier caps. It holds three labelled
 deployments (a hello page, a two-page site with a stylesheet, a
 password-protected page whose site password is `hello-reviewer`), one live
-platform subdomain and one custom domain awaiting DNS, all safe to change or
-delete. The account's
+platform subdomain and one live custom domain, all safe to change or delete. The account's
 password and API key are rotated the day the listing is approved.
 
 The other fourteen tools need a connected ShipStatic account, and the
