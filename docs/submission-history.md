@@ -101,9 +101,19 @@ Notes:
   site password stays on every door: it is a setting for the site being
   published, not a credential OpenAI's data rule names (`docs/decisions.md`,
   2026-09-13).
-- No demo credentials, by OpenAI's own conditional rule
-  (`docs/decisions.md`, 2026-09-13); all five positive test cases are
-  anonymous. Preflight now asserts the full hint table and the absence of
+- Demo credentials provided as a courtesy (`docs/decisions.md`,
+  2026-09-14): `shipstatic.reviewer@gmail.com` ("ShipStatic Reviewer",
+  account `479svhttge600ru7`, sponsored plan, label `review`); its Google
+  password lives only in the portal field; API key hint `ship-…1580`,
+  rotate both on approval. Seeded, all safe to mutate or delete:
+  - `surging-whirl-34s7s7d.shipstatic.com`, a hello page (`review,hello`)
+  - `lucid-ripple-z77vz8u.shipstatic.com`, two pages plus a stylesheet
+    (`review,welcome`)
+  - `airy-bot-mv3w7z3.shipstatic.com`, locked with the site password
+    `hello-reviewer` (`review,private`)
+  - `www.review-demo.example`, linked to the welcome site, DNS pending by
+    design
+  All five positive test cases are still anonymous. Preflight now asserts the full hint table and the absence of
   instructing descriptions.
 - Preflight all green against production before the portal is opened;
   `manifest.md` at 1.12.1. Flip this entry to `Submitted` with the Case ID.

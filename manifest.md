@@ -120,13 +120,20 @@ whether a deployment is protected.
 
 ## Authentication: partial (the server starts without authentication; individual tools prompt on demand)
 
-**No demo credentials are required, and none are issued to the review
-team.** OpenAI's rule is conditional, verbatim: "provide reviewer-ready
-demo credentials if the server requires sign-in." This server does not:
-publishing, the plugin's whole purpose, works with no account at all, so a
-reviewer connects and deploys without credentials, MFA, or setup, and every
-test case in the submission runs anonymously. The portal's demo-credentials
-field stays empty.
+**Demo credentials are provided, though the rule does not require them.**
+OpenAI's rule is conditional, verbatim: "provide reviewer-ready demo
+credentials if the server requires sign-in." This server does not:
+publishing, the plugin's whole purpose, works with no account at all, and
+every test case in the submission runs anonymously. A populated reviewer
+account is handed over anyway, so the fourteen account tools can be
+explored without setup: a Google login (the address and password go in the
+portal's demo-credentials field and nowhere else), no MFA, no email
+confirmation, already signed in to ShipStatic once, on a sponsored plan so
+every tool succeeds against paid-tier caps. It holds three labelled
+deployments (a hello page, a two-page site with a stylesheet, a
+password-protected page whose site password is `hello-reviewer`) and one
+custom domain awaiting DNS, all safe to change or delete. The account's
+password and API key are rotated the day the listing is approved.
 
 The other fourteen tools need a connected ShipStatic account, and the
 server states that in the two places OpenAI's auth guide names, both of
