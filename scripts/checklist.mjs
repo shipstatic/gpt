@@ -102,7 +102,7 @@ const PHASES = [
       { title: 'Localization', detail: 'manifest.md → §Localization' },
       { title: 'Website, privacy, terms, support', detail: 'manifest.md → §Company URL, §Privacy policy URL, §Terms of service URL, §Support contact' },
       { title: 'MCP server URL (Universal)', detail: `${pins.url} (manifest.md → §MCP server URL)` },
-      { title: 'Authentication', detail: 'manifest.md → §Authentication. Partial: the server starts without authentication and individual tools prompt on demand. Leave the demo-credentials field EMPTY: OpenAI asks for credentials only if the server requires sign-in, and every submitted test case runs anonymously.' },
+      { title: 'Authentication', detail: 'manifest.md → §Authentication. Partial: the server starts without authentication and individual tools prompt on demand. Demo credentials: the reviewer Google login and password (docs/submission-history.md names the account; the password lives only in the portal). Not required by OpenAI\'s rule, provided so the fourteen account tools can be explored; every submitted test case still runs anonymously.' },
       { title: 'Scan Tools, then READ the result', detail: 'Fifteen tools. deployments_upload must show as optional sign-in and the other fourteen as requiring it: that is the securitySchemes the scan imports. If the scan shows no auth on any tool, stop; preflight and the server disagree with the portal and the snapshot would repeat the 1.0.0 record.' },
       { title: 'Version', detail: `${pins.version} (manifest.md → §Version, held to the live server by preflight)` },
       { title: 'Release notes', detail: 'manifest.md → §Release notes' },

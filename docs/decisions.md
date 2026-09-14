@@ -332,6 +332,34 @@ sentence names the precedent. If a review reply insists, revisit then.
 
 ---
 
+## 2026-09-14 — A reviewer account is provided, as a courtesy rather than a requirement
+
+**Decision:** the portal's demo-credentials field carries a Google login we
+own (`shipstatic.reviewer@gmail.com`, display name "ShipStatic Reviewer"),
+already signed in to ShipStatic once, on the sponsored plan, populated with
+three labelled deployments and one custom domain awaiting DNS. Every test
+case still runs anonymously; the account is for the reviewer's own
+exploration of the fourteen account tools.
+
+**Why:** the 2026-09-13 decision stands (OpenAI's rule is conditional and
+this server needs no sign-in), so nothing is owed. But the Claude listing's
+reviewer account proved worth having, and a Google account we own costs no
+product work: no password lane on the platform, no inbox to hand over.
+"Something similar" for this listing is the same account shape under an
+identity OpenAI's reviewers can type.
+
+**Fixtures** (deployment hostnames are in `docs/submission-history.md`):
+`review,hello` a single page; `review,welcome` a two-page site with a
+stylesheet and a link between the pages; `review,private` a page locked with
+the site password `hello-reviewer`; `www.review-demo.example` linked to the
+welcome site and pending DNS by design (`.example` never resolves). All safe
+to mutate or delete; the pages name no store, no host and no vendor.
+
+**Rotate on approval:** the Google password and the account's API key
+(hint `ship-…1580`), the day the listing is approved.
+
+---
+
 ## Pending decisions (require human input)
 
 The blocking ones flow through to `scripts/checklist.mjs` for the
