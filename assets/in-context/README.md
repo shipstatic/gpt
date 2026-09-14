@@ -50,7 +50,7 @@ connect.
 3. If **ShipStatic** appears in the list, you're connected. If not,
    click **Connect new App** and paste the dev-mode install URL.
 4. Open a new chat. Pick a prompt from `../../submission/test-cases.json`;
-   prompt #1 ("Create a Paris destination page and give me a shareable URL.")
+   prompt #1 ("Create a Paris destination page and publish it online so I can share the link.")
    is the simplest and most repeatable.
 5. Submit the prompt and wait for the deploy to complete. The card
    will render immediately with a "Preview loading…" overlay; allow
