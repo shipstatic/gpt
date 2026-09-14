@@ -191,11 +191,11 @@
   },
   "test_cases": [
     {
-      "description": "Single-file deploy, the simplest path. The model writes one index.html and deploys it with no account, no confirmation gate and no setup; the deploy card renders inline. The screenshot tile may read \"Preview loading\" for up to about thirty seconds while the capture lands.",
-      "user_prompt": "Deploy a single-page website that says \"Hello world\" in big bold text.",
+      "description": "The simplest path: a single HTML page, written by the model and published with no account, no confirmation gate and no setup. The user asks for a page and a link, never for a deploy tool; the deploy card renders inline with the live URL. The screenshot tile may read \"Preview loading\" for up to about thirty seconds while the capture lands.",
+      "user_prompt": "Create a Paris destination page and give me a shareable URL.",
       "file_attachment_urls": null,
       "tools_triggered": "deployments_upload",
-      "expected_output": "A deploy card with a live *.shipstatic.com URL, \"1 file\" and a small byte count, a screenshot of the page, and a \"Claim to keep forever\" link. Opening the URL shows the Hello world page.",
+      "expected_output": "A deploy card with a live *.shipstatic.com URL, \"1 file\" and a small byte count, a screenshot of the page, and a \"Claim to keep forever\" link; the reply repeats the URL. Opening it shows a one-page site about Paris as a destination.",
       "expected_output_url": null
     },
     {
