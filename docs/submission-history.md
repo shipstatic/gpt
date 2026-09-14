@@ -113,8 +113,8 @@ Notes:
     `hello-reviewer` (`review,private`)
   - `review-team.shipstatic.com`, a platform subdomain linked to the hello
     page, live
-  - `www.review-demo.example`, a custom domain linked to the welcome site,
-    DNS pending by design
+  - `reviewer.exampledomain.xyz`, a custom domain (DNS configured by the
+    operator) linked to the welcome site, verified and live
   All five positive test cases are still anonymous. Preflight now asserts the full hint table and the absence of
   instructing descriptions.
 - Preflight all green against production before the portal is opened;
