@@ -17,11 +17,12 @@ At minimum, screenshots that show:
 1. **A real deploy through the App**: the conversation thread with
    the user's prompt, the agent calling the tool, and the rendered
    widget card with a working URL.
-2. **The widget at the moment data arrives**: the "Preview loading…"
-   overlay (the first ~5–30 s after deploy) is normal and worth
-   capturing once so reviewers know it's intentional.
-3. **The widget fully rendered**: URL, copy button, screenshot tile,
-   meta row, claim line — everything populated.
+2. **The card while the deploy runs**: its skeleton, a bar where each
+   row will be, is normal and worth capturing once so reviewers know
+   it is intentional.
+3. **The card fully rendered**: the tile framing the live site, the URL
+   with its copy button, the details row (files, size, time left), and
+   the claim link, everything populated.
 4. **Both ChatGPT web and ChatGPT mobile**: OpenAI explicitly tests on
    both. iOS or Android is fine; pick one (or do both).
 
@@ -53,8 +54,9 @@ connect.
    prompt #1 ("Create a Paris destination page and publish it online so I can share the link.")
    is the simplest and most repeatable.
 5. Submit the prompt and wait for the deploy to complete. The card
-   will render immediately with a "Preview loading…" overlay; allow
-   up to ~30 s for the screenshot to land.
+   shows its skeleton while the deploy runs, then fills in; the tile
+   shows the site itself once the site has loaded in it (an image
+   placeholder stands in if that takes more than a second).
 6. Take a screenshot of the whole conversation visible region (full
    ChatGPT chrome plus the rendered card).
 7. Save as `web-light-card-rendered.png` (or `web-dark-` if you're in
@@ -73,10 +75,11 @@ connect.
 ### Optional: capture the loading state and the password chip
 
 For richer listing imagery:
-- `web-light-loading.png` — screenshot during the "Preview loading…"
-  window, so reviewers see the placeholder state intentionally.
-- `password-chip.png` — run prompt #4 (password-protected deploy) and
-  screenshot the rendered card showing the lock chip in the meta row.
+- `web-light-loading.png`: screenshot the card's skeleton while the
+  deploy runs, so reviewers see the loading state intentionally.
+- `password-chip.png`: run prompt #4 (password-protected deploy) and
+  screenshot the rendered card showing the password chip at the end of
+  the details row (on a phone-width card the chip shows only its lock).
 
 ## Naming convention
 
@@ -84,10 +87,10 @@ For richer listing imagery:
 |---|---|
 | `web-light-card-rendered.png` | Desktop, light theme, fully rendered card |
 | `web-dark-card-rendered.png` | Desktop, dark theme |
-| `web-light-loading.png` | Desktop, "Preview loading…" overlay visible |
+| `web-light-loading.png` | Desktop, the card's skeleton while the deploy runs |
 | `ios-card.png` | iOS mobile, fully rendered |
 | `android-card.png` | Android mobile, fully rendered |
-| `password-chip.png` | Any platform, password-protected deploy with lock chip |
+| `password-chip.png` | Any platform, password-protected deploy with the password chip |
 
 ## Quality bar
 
@@ -103,4 +106,7 @@ For richer listing imagery:
 Headless browser tooling could in principle render the widget, but it
 can't drive a real ChatGPT conversation through the OAuth-protected
 dev-mode App. The simplest path is human capture, done once before
-submission, and re-captured if the widget changes materially.
+submission, and re-captured if the card changes materially. It
+changed materially on 2026-09-17 (the skeleton, the live-site tile,
+the details row and the chip), so the captures in this folder predate
+it and are owed again before the next submission.
