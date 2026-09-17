@@ -74,7 +74,7 @@ The `/gpt` path is deliberately distinct from `/` so deploys tag
 refusal in the shape OpenAI's hosts read. Same MCP server impl on both
 paths. URL type: Universal (one fixed URL for every user).
 
-## Version: `1.12.1`
+## Version: `1.12.2`
 
 Tracked by `cloudflare/mcp/src/version.ts` `VERSION` constant. The live
 endpoint reports this value on `initialize`. `pnpm preflight` enforces
@@ -89,7 +89,7 @@ operations) answer once an account is connected over OAuth, which ChatGPT
 starts from the credential refusal described under Authentication.
 
 Every tool's hints come from one registry row per tool in the server
-(`@shipstatic/mcp` 1.12.1), so they state what the platform measured:
+(`@shipstatic/mcp` 1.12.2), so they state what the platform measured:
 the ten reads are read-only and closed-world (they reach ShipStatic and
 nothing beyond it); `deployments_set` and `domains_set` replace state and
 are marked destructive; the two deletes are destructive and idempotent;
@@ -158,7 +158,7 @@ is provisioned and nothing is handed over.
 
 Paste for the version above, then keep this section current:
 
-> Update to 1.12.1. Since the published 1.0.0: account features over OAuth
+> Update to 1.12.2. Since the published 1.0.0: account features over OAuth
 > (listing and managing deployments, custom domains with DNS guidance,
 > account details), optional expiry (`ttl`) on a deploy, and per-tool
 > authentication metadata so ChatGPT offers sign-in only where an account
@@ -166,7 +166,9 @@ Paste for the version above, then keep this section current:
 > read-only and closed-world; replacing and deleting are marked
 > destructive), descriptions describe the tools, the account tool
 > returns only email, name, plan, usage and caps, and every tool publishes
-> an output schema with every field described. Anonymous deploys are
+> an output schema with every field described. The deploy card frames the
+> live site itself and states the deployment's size and the time it has
+> left the way every ShipStatic surface does. Anonymous deploys are
 > unchanged.
 
 ---

@@ -81,6 +81,22 @@ Notes:
   OpenAI fetch `/.well-known/oauth-protected-resource/gpt` then the
   browser reach `/auth/oauth2/authorize`.
 
+## 2026-09-17 — v1.12.2 — Prepared
+
+**Case ID:** —
+**Submitted by:** —
+**Reviewer feedback:** —
+**Action taken:**
+- Supersedes the 1.12.1 `Prepared` entry below, which was never submitted:
+  1.12.2 landed on production on 2026-09-17 and the scan is the listing.
+- What 1.12.2 changes for the reviewer: the deploy card frames the live
+  site (a sandboxed frame of the deployment, no screenshot), shows the
+  deployment's size and the time it has left in the platform's one spelling,
+  and carries its wording at runtime; the catalogue, the hints, the auth
+  halves and the demo credentials are unchanged from 1.12.1.
+- Preflight green against production; `manifest.md` at 1.12.2. Flip this
+  entry to `Submitted` with the Case ID.
+
 ## 2026-09-13 — v1.12.1 — Prepared
 
 **Case ID:** —
