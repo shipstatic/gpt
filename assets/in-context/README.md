@@ -55,8 +55,8 @@ connect.
    is the simplest and most repeatable.
 5. Submit the prompt and wait for the deploy to complete. The card
    shows its skeleton while the deploy runs, then fills in; the tile
-   shows the site itself once the site has loaded in it (an image
-   placeholder stands in if that takes more than a second).
+   shows the site itself once the site has loaded in it (a plain surface
+   until then), on a band of dots beside it when the card is wide.
 6. Take a screenshot of the whole conversation visible region (full
    ChatGPT chrome plus the rendered card).
 7. Save as `web-light-card-rendered.png` (or `web-dark-` if you're in
