@@ -21,10 +21,11 @@ const SITE = process.env.PREFLIGHT_SITE ?? 'https://shipstatic.com';
 const EXPECTED_TOOL = 'deployments_upload';
 const EXPECTED_WIDGET_URI = 'ui://widget/deploy-card.html';
 const EXPECTED_APP_DOMAIN = SITE;
-// The screenshot host is an ENVIRONMENT fact (the widget's CSP names the
-// environment it runs in), derived the way the worker derives it, so an
-// override to the dev endpoint checks the dev CSP rather than failing on it.
-const SCREENSHOT_HOST = `https://screenshots.${new URL(MCP).hostname.split('.').slice(1).join('.')}`;
+// The frame origin is an ENVIRONMENT fact: the card's tile frames the
+// deployment itself, so its CSP names the environment's own sites, derived the
+// way the worker derives it, so an override to the dev endpoint checks the dev
+// CSP rather than failing on it.
+const SITES_ORIGIN = `https://*.${new URL(MCP).hostname.split('.').slice(1).join('.')}`;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const manifestPath = join(__dirname, '..', 'manifest.md');
 const historyPath = join(__dirname, '..', 'docs', 'submission-history.md');
@@ -100,9 +101,9 @@ let liveTools = [];
     ? pass('  Tool is model-invoked (visibility includes "model")')
     : fail('  Tool visibility', JSON.stringify(meta.ui?.visibility));
 
-  // outputSchema fields the widget renders
+  // outputSchema fields the card renders
   const out = tool?.outputSchema?.properties ?? {};
-  const expected = ['deployment', 'url', 'claim', 'screenshot', 'expires', 'files', 'size', 'password'];
+  const expected = ['url', 'claim', 'expires', 'files', 'size', 'password'];
   const missing = expected.filter(k => !(k in out));
   missing.length === 0
     ? pass('  Output schema includes every field the widget renders')
@@ -136,9 +137,9 @@ let liveTools = [];
   ui.prefersBorder === true
     ? pass('  Widget asks the host to draw the card frame (prefersBorder: true)')
     : fail('  Widget prefersBorder', String(ui.prefersBorder));
-  ui.csp && Array.isArray(ui.csp.resourceDomains)
-    && ui.csp.resourceDomains.includes(SCREENSHOT_HOST)
-    ? pass(`  Widget CSP whitelists the screenshot host (${SCREENSHOT_HOST})`)
+  JSON.stringify(ui.csp) ===
+    JSON.stringify({ connectDomains: [], resourceDomains: [], frameDomains: [SITES_ORIGIN] })
+    ? pass(`  Widget CSP frames the platform's own sites (${SITES_ORIGIN}) and allows nothing else`)
     : fail('  Widget CSP (_meta.ui.csp)', JSON.stringify(ui.csp));
 
   // openai/widgetDescription — surfaced under the widget; reviewer-

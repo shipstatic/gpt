@@ -2,10 +2,10 @@
   "$comment": "The review team runs these against the live plugin, so every positive case must reproducibly succeed and every negative case must reproducibly NOT invoke the plugin. Exactly five positive and three negative, the portal's minimum. Every positive case is ANONYMOUS by design: OpenAI asks for demo credentials only if the server requires sign-in, and this one does not, so no case needs an account or a fixture. `tools_triggered` is the exact MCP tool name. Descriptions and expected outputs are review-facing: what the reviewer sees, never how the server does it.",
   "positive": [
     {
-      "description": "The simplest path: a single HTML page, written by the model and published with no account, no confirmation gate and no setup. The user asks for a page to be put online and shared, naming no tool and no host; the deploy card renders inline with the live URL. The screenshot tile may read \"Preview loading\" for up to about thirty seconds while the capture lands.",
+      "description": "The simplest path: a single HTML page, written by the model and published with no account, no confirmation gate and no setup. The user asks for a page to be put online and shared, naming no tool and no host; the deploy card renders inline with the live URL, and its tile shows the page itself once the page has loaded in it.",
       "user_prompt": "Create a Paris destination page and publish it online so I can share the link.",
       "tools_triggered": "deployments_upload",
-      "expected_output": "A deploy card with a live *.shipstatic.com URL, \"1 file\" and a small byte count, a screenshot of the page, and a \"Claim to keep forever\" link; the reply repeats the URL. Opening it shows a one-page site about Paris as a destination."
+      "expected_output": "A deploy card with a live *.shipstatic.com URL, \"1 file\" and a small byte count, a tile showing the page, and a \"Claim to keep forever\" link; the reply repeats the URL. Opening it shows a one-page site about Paris as a destination."
     },
     {
       "description": "Multi-file site with cross-links. The model generates index.html, styles.css and about.html and sends all three in ONE deploy call; the stylesheet applies and the about link works on the live site.",
@@ -20,10 +20,10 @@
       "expected_output": "A deploy card and the URL repeated in the reply. Fetching the URL returns HTML containing exactly <h1>Hello reviewer</h1> and <title>ShipStatic test</title>."
     },
     {
-      "description": "Password-protected deploy. The password option locks the published site behind a visitor unlock prompt; it is a setting for the site being published, not a credential of the reviewer's. The model passes it with the deploy and repeats it back, since a password the user never sees locks them out. The card shows a lock chip and the site asks for the password before rendering.",
+      "description": "Password-protected deploy. The password option locks the published site behind a visitor unlock prompt; it is a setting for the site being published, not a credential of the reviewer's. The model passes it with the deploy and repeats it back, since a password the user never sees locks them out. The card shows a password chip and the site asks for the password before rendering.",
       "user_prompt": "Deploy a one-page \"coming soon\" landing page and protect it with the password \"demo123\".",
       "tools_triggered": "deployments_upload",
-      "expected_output": "A deploy card with a lock chip in its meta row, the password \"demo123\" confirmed in the reply, and a URL that prompts for the password before showing the page."
+      "expected_output": "A deploy card with a password chip at the end of its details row, the password \"demo123\" confirmed in the reply, and a URL that prompts for the password before showing the page."
     },
     {
       "description": "The anonymous lifetime and the claim link, explained. Without an account a deployment expires in 3 days unless claimed; the tool result carries a one-time claim URL and the server's instructions tell the model to show it. The reviewer sees the model relay both facts correctly.",
