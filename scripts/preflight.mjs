@@ -20,7 +20,10 @@ const MCP = process.env.PREFLIGHT_MCP ?? process.env.PREFLIGHT_HOST ?? 'https://
 const SITE = process.env.PREFLIGHT_SITE ?? 'https://shipstatic.com';
 const EXPECTED_TOOL = 'deployments_upload';
 const EXPECTED_WIDGET_URI = 'ui://widget/deploy-card.html';
-const EXPECTED_APP_DOMAIN = SITE;
+// The App's origin is an IDENTITY fact: it names the App in OpenAI's
+// directory, so the worker states it as production in every environment and
+// this check does not follow a PREFLIGHT_SITE override.
+const EXPECTED_APP_DOMAIN = 'https://shipstatic.com';
 // The frame origin is an ENVIRONMENT fact: the card's tile frames the
 // deployment itself, so its CSP names the environment's own sites, derived the
 // way the worker derives it, so an override to the dev endpoint checks the dev
@@ -129,11 +132,17 @@ let liveTools = [];
     ? pass('Widget HTML serves with the right MIME type')
     : fail('Widget HTML', JSON.stringify(c)?.slice(0, 200));
 
-  // Widget _meta fields — submission gates per OpenAI Apps SDK
+  // Widget _meta fields — submission gates per OpenAI Apps SDK. The App's
+  // origin rides ChatGPT's own key, never the standard `ui.domain`: that
+  // key's format is each host's, and Claude refuses to render the card over
+  // this value.
   const ui = c?._meta?.ui ?? {};
-  ui.domain === EXPECTED_APP_DOMAIN
-    ? pass(`  Widget declares its parent App domain (${EXPECTED_APP_DOMAIN})`)
-    : fail('  Widget parent domain (_meta.ui.domain)', String(ui.domain));
+  c?._meta?.['openai/widgetDomain'] === EXPECTED_APP_DOMAIN
+    ? pass(`  Widget declares its App origin (openai/widgetDomain: ${EXPECTED_APP_DOMAIN})`)
+    : fail('  Widget App origin (_meta.openai/widgetDomain)', String(c?._meta?.['openai/widgetDomain']));
+  !('domain' in ui)
+    ? pass('  Widget leaves the standard ui.domain to each host')
+    : fail('  Widget carries _meta.ui.domain, which Claude refuses', String(ui.domain));
   ui.prefersBorder === true
     ? pass('  Widget asks the host to draw the card frame (prefersBorder: true)')
     : fail('  Widget prefersBorder', String(ui.prefersBorder));
