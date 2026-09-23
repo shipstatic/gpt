@@ -24,11 +24,11 @@ const EXPECTED_WIDGET_URI = 'ui://widget/deploy-card.html';
 // directory, so the worker states it as production in every environment and
 // this check does not follow a PREFLIGHT_SITE override.
 const EXPECTED_APP_DOMAIN = 'https://shipstatic.com';
-// The frame origin is an ENVIRONMENT fact: the card's tile frames the
-// deployment itself, so its CSP names the environment's own sites, derived the
-// way the worker derives it, so an override to the dev endpoint checks the dev
-// CSP rather than failing on it.
-const SITES_ORIGIN = `https://*.${new URL(MCP).hostname.split('.').slice(1).join('.')}`;
+// The screenshot origin is an ENVIRONMENT fact: the card's tile shows the
+// deployment's screenshot, so its CSP names the environment's own screenshot
+// host, derived the way the worker derives it, so an override to the dev
+// endpoint checks the dev CSP rather than failing on it.
+const SCREENSHOTS_ORIGIN = `https://screenshots.${new URL(MCP).hostname.split('.').slice(1).join('.')}`;
 const __dirname = dirname(fileURLToPath(import.meta.url));
 const manifestPath = join(__dirname, '..', 'manifest.md');
 const historyPath = join(__dirname, '..', 'docs', 'submission-history.md');
@@ -147,8 +147,8 @@ let liveTools = [];
     ? pass('  Widget asks the host to draw the card frame (prefersBorder: true)')
     : fail('  Widget prefersBorder', String(ui.prefersBorder));
   JSON.stringify(ui.csp) ===
-    JSON.stringify({ connectDomains: [], resourceDomains: [], frameDomains: [SITES_ORIGIN] })
-    ? pass(`  Widget CSP frames the platform's own sites (${SITES_ORIGIN}) and allows nothing else`)
+    JSON.stringify({ connectDomains: [], resourceDomains: [SCREENSHOTS_ORIGIN], frameDomains: [] })
+    ? pass(`  Widget CSP loads the platform's own screenshots (${SCREENSHOTS_ORIGIN}) and allows nothing else`)
     : fail('  Widget CSP (_meta.ui.csp)', JSON.stringify(ui.csp));
 
   // openai/widgetDescription — surfaced under the widget; reviewer-
