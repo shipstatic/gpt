@@ -20,30 +20,6 @@
 # No pnpm setup step: the manifest declares no dependencies and no
 # packageManager, and preflight is a plain Node script, so `node` runs it
 # directly. Adding pnpm here would install nothing and pin nothing.
-#
-# WHO HEARS IT is the half this file did not have, and it cost four days.
-# On 2026-09-21 the scheduled run caught the domain-standing release 2.5
-# hours after it landed (manifest 1.12.2 against live 2.0.0) and was exactly
-# right. It then stayed red across three runs until 2026-09-25, two of them
-# pushes somebody made while it was already red, because nothing announced
-# the failure: the only consumer of the red was the Actions tab. The fence
-# was never the problem. The loop was.
-#
-# So the fence now has a reader outside GitHub: root CLAUDE.md lists
-# `pnpm preflight` in the periodic sweep table, which is a thing the
-# operator already runs at the end of a wave and before a release, and a
-# stale listing is exactly a release-time fact.
-#
-# A notify job is the other half and is deliberately NOT written here. It
-# needs a `SLACK_WEBHOOK_URL` this repo does not carry (siblings hold it as
-# a repo secret; this one holds no secrets at all), and guarding it is the
-# trap root CLAUDE.md already records: `secrets` cannot be read from an
-# `if:` at all, and the documented workaround of copying it into an `env`
-# the `if` reads is where every vscode release silently published nothing
-# for months, because the `env` was written at step level where the step's
-# own `if` cannot see it. Half-guarded, it fails for a second and wrong
-# reason or skips forever. Add the secret first, then the job, job-level
-# `env`, and drill it by watching it fire.
 name: CI
 
 on:
@@ -70,3 +46,21 @@ jobs:
           node-version: 22
       - name: Preflight against production
         run: node scripts/preflight.mjs
+
+  # The family CI shape: failures notify Slack where the webhook secret is
+  # set. Job-level `env` so the `if:` can read it.
+  notify:
+    needs: [preflight]
+    if: failure()
+    runs-on: ubuntu-latest
+    timeout-minutes: 2
+    env:
+      SLACK_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+    steps:
+      - if: env.SLACK_WEBHOOK_URL != ''
+        uses: slackapi/slack-github-action@v4
+        with:
+          webhook: ${{ secrets.SLACK_WEBHOOK_URL }}
+          webhook-type: incoming-webhook
+          payload: |
+            text: "🔴 gpt CI failed on ${{ github.ref_name }}"
