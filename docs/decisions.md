@@ -368,9 +368,14 @@ The blocking ones flow through to `scripts/checklist.mjs` for the
 submission flow.
 
 - [ ] **Republish the plugin at the live version** — Scan Tools, submit
-      1.11.0 (demo-credentials field empty), publish on approval, record a
-      `Published` entry. Until then the directory serves the 1.0.0 snapshot
-      and ChatGPT cannot start a sign-in.
+      the version `manifest.md` names (preflight holds it to what the live
+      server reports, so it is never a literal to keep in step by hand),
+      publish on approval, record a `Published` entry. The demo-credentials
+      field is FILLED, per the 2026-09-14 decision above which supersedes
+      the 2026-09-13 one; this item said "empty" until 2026-09-25 and
+      contradicted both that decision and the checklist's own
+      Authentication step. Until this is done the directory serves the
+      1.0.0 snapshot and ChatGPT cannot start a sign-in.
 - [ ] **In-context screenshots for the sign-in flow** — the connected
       flow now exists (account tools over OAuth); capture it once the
       republished plugin can be added, for the next listing update.
