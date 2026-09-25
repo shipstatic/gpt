@@ -87,36 +87,19 @@ Notes:
 **Submitted by:** —
 **Reviewer feedback:** —
 **Action taken:**
-- Supersedes the 1.12.2 `Prepared` entry below, which was never submitted.
-  It is the fourth preparation in a row that has not reached the portal
-  (1.10.2, 1.12.1, 1.12.2, and now this one), so the directory has served
-  the 1.0.0 snapshot since 2026-08, while `@shipstatic/mcp` has published
-  29 stable releases since that one. Nothing here fixes that: only opening
-  the portal does.
-- What 2.2.0 changes for the reviewer, against 1.12.2:
-  - A custom domain reports its STANDING as one word (`unverified`,
-    `unlinked`, `live`, `paused`), saying what the domain needs from its
-    owner, and carries the DNS result separately as `verification`
-    (`pending`, `partial`, `verified`). Both are described in the tool's
-    output schema, and `domains_get`'s description names the four words,
-    so an assistant reads the next step rather than deriving it. This was
-    a breaking wire change released on 2026-09-21.
-  - The custom-domain flow in the catalogue ends at the deployment rather
-    than at verification: a verified domain serves nothing until something
-    is linked, and the tools now say so.
-  - `whoami` names the plan the account is on, beside email, name, usage
-    and caps.
-  - The deploy card's tile shows the deployment's own screenshot, rendered
-    on first request, in place of the sandboxed frame of the live site that
-    1.12.2 described. The card also leaves the standard `ui.domain` to each
-    host and states its App origin under `openai/widgetDomain` alone, which
-    is what lets one resource render in both ChatGPT and Claude.
+- Supersedes the 1.12.2 `Prepared` entry below, which was never submitted:
+  the live door reports 2.2.0 and the scan is the listing.
+- What 2.2.0 changes for the reviewer: a custom domain reports its standing
+  as one word (`unverified`, `unlinked`, `live`, `paused`) with the DNS
+  result beside it as `verification`, both described in the output schema
+  and named in `domains_get`'s description; the custom-domain flow ends at
+  linking a deployment rather than at verification; `whoami` names the
+  plan; and the deploy card's tile shows the deployment's screenshot, its
+  App origin stated under `openai/widgetDomain` with `ui.domain` left to
+  each host. The hints, the test cases, the auth halves and the demo
+  credentials are unchanged from 1.12.1.
 - Preflight green against production; `manifest.md` at 2.2.0. Flip this
   entry to `Submitted` with the Case ID.
-- Demo credentials, the seeded review fixtures and the five positive test
-  cases are unchanged from the 1.12.1 entry below; re-read it before
-  submitting, and rotate the reviewer's Google password and API key on
-  approval as that entry says.
 
 ## 2026-09-17 — v1.12.2 — Prepared
 

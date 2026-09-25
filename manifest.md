@@ -166,13 +166,11 @@ Paste for the version above, then keep this section current:
 > read-only and closed-world; replacing and deleting are marked
 > destructive), descriptions describe the tools, the account tool
 > returns only email, name, plan, usage and caps, and every tool publishes
-> an output schema with every field described. A custom domain now reports
-> its standing as one word, `unverified`, `unlinked`, `live` or `paused`,
-> saying what the domain needs from its owner, and carries the DNS result
-> separately as `verification`, so an assistant reads the next step rather
-> than working it out. The deploy card shows the deployment's own
-> screenshot and states its size and the time it has left the way every
-> ShipStatic surface does. Anonymous deploys are unchanged.
+> an output schema with every field described. A custom domain states what
+> it needs from its owner in one word (`unverified`, `unlinked`, `live` or
+> `paused`), with its DNS result beside it. The deploy card shows the
+> deployment's screenshot and states its size and the time it has left the
+> way every ShipStatic surface does. Anonymous deploys are unchanged.
 
 ---
 
