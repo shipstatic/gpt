@@ -81,6 +81,43 @@ Notes:
   OpenAI fetch `/.well-known/oauth-protected-resource/gpt` then the
   browser reach `/auth/oauth2/authorize`.
 
+## 2026-09-25 — v2.2.0 — Prepared
+
+**Case ID:** —
+**Submitted by:** —
+**Reviewer feedback:** —
+**Action taken:**
+- Supersedes the 1.12.2 `Prepared` entry below, which was never submitted.
+  It is the fourth preparation in a row that has not reached the portal
+  (1.10.2, 1.12.1, 1.12.2, and now this one), so the directory has served
+  the 1.0.0 snapshot since 2026-08, while `@shipstatic/mcp` has published
+  29 stable releases since that one. Nothing here fixes that: only opening
+  the portal does.
+- What 2.2.0 changes for the reviewer, against 1.12.2:
+  - A custom domain reports its STANDING as one word (`unverified`,
+    `unlinked`, `live`, `paused`), saying what the domain needs from its
+    owner, and carries the DNS result separately as `verification`
+    (`pending`, `partial`, `verified`). Both are described in the tool's
+    output schema, and `domains_get`'s description names the four words,
+    so an assistant reads the next step rather than deriving it. This was
+    a breaking wire change released on 2026-09-21.
+  - The custom-domain flow in the catalogue ends at the deployment rather
+    than at verification: a verified domain serves nothing until something
+    is linked, and the tools now say so.
+  - `whoami` names the plan the account is on, beside email, name, usage
+    and caps.
+  - The deploy card's tile shows the deployment's own screenshot, rendered
+    on first request, in place of the sandboxed frame of the live site that
+    1.12.2 described. The card also leaves the standard `ui.domain` to each
+    host and states its App origin under `openai/widgetDomain` alone, which
+    is what lets one resource render in both ChatGPT and Claude.
+- Preflight green against production; `manifest.md` at 2.2.0. Flip this
+  entry to `Submitted` with the Case ID.
+- Demo credentials, the seeded review fixtures and the five positive test
+  cases are unchanged from the 1.12.1 entry below; re-read it before
+  submitting, and rotate the reviewer's Google password and API key on
+  approval as that entry says.
+
 ## 2026-09-17 — v1.12.2 — Prepared
 
 **Case ID:** —
