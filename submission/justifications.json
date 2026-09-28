@@ -199,7 +199,7 @@
   "whoami": {
     "readOnlyHint": {
       "value": true,
-      "why": "Returns the connected account's email, name, plan, current usage and plan caps, and changes nothing."
+      "why": "Returns your email and name, and the connected account's plan, usage and caps, and changes nothing."
     },
     "openWorldHint": {
       "value": false,

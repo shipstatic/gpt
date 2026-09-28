@@ -183,7 +183,7 @@
         "destructiveHint": false
       },
       "justifications": {
-        "read_only_justification": "Returns the connected account's email, name, plan, current usage and plan caps, and changes nothing.",
+        "read_only_justification": "Returns your email and name, and the connected account's plan, usage and caps, and changes nothing.",
         "open_world_justification": "Reads from the connected ShipStatic account and nothing beyond it; the read changes no public state.",
         "destructive_justification": "Retrieves account details only; nothing is deleted, overwritten or revoked."
       }
