@@ -1,15 +1,15 @@
 #!/usr/bin/env node
-// Human-action checklist for submission. Run after `pnpm preflight`
+// Human-action checklist for the listing. Run after `pnpm preflight`
 // passes green. This prints the steps that cannot be automated: every
 // item the human handles before, during, and after clicking Submit in
-// OpenAI's plugin submission portal.
+// OpenAI's plugin portal.
 //
-// It restates NO copy. Every portal field points at the manifest section
-// that owns it, and the two values it does print (the version, the MCP
-// server URL) are read from the manifest's headers, the same headers
-// preflight compares to the live server. The "Open decisions" block at the
-// end is sourced from `docs/decisions.md` (the canonical "Pending decisions"
-// list) so the two stay in lockstep.
+// It restates NO copy. The listing is the ZIP `pnpm package` builds, so the
+// portal has almost nothing to paste; the two values printed here (the
+// package version, the MCP server URL) are read from the manifest's pinned
+// headers. The "Open decisions" block at the end is sourced from
+// `docs/decisions.md` (the canonical "Pending decisions" list) so the two
+// stay in lockstep.
 //
 //   pnpm checklist
 
@@ -22,7 +22,8 @@ const decisionsPath = join(__dirname, '..', 'docs', 'decisions.md');
 const manifestPath = join(__dirname, '..', 'manifest.md');
 
 // The manifest's two pinned headers, read rather than restated. Preflight
-// holds both to the live server; this only shows them.
+// holds the URL to the live door and the version to the built package; this
+// only shows them.
 async function readManifestPins() {
   let manifest;
   try {
@@ -74,67 +75,80 @@ const pins = await readManifestPins();
 const PHASES = [
   {
     when: 'Before opening the portal',
-    why:  'These are the prerequisites OpenAI checks before they look at the plugin. Any "no" here is a hard blocker.',
+    why:  'These are the prerequisites OpenAI checks before it looks at the plugin. Any "no" here is a hard blocker.',
     items: [
       {
         title: 'Your OpenAI org is identity-verified',
-        detail: 'Either Individual or Business, set in https://platform.openai.com. Unverified orgs are auto-rejected.',
+        detail: 'Individual or Business, in https://platform.openai.com/settings/organization/general. The directory shows the name of the identity chosen at upload.',
       },
       {
-        title: 'Your account has Apps Management: Write on the org',
-        detail: 'OpenAI Platform roles settings. Without it the portal cannot create, edit or submit plugin drafts.',
+        title: 'Your account can submit',
+        detail: 'Organization owners can; other members need Apps Management Write on the org (organization roles).',
       },
       {
-        title: 'Screenshots are current',
-        detail: 'assets/widget-light.png, assets/widget-dark.png, and the in-context captures in assets/in-context/. Re-shoot if the widget changed since the last submission.',
+        title: 'pnpm preflight is all-green',
+        detail: 'It holds the live door to what the scan checks, the four listing URLs, and plugin.json + mcp.json to their owners. Two of its checks are yours to close: the demo recording URL in manifest.md, and the reviewer sign-in proof below.',
+      },
+      {
+        title: 'Prove the reviewer sign-in from a fresh device',
+        detail: 'A clean browser profile with no Google session: sign in to my.shipstatic.com with the reviewer Google account. If Google asks for a code or a device approval, that is the question for OpenAI submission support before anything else is built (manifest.md, Authentication).',
+      },
+      {
+        title: 'Record the walkthrough, then pin its URL',
+        detail: 'A reviewer-accessible recording of the five positive cases in submission/test-cases.json, in order, on the reviewer account. Pin it as "## Demo recording URL" in manifest.md, run pnpm package, commit.',
+      },
+      {
+        title: 'Build the ZIP',
+        detail: `pnpm package writes plugin.json and mcp.json (${pins.version}) and dist/shipstatic-plugin.zip. Commit the two JSON files; the ZIP is what you upload.`,
       },
     ],
   },
   {
-    when: 'In the plugin submission portal',
-    why:  'Open the plugin, or create one "With MCP". Import chatgpt-app-submission.json where the form offers it; for everything else, paste from the matching section in manifest.md or upload the matching asset.',
+    when: 'In the portal: upload and checks',
+    why:  'https://platform.openai.com/plugins. The listing is the ZIP; the tools are scanned off the server. Nothing is pasted by hand except the reviewer credentials.',
     items: [
-      { title: 'Plugin name', detail: 'manifest.md → §Plugin name' },
-      { title: 'Logo', detail: 'Upload assets/icon-1024.png (the 1024×1024 master). assets/icon-480.png is for the MCP Registry, not this submission.' },
-      { title: 'Short description', detail: 'manifest.md → §Short description' },
-      { title: 'Long description', detail: 'manifest.md → §Long description' },
-      { title: 'Category', detail: 'manifest.md → §Category' },
-      { title: 'Localization', detail: 'manifest.md → §Localization' },
-      { title: 'Website, privacy, terms, support', detail: 'manifest.md → §Company URL, §Privacy policy URL, §Terms of service URL, §Support contact' },
-      { title: 'MCP server URL (Universal)', detail: `${pins.url} (manifest.md → §MCP server URL)` },
-      { title: 'Authentication', detail: 'manifest.md → §Authentication. Partial: the server starts without authentication and individual tools prompt on demand. Demo credentials: the reviewer Google login and password (docs/submission-history.md names the account; the password lives only in the portal). Not required by OpenAI\'s rule, provided so the fourteen account tools can be explored; every submitted test case still runs anonymously.' },
-      { title: 'Scan Tools, then READ the result', detail: 'Fifteen tools. deployments_upload must show as optional sign-in and the other fourteen as requiring it: that is the securitySchemes the scan imports. If the scan shows no auth on any tool, stop; preflight and the server disagree with the portal and the snapshot would repeat the 1.0.0 record.' },
-      { title: 'Version', detail: `${pins.version} (manifest.md → §Version, held to the live server by preflight)` },
-      { title: 'Release notes', detail: 'manifest.md → §Release notes' },
-      { title: 'Screenshots', detail: 'Upload assets/widget-light.png, assets/widget-dark.png, plus the in-context captures from assets/in-context/' },
-      { title: 'Import chatgpt-app-submission.json', detail: 'Built by pnpm submission (preflight refuses a stale one). It fills App Info, every tool\'s hint justifications, and the five positive and three negative test cases. Review what it filled; the review team runs the cases against the live plugin.' },
+      { title: 'Upload the ZIP', detail: 'Plugins → Upload new or existing plugin → choose the verified developer identity → upload dist/shipstatic-plugin.zip. The existing listing (1.0.0, from the previous form) is the plugin to upload INTO; download its release ZIP first if the portal asks for the existing package.' },
+      { title: 'Metadata & Skills: read the Issues', detail: 'Copy any finding, fix it in manifest.md or the test cases, pnpm package, upload again. The package fields are read-only in the portal by design.' },
+      { title: 'MCPs: connect the server', detail: `Connect → MCP Server URL ${pins.url}, authentication as the door states it (sign-in optional on deployments_upload, required on the other fourteen). The URL cannot change later without support.` },
+      { title: 'Complete the domain-verification challenge', detail: 'The portal shows a challenge URL on the MCP hostname or an eligible parent. The token from the first submission sits at https://www.shipstatic.com/.well-known/openai-apps-challenge, which is a SIBLING of mcp.shipstatic.com, not a parent; if the portal names mcp.shipstatic.com or shipstatic.com, the token needs a home there (the mcp worker, a var-held token) before the connection completes.' },
+      { title: 'Wait for the tool scan, then READ it', detail: 'Fifteen tools. deployments_upload shows sign-in optional and the other fourteen sign-in required; the hints as preflight states them. If the scan disagrees with a green preflight, stop: the scan is what users get.' },
     ],
   },
   {
-    when: 'After clicking Submit for Review',
-    why:  'You get an email confirmation with a Case ID. Submitting starts review; it does not publish. After approval, YOU publish from the portal, and only then do users get the new snapshot.',
+    when: 'In the portal: review details and submit',
+    why:  'Review information imports from the ZIP; the credentials are entered by hand and stay outside the package.',
+    items: [
+      { title: 'Review details: enter the reviewer credentials', detail: 'The reviewer Google login and password (manifest.md, Authentication, and docs/submission-history.md for the account), with the sign-in instructions from the manifest. Never in the package: ZIP metadata refuses test_credentials.' },
+      { title: 'Check the imported test cases and recording', detail: 'Five positive, three negative, the recording URL: all read-only here, all from the ZIP. A change means a new ZIP.' },
+      { title: 'Submit for review', detail: 'Complete the policy attestations. Track under Review status; feedback arrives by email. One review at a time per plugin.' },
+      { title: 'Record the submission', detail: `Flip the Prepared entry in docs/submission-history.md to Submitted (package ${pins.version}).` },
+    ],
+  },
+  {
+    when: 'After approval, and from then on',
+    why:  'Publishing is your click. After it, the server is scanned daily and eligible tool changes go live on their own; the package moves only when a listing fact changes.',
     items: [
       {
-        title: 'Record the submission',
-        detail: `Flip the Prepared entry in docs/submission-history.md to Submitted with the Case ID (version ${pins.version}).`,
-      },
-      {
-        title: 'Wait for review',
-        detail: 'OpenAI publishes no fixed timeline; the outcome arrives on the same email thread (approved / changes requested / rejected). Record it in the same entry.',
-      },
-      {
-        title: 'Publish the approved version, then record it as Published',
-        detail: 'Append a Published entry to docs/submission-history.md. Preflight reads the latest Published entry as what the directory serves; until it is recorded, preflight keeps reporting the previous snapshot.',
+        title: 'Publish, then record it',
+        detail: 'Open the approved package version → Publish plugin. Append a Published entry to docs/submission-history.md.',
       },
       {
         title: 'Prove the connect flow once',
         detail: 'Remove and re-add the plugin in ChatGPT, call an account tool, sign in. Proof: a new oauthConsent row for the ChatGPT client, and OpenAI fetching the /gpt protected-resource document on a live tail.',
       },
+      {
+        title: 'After every hosted MCP release: Rescan, and read the held definitions',
+        detail: 'MCPs → the server → Issues → Rescan (or wait for the daily scan). A held tool keeps its last approved definition until the finding is fixed or appealed; the server must stay compatible with the approved schemas until the update is live.',
+      },
+      {
+        title: 'Keep the reviewer account alive',
+        detail: 'Its fixtures and its password stay as they are for later reviews; rotate the password only if it leaks, and update Review details the same day.',
+      },
     ],
   },
 ];
 
-console.log('\n\x1b[1mShipStatic ChatGPT plugin: submission checklist\x1b[0m');
+console.log('\n\x1b[1mShipStatic ChatGPT plugin: listing checklist\x1b[0m');
 console.log(`Generated: ${new Date().toISOString()}`);
 console.log('Walk this top-to-bottom. Each \x1b[2m☐\x1b[0m is a thing to do.\n');
 

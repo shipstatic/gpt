@@ -1,0 +1,98 @@
+{
+  "$schema": "https://agent-plugins.org/schemas/1.0.0/plugin.schema.json",
+  "name": "shipstatic",
+  "version": "1.1.0",
+  "description": "Deploy static sites instantly",
+  "author": {
+    "name": "ShipStatic",
+    "email": "hello@shipstatic.com",
+    "url": "https://shipstatic.com"
+  },
+  "homepage": "https://shipstatic.com",
+  "license": "MIT",
+  "extensions": {
+    "com.openai": {
+      "interface": {
+        "displayName": "ShipStatic",
+        "shortDescription": "Deploy static sites instantly",
+        "longDescription": "One URL. Your agent ships.\n\nAsk ChatGPT to build something for the web (a landing page, a\nportfolio, a single-file demo, a generated doc) and this plugin\npublishes it instantly. You get a real *.shipstatic.com URL you\ncan share immediately.\n\nNo install, no signup, no API key, with 3 days to claim ownership\nand keep the site permanently. Connect a ShipStatic account when you\nwant the rest: custom domains, listing everything you have published,\nand sites that never expire. The plugin starts that sign-in for you.",
+        "developerName": "ShipStatic",
+        "category": "Developer Tools",
+        "capabilities": [
+          "Publish a static site to a live URL",
+          "List and manage your deployments",
+          "Connect a custom domain"
+        ],
+        "websiteURL": "https://shipstatic.com",
+        "supportURL": "https://www.shipstatic.com/support",
+        "privacyPolicyURL": "https://shipstatic.com/privacy",
+        "termsOfServiceURL": "https://shipstatic.com/terms",
+        "defaultPrompt": [
+          "Create a landing page for my coffee shop and publish it online.",
+          "Deploy this HTML page and give me a link I can share.",
+          "List the sites in my ShipStatic account."
+        ],
+        "logo": "./assets/icon-1024.png",
+        "composerIcon": "./assets/icon-480.png"
+      },
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Anonymous publishing, the plugin's whole purpose. Run this one BEFORE connecting the reviewer account: a single HTML page, written by the model and published with no account, no confirmation gate and no setup. The user asks for a page to be put online and shared, naming no tool and no host.",
+              "prompt": "Create a Paris destination page and publish it online so I can share the link.",
+              "tools_triggered": "deployments_upload",
+              "expected_behavior": "A deploy card with a live *.shipstatic.com URL, \"1 file\" and a small byte count, a tile showing the page, and a \"Claim to keep forever\" link; the reply repeats the URL and says the site expires in 3 days unless claimed. Opening the URL shows a one-page site about Paris. (Run with the account already connected, the card shows no claim link and the site belongs to the account instead.)"
+            },
+            {
+              "description": "Connecting the account. The account tool needs a signed-in ShipStatic account, so ChatGPT offers to connect the plugin; the reviewer signs in with the reviewer Google account from Review details (no MFA, no code). Once connected, the tool answers with the account the reviewer is signed in as.",
+              "prompt": "Which ShipStatic account am I connected to, and what plan is it on?",
+              "tools_triggered": "whoami",
+              "expected_behavior": "If not yet connected, ChatGPT offers to connect ShipStatic and opens the sign-in; Continue with Google as the reviewer account completes it without any code or approval step. The reply then names the account: ShipStatic Reviewer (shipstatic.reviewer@gmail.com) on the sponsored plan, with its usage of 3 deployments, 1 platform domain and 1 custom domain against the plan's caps."
+            },
+            {
+              "description": "Reading the account: the list of everything published and the details of one deployment, found by its label. Read-only, repeatable.",
+              "prompt": "List the sites in my ShipStatic account and show me the details of the one labelled hello.",
+              "tools_triggered": "deployments_list, deployments_get",
+              "expected_behavior": "The reply lists the account's three deployments with their labels (review, hello; review, welcome; review, private) and URLs, then the details of surging-whirl-34s7s7d.shipstatic.com: 1 file, its size, labels review and hello, no expiry, not password protected."
+            },
+            {
+              "description": "The custom-domain surface, read-only: the domain's standing in one word and the DNS records it uses. The reviewer account owns reviewer.exampledomain.xyz, a custom domain the operator pointed at the platform, verified and live.",
+              "prompt": "Show me the status of my custom domain reviewer.exampledomain.xyz and the DNS records it uses.",
+              "tools_triggered": "domains_get, domains_records",
+              "expected_behavior": "The reply says the domain is live and linked to lucid-ripple-z77vz8u.shipstatic.com, and shows the one DNS record for it: a CNAME for reviewer pointing at the platform's CNAME target."
+            },
+            {
+              "description": "A controlled destructive action on a fixture the case itself creates: a throwaway page published into the account, then deleted. Nothing pre-existing is touched, and the case leaves the account as it found it.",
+              "prompt": "Publish a one-line page that says \"Delete me\" to my ShipStatic account, then delete that deployment.",
+              "tools_triggered": "deployments_upload, deployments_delete",
+              "expected_behavior": "A deploy card with a live URL and no claim link (the site belongs to the account), then a reply confirming the deployment is deleted. Opening the URL afterwards no longer shows the page, and the account's deployment count is back to three."
+            }
+          ],
+          "negative": [
+            {
+              "description": "An unrelated productivity request. Nothing about publishing a site; the plugin must not be invoked.",
+              "prompt": "What meetings do I have tomorrow?",
+              "expected_behavior": "ChatGPT answers from its own tools or says it cannot see a calendar. ShipStatic is not called and no deploy card appears."
+            },
+            {
+              "description": "A nearby question that needs an explanation, not a deployment. The plugin's domain tools return DNS records for a domain the user owns on ShipStatic; a general question about DNS should be answered in prose without calling them.",
+              "prompt": "Can you explain what a CNAME record is and how it differs from an A record?",
+              "expected_behavior": "A plain explanation of the two record types. No ShipStatic tool is called and nothing is deployed."
+            },
+            {
+              "description": "A hosting request the plugin cannot serve. ShipStatic hosts static sites only; a server process is out of scope, so the model should say so rather than deploy something that cannot run.",
+              "prompt": "Deploy my Node.js Express API server with its PostgreSQL database so it runs 24/7.",
+              "expected_behavior": "ChatGPT explains that ShipStatic hosts static sites (HTML, CSS, JavaScript and assets) and cannot run a server or a database, and suggests what would fit instead. No deploy is attempted and no card appears."
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "This plugin sells nothing and processes no payments."
+      },
+      "publication": {
+        "release_notes": "First package upload, replacing the 1.0.0 listing made through the\nprevious submission form. The MCP server now offers account features over\nOAuth beside anonymous publishing: listing and managing deployments,\ncustom domains with DNS guidance, and account details, with sign-in\noffered only where an account is needed. Every tool states its effect in\nits annotations and publishes an output schema. Anonymous deploys are\nunchanged."
+      }
+    }
+  }
+}

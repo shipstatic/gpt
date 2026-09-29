@@ -2,9 +2,11 @@
 
 What this folder is for: screenshots of the App **actually running
 inside ChatGPT**, showing a real conversation thread + the rendered
-widget card. OpenAI uses these as the directory-listing imagery, and
-review teams check them to confirm the App behaves the same way for
-end users.
+widget card. The directory no longer shows screenshots (starter prompts
+took their place, `manifest.md` "Default prompts"), so these are review
+evidence: they confirm the card renders the same way for end users on
+desktop and mobile, and they are what a reviewer's question about the
+card is answered with.
 
 These cannot be captured by a script — they need a real human running
 a real deploy in dev-mode ChatGPT. Save the resulting PNGs in this
@@ -51,8 +53,8 @@ connect.
 3. If **ShipStatic** appears in the list, you're connected. If not,
    click **Connect new App** and paste the dev-mode install URL.
 4. Open a new chat. Pick a prompt from `../../submission/test-cases.json`;
-   prompt #1 ("Create a Paris destination page and publish it online so I can share the link.")
-   is the simplest and most repeatable.
+   the first positive case ("Create a Paris destination page and publish it
+   online so I can share the link.") is the simplest and most repeatable.
 5. Submit the prompt and wait for the deploy to complete. The card
    shows its skeleton while the deploy runs, then fills in; the tile
    shows the site itself once the site has loaded in it (a plain surface
@@ -77,9 +79,11 @@ connect.
 For richer listing imagery:
 - `web-light-loading.png`: screenshot the card's skeleton while the
   deploy runs, so reviewers see the loading state intentionally.
-- `password-chip.png`: run prompt #4 (password-protected deploy) and
-  screenshot the rendered card showing the password chip at the end of
-  the details row (on a phone-width card the chip shows only its lock).
+- `password-chip.png`: deploy a page with a site password and screenshot
+  the rendered card showing the password chip at the end of the details
+  row (on a phone-width card the chip shows only its lock). No submitted
+  case exercises the password while its policy question is open
+  (`docs/decisions.md`).
 
 ## Naming convention
 

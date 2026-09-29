@@ -1,15 +1,14 @@
 # The listing's clock.
 #
-# This repo holds no code: it holds the text pasted into OpenAI's plugin
-# submission portal, and `scripts/preflight.mjs` compares that text (and the
-# live `/gpt` door) to what the portal will scan. The live door moves in
-# ANOTHER repo (`cloudflare/mcp`), on its own cadence, and a published plugin
-# is a snapshot taken at scan time, so a release there makes this repo wrong
-# without anyone touching it. Twice that was found late: 2026-08-14 (manifest
-# 0.6.0 against live 1.2.0) and 2026-09-12 (the 09-07 convoy never ran the
-# runbook step; the directory was still serving a 1.0.0 snapshot taken before
-# the door had OAuth). A check that only runs when somebody is about to submit
-# is a check that runs once. So it runs on a schedule as well as on push.
+# This repo holds no product code: it holds the sources of the plugin package
+# OpenAI's directory takes, and `scripts/preflight.mjs` compares the package
+# to its owners and the live `/gpt` door to what OpenAI's scan evaluates. The
+# door moves in ANOTHER repo (`cloudflare/mcp`), on its own cadence, and once
+# the plugin is published OpenAI scans it daily and HOLDS a tool whose
+# annotations, description or schema it flags, so a release there can change
+# what users get without anyone here touching anything. A check that only
+# runs when somebody is about to submit is a check that runs once. So it runs
+# on a schedule as well as on push, and names the hold before the scan does.
 #
 # Tests-only, main-only: nothing here publishes anything, and the repo keeps
 # its `main`-only exemption from the development-branch model (root

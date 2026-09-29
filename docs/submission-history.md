@@ -1,15 +1,16 @@
 # Submission History
 
-A log of OpenAI plugin submissions and their outcomes. Append one entry
-per submission, and one when a version is PUBLISHED. Reviewers' notes,
-Case IDs, and acceptance / rejection reasons live here so future-us can
-see what worked and what didn't.
+A log of OpenAI plugin uploads and their outcomes. Append one entry per
+upload, and one when a package version is PUBLISHED. Reviewers' notes,
+Case IDs, and acceptance / rejection reasons live here so future-us can see
+what worked and what didn't.
 
-**The last `Published` entry is what OpenAI holds.** A published plugin
-serves a snapshot of the tool surface taken at scan time, so this file is
-the platform's only record of which version ChatGPT users actually get.
-`pnpm preflight` reads the latest `Published` entry and reports how far
-behind the live server it is; the heading shape below is what it parses.
+**Versions in this file are the PACKAGE's from 2026-09-30 on.** Before that
+date the listing carried the MCP server's version, because the previous
+portal scanned the server into a snapshot and published that; entries below
+the 2026-09-30 one name server versions. Since then the package moves on its
+own clock (a listing fact changed) and the tools follow the server through
+OpenAI's daily scan, so an MCP release adds no entry here.
 
 Format per entry (the status is one of `Prepared` (our half is ready,
 the portal not yet opened), `Submitted`, `In review`, `Changes requested`,
@@ -25,6 +26,38 @@ the portal not yet opened), `Submitted`, `In review`, `Changes requested`,
 ```
 
 ---
+
+## 2026-09-30 — v1.1.0 (package) — Prepared
+
+**Case ID:** —
+**Submitted by:** —
+**Reviewer feedback:** —
+**Action taken:**
+- The first package upload, under the new portal: `plugin.json` + `mcp.json`
+  built from `manifest.md` and `submission/test-cases.json`, zipped with the
+  icons. Supersedes every server-versioned `Prepared` entry below, none of
+  which was submitted.
+- What the reviewer meets: anonymous publishing plus, on the reviewer account,
+  connecting over OAuth, reading the account (`whoami`, list, get), a custom
+  domain's standing and records, and a deploy the case itself deletes. The
+  reviewer credentials are REQUIRED and entered in Review details; the
+  account is permanent (`docs/decisions.md`, 2026-09-30).
+- Reviewer account: `shipstatic.reviewer@gmail.com` ("ShipStatic Reviewer",
+  account `479svhttge600ru7`, sponsored plan, label `review`); its Google
+  password lives only in the portal field. Fixtures, all safe to mutate or
+  delete:
+  - `surging-whirl-34s7s7d.shipstatic.com`, a hello page (`review,hello`)
+  - `lucid-ripple-z77vz8u.shipstatic.com`, two pages plus a stylesheet
+    (`review,welcome`)
+  - `airy-bot-mv3w7z3.shipstatic.com`, locked with the site password
+    `hello-reviewer` (`review,private`)
+  - `review-team.shipstatic.com`, a platform subdomain linked to the hello
+    page, live
+  - `reviewer.exampledomain.xyz`, a custom domain (DNS configured by the
+    operator) linked to the welcome site, verified and live
+- Owed before submission (preflight is red until the first): the demo
+  recording URL, the fresh-device sign-in proof, the challenge URL read off
+  the portal. Then flip this entry to `Submitted` with the Case ID.
 
 ## 2026-05-15 — v0.6.0 — In review
 

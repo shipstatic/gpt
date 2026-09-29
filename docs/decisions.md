@@ -154,6 +154,93 @@ distinct.
 
 ---
 
+## 2026-09-30 — The listing is a package, and the tools follow the server
+
+**Decision:** the submission is a plugin ZIP (`plugin.json`, `mcp.json`, the
+icons), built by `pnpm package` from `manifest.md` and the test cases and
+committed as its two JSON files. The hosted tools are not in it. After the
+first publication OpenAI scans the MCP server daily and takes eligible tool
+changes live on its own, holding a flagged change against the last approved
+definition; a package upload is owed only when a listing fact changes.
+
+**Why:** OpenAI's submission documentation moved to this shape (read
+2026-09-30: "Submit the package you've already built as a ZIP", "changes to
+your MCP server are picked up automatically", "hosted tool changes are
+checked directly from your server"). The 2026-09-12 decision below ("the
+listing is a snapshot, and it is part of the release") described the
+previous portal, and its consequence, a rescan-resubmit-republish step on
+every hosted release, is deleted with it. `pnpm preflight` keeps the clock
+it gave this repo, pointed at what the scan now evaluates: a change the scan
+would hold is found here before the scan runs.
+
+**Supersedes:** 2026-09-12 "The listing is a snapshot" (the snapshot
+doctrine, the `Published` entry preflight parsed, the portal's import file
+and its annotation justifications, which OpenAI no longer takes: "Annotation
+justifications are no longer required"). `chatgpt-app-submission.json` and
+`submission/justifications.json` are deleted.
+
+**Locks in:** the package version is the PACKAGE's, moved independently of
+the server's; `manifest.md`'s `## Version` is 1.1.0 for the first upload,
+the directory's 1.0.0 having been published through the previous form; the
+release notes describe the package version, not the server's.
+
+**Owed, named by the checklist:** the domain-verification challenge lives at
+`www.shipstatic.com`, a sibling of `mcp.shipstatic.com`; today's rule wants
+the MCP hostname or a parent, so the portal's challenge URL is read before
+anything is built for it. And the server must stay compatible with the
+approved tool schemas until a held update goes live.
+
+---
+
+## 2026-09-30 — Reviewer credentials are required, and the account is permanent
+
+**Decision:** the reviewer Google account (`shipstatic.reviewer@gmail.com`)
+is entered in the portal's Review details as REQUIRED credentials, its
+fixtures stay as they are for every later review, and its password is
+rotated only if it leaks, never on approval. Four of the five positive test
+cases run on that account.
+
+**Why:** OpenAI's submission page, read 2026-09-30: reviewer credentials are
+needed "if sign-in is required", the account "should work immediately
+without MFA approval, email or SMS codes, magic links, or private-network
+access", and "keep the test account and sample data available for
+subsequent reviews". Fourteen of fifteen tools need an account, and the
+review team tests the integration, not one tool; five anonymous
+`deployments_upload` cases exercised none of the release's principal
+feature. The 2026-09-13 decision ("OpenAI's rule is conditional") and the
+2026-09-14 one ("a courtesy", "rotate on approval") read the previous
+guidance and are superseded.
+
+**What it does not decide:** no password lane on the platform. The reviewer
+path is Google sign-in, and the one step in it that could count as an
+"approval" is Google's own new-device verification. The checklist requires a
+fresh-device proof before submission; if Google challenges, the question
+goes to OpenAI's submission support before anything is built.
+
+---
+
+## 2026-09-30 — The site password is an open question, not a settled one
+
+**Decision:** `deployments_upload` keeps `password` on `/gpt`, no test case
+exercises it, and the manifest says the question is open. The 2026-09-13
+entry's reasoning (a site setting, the hosting industry's word, sent to our
+own API) stands as the argument; it is not a ruling, and none exists.
+
+**Why:** OpenAI's restricted-data rule names "passwords" without saying
+whose, and an external audit (2026-09-30) declined to treat the argument as
+clearance. Nobody in reach can grant an exception: the question goes to
+OpenAI's submission support or the OpenAI contact, in these words: "May an
+MCP tool accept a newly chosen visitor password solely to enable password
+protection on a website it creates, or must that configuration happen
+outside ChatGPT under the restricted-data policy?"
+
+**If refused:** the field leaves the `/gpt` door alone, through the hosted
+server's per-door composition, and protected sites become a console-only
+setting from ChatGPT. Renaming the field settles nothing and is not the
+fallback.
+
+---
+
 ## 2026-09-12 — The listing is a snapshot, and it is part of the release
 
 **Decision:** treat OpenAI's published plugin as a PIN held by a registry
@@ -365,12 +452,23 @@ to mutate or delete; the pages name no store, no host and no vendor.
 ## Pending decisions (require human input)
 
 The blocking ones flow through to `scripts/checklist.mjs` for the
-submission flow.
+listing flow.
 
-- [ ] **Republish the plugin at the live version** — Scan Tools, submit,
-      publish on approval, record a `Published` entry. Until then the
-      directory serves the 1.0.0 snapshot and ChatGPT cannot start a
-      sign-in.
-- [ ] **In-context screenshots for the sign-in flow** — the connected
-      flow now exists (account tools over OAuth); capture it once the
-      republished plugin can be added, for the next listing update.
+- [ ] **Record the walkthrough and pin its URL** — a reviewer-accessible
+      recording of the five positive cases on the reviewer account, pinned as
+      `## Demo recording URL` in `manifest.md`. Preflight is red until it is.
+- [ ] **Prove the reviewer sign-in from a fresh device** — a clean browser
+      profile, no Google session, sign in to my.shipstatic.com as the reviewer
+      account. A Google code or device approval is the question for OpenAI
+      submission support.
+- [ ] **Ask about the site password** — the question in the 2026-09-30
+      entry above, to OpenAI submission support or the OpenAI contact. Until
+      answered the field stays and no case exercises it.
+- [ ] **Read the domain-verification challenge URL the portal shows** — the
+      token sits at `www.shipstatic.com`, a sibling of the MCP host; if the
+      portal names `mcp.shipstatic.com` or `shipstatic.com`, the token needs a
+      home there before the connection completes.
+- [ ] **Upload the package and submit** — `pnpm package`, upload the ZIP,
+      connect the server, enter the credentials, submit; record it in
+      `docs/submission-history.md`. Until published, the directory serves the
+      1.0.0 listing and ChatGPT cannot start a sign-in.
