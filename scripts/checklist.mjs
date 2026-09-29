@@ -91,11 +91,11 @@ const PHASES = [
       },
       {
         title: 'Prove the reviewer sign-in from a fresh device',
-        detail: 'A clean browser profile with no Google session: sign in to my.shipstatic.com with the reviewer Google account. If Google asks for a code or a device approval, that is the question for OpenAI submission support before anything else is built (manifest.md, Authentication).',
+        detail: 'A clean browser profile with no Google session, through ChatGPT itself: run the whoami case, take the Connect ShipStatic prompt, Continue with Google as the reviewer account, and finish the case. Signing in to the dashboard proves less than the flow the reviewer walks. If Google asks for a code or a device approval, that is the question for OpenAI submission support before anything else is built (manifest.md, Authentication).',
       },
       {
         title: 'Record the walkthrough, then pin its URL',
-        detail: 'A reviewer-accessible recording of the five positive cases in submission/test-cases.json, in order, on the reviewer account. Pin it as "## Demo recording URL" in manifest.md, run pnpm package, commit.',
+        detail: 'A reviewer-accessible recording of the five positive and three negative cases in submission/test-cases.json, in order, on the reviewer account, on desktop and on mobile. Pin it as "## Demo recording URL" in manifest.md, run pnpm package, commit. Preflight checks that the URL answers; that it plays and shows what it should is yours.',
       },
       {
         title: 'Build the ZIP',

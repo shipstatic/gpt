@@ -296,10 +296,18 @@ if (inputs) {
       ? pass(`mcp.json names the live door (${url})`)
       : fail('mcp.json MCP server URL', `${url} ≠ ${MCP}/gpt`);
 
+    // Reachable is all a script can say about a recording. Whether it plays,
+    // shows the eight cases, and shows the sign-in a reviewer will meet is
+    // the checklist's, and a green here does not stand in for it.
     const recording = pinned(inputs.manifest, 'Demo recording URL');
-    recording !== UNSET
-      ? pass(`The demo recording URL is set (${recording})`)
-      : fail('Demo recording URL', 'still TBD in manifest.md; required for MCP review');
+    if (recording === UNSET) {
+      fail('Demo recording URL', 'still TBD in manifest.md; required for MCP review');
+    } else {
+      const res = await fetch(recording, { redirect: 'follow' }).catch(() => null);
+      res?.status === 200
+        ? pass(`The demo recording URL answers 200 (${recording}); playback and content are checked by a person`)
+        : fail('Demo recording URL', `status=${res?.status ?? 'unreachable'} ${recording}`);
+    }
   } catch (err) {
     fail('package build', String(err.message));
   }

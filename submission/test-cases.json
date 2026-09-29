@@ -1,17 +1,17 @@
 {
-  "$comment": "The review team runs these against the live plugin with the reviewer account, so every positive case must reproducibly succeed and every negative case must reproducibly NOT invoke the plugin. Exactly five positive and three negative, what initial review requires. Together the positives walk the product: an anonymous deploy, connecting the account, reading it, a domain read, and a deploy the case itself deletes. Fixtures are the reviewer account's own (docs/submission-history.md names them). `tools_triggered` is the exact MCP tool name, comma-separated when a case takes more than one call. Descriptions and expected behaviour are review-facing: what the reviewer sees, never how the server does it.",
+  "$comment": "The review team runs these against the live plugin with the reviewer account, so every positive case must reproducibly succeed and every negative case must reproducibly NOT invoke the plugin. Exactly five positive and three negative, what initial review requires. Together the positives walk the product: an anonymous deploy, connecting the account, reading it, a domain read, and a deploy the case itself deletes. Fixtures are the reviewer account's own (docs/submission-history.md names them); the account's login identifier stays out of this file, since the package is public and Review details is where credentials go. `tools_triggered` is the exact MCP tool name, comma-separated when a case takes more than one call. Descriptions and expected behaviour are review-facing: what the reviewer sees, never how the server does it.",
   "positive": [
     {
       "description": "Anonymous publishing, the plugin's whole purpose. Run this one BEFORE connecting the reviewer account: a single HTML page, written by the model and published with no account, no confirmation gate and no setup. The user asks for a page to be put online and shared, naming no tool and no host.",
-      "prompt": "Create a Paris destination page and publish it online so I can share the link.",
+      "prompt": "Create a single-page Paris destination page and publish it online so I can share the link.",
       "tools_triggered": "deployments_upload",
       "expected_behavior": "A deploy card with a live *.shipstatic.com URL, \"1 file\" and a small byte count, a tile showing the page, and a \"Claim to keep forever\" link; the reply repeats the URL and says the site expires in 3 days unless claimed. Opening the URL shows a one-page site about Paris. (Run with the account already connected, the card shows no claim link and the site belongs to the account instead.)"
     },
     {
-      "description": "Connecting the account. The account tool needs a signed-in ShipStatic account, so ChatGPT offers to connect the plugin; the reviewer signs in with the reviewer Google account from Review details (no MFA, no code). Once connected, the tool answers with the account the reviewer is signed in as.",
+      "description": "Connecting the account. The account tool needs a signed-in ShipStatic account, so ChatGPT offers to connect the plugin; the reviewer signs in with the Google account provided in Review details (no MFA, no code). Once connected, the tool answers with the account the reviewer is signed in as.",
       "prompt": "Which ShipStatic account am I connected to, and what plan is it on?",
       "tools_triggered": "whoami",
-      "expected_behavior": "If not yet connected, ChatGPT offers to connect ShipStatic and opens the sign-in; Continue with Google as the reviewer account completes it without any code or approval step. The reply then names the account: ShipStatic Reviewer (shipstatic.reviewer@gmail.com) on the sponsored plan, with its usage of 3 deployments, 1 platform domain and 1 custom domain against the plan's caps."
+      "expected_behavior": "If not yet connected, ChatGPT offers to connect ShipStatic and opens the sign-in; Continue with Google as the account provided in Review details completes it without any code or approval step. The reply then names that account (display name ShipStatic Reviewer) on the sponsored plan, with its usage of 3 deployments, 1 platform domain and 1 custom domain against the plan's caps."
     },
     {
       "description": "Reading the account: the list of everything published and the details of one deployment, found by its label. Read-only, repeatable.",

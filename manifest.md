@@ -189,9 +189,11 @@ Registration is dynamic (DCR), the authorization server is
 ## Demo recording URL: `TBD`
 
 Required for MCP review: a reviewer-accessible recording walking the five
-positive cases. Unset, the package omits the field and preflight names it as
-owed. Record it after the fresh-device sign-in proof, so the recording shows
-the sign-in the reviewer will see.
+positive and three negative cases, on desktop and on mobile. Unset, the
+package omits the field and preflight names it as owed; set, preflight checks
+only that the URL answers, and a person checks that it plays and shows what
+it should. Record it after the fresh-device sign-in proof, so the recording
+shows the sign-in the reviewer will see.
 
 ## Release notes
 
