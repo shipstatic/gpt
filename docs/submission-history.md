@@ -81,6 +81,23 @@ Notes:
   OpenAI fetch `/.well-known/oauth-protected-resource/gpt` then the
   browser reach `/auth/oauth2/authorize`.
 
+## 2026-09-29 — v2.3.2 — Prepared
+
+**Case ID:** —
+**Submitted by:** —
+**Reviewer feedback:** —
+**Action taken:**
+- Supersedes the 2.2.0 `Prepared` entry below, which was never submitted:
+  the live door reports 2.3.2 and the scan is the listing.
+- What 2.3.2 changes for the reviewer, all in `whoami`: it returns your own
+  email and name (the person's, not the account's), and the account's
+  plan, usage and caps now count the account's members beside its
+  deployments and domains. The tool surface, the hints, the test cases,
+  the auth halves and the demo credentials are unchanged from 2.2.0; 2.3.1
+  and 2.3.2 moved only the package's pins.
+- Preflight green against production; `manifest.md` at 2.3.2. Flip this
+  entry to `Submitted` with the Case ID.
+
 ## 2026-09-25 — v2.2.0 — Prepared
 
 **Case ID:** —

@@ -74,7 +74,7 @@ The `/gpt` path is deliberately distinct from `/` so deploys tag
 refusal in the shape OpenAI's hosts read. Same MCP server impl on both
 paths. URL type: Universal (one fixed URL for every user).
 
-## Version: `2.2.0`
+## Version: `2.3.2`
 
 Tracked by `cloudflare/mcp/src/version.ts` `VERSION` constant. The live
 endpoint reports this value on `initialize`. `pnpm preflight` enforces
@@ -89,7 +89,7 @@ operations) answer once an account is connected over OAuth, which ChatGPT
 starts from the credential refusal described under Authentication.
 
 Every tool's hints come from one registry row per tool in the server
-(`@shipstatic/mcp` 2.2.0), so they state what the platform measured:
+(`@shipstatic/mcp` 2.3.2), so they state what the platform measured:
 the ten reads are read-only and closed-world (they reach ShipStatic and
 nothing beyond it); `deployments_set` and `domains_set` replace state and
 are marked destructive; the two deletes are destructive and idempotent;
@@ -158,14 +158,15 @@ is provisioned and nothing is handed over.
 
 Paste for the version above, then keep this section current:
 
-> Update to 2.2.0. Since the published 1.0.0: account features over OAuth
+> Update to 2.3.2. Since the published 1.0.0: account features over OAuth
 > (listing and managing deployments, custom domains with DNS guidance,
 > account details), optional expiry (`ttl`) on a deploy, and per-tool
 > authentication metadata so ChatGPT offers sign-in only where an account
 > is needed. Tool annotations now state each tool's real effect (reads are
 > read-only and closed-world; replacing and deleting are marked
 > destructive), descriptions describe the tools, the account tool
-> returns only email, name, plan, usage and caps, and every tool publishes
+> returns only your email and name and the account's plan, usage and caps
+> (its members counted beside its deployments and domains), and every tool publishes
 > an output schema with every field described. A custom domain states what
 > it needs from its owner in one word (`unverified`, `unlinked`, `live` or
 > `paused`), with its DNS result beside it. The deploy card shows the
