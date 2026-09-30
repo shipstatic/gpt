@@ -91,7 +91,7 @@ const PHASES = [
       },
       {
         title: 'Prove the reviewer sign-in from a fresh device',
-        detail: 'A clean browser profile with no Google session, through ChatGPT itself: run the whoami case, take the Connect ShipStatic prompt, Continue with Google as the reviewer account, and finish the case. Signing in to the dashboard proves less than the flow the reviewer walks. If Google asks for a code or a device approval, that is the question for OpenAI submission support before anything else is built (manifest.md, Authentication).',
+        detail: 'A clean browser profile with no session of any kind, through ChatGPT itself: run the whoami case, take the Connect ShipStatic prompt, enter the reviewer address, enter the password in the field that appears, and finish the case. Signing in to the dashboard proves less than the flow the reviewer walks (manifest.md, Authentication).',
       },
       {
         title: 'Record the walkthrough, then pin its URL',
@@ -118,7 +118,7 @@ const PHASES = [
     when: 'In the portal: review details and submit',
     why:  'Review information imports from the ZIP; the credentials are entered by hand and stay outside the package.',
     items: [
-      { title: 'Review details: enter the reviewer credentials', detail: 'The reviewer Google login and password (manifest.md, Authentication, and docs/submission-history.md for the account), with the sign-in instructions from the manifest. Never in the package: ZIP metadata refuses test_credentials.' },
+      { title: 'Review details: enter the reviewer credentials', detail: 'The reviewer address and its ShipStatic password (manifest.md, Authentication, and docs/submission-history.md for the account), with the sign-in instructions from the manifest. Never in the package: ZIP metadata refuses test_credentials.' },
       { title: 'Check the imported test cases and recording', detail: 'Five positive, three negative, the recording URL: all read-only here, all from the ZIP. A change means a new ZIP.' },
       { title: 'Submit for review', detail: 'Complete the policy attestations. Track under Review status; feedback arrives by email. One review at a time per plugin.' },
       { title: 'Record the submission', detail: `Flip the Prepared entry in docs/submission-history.md to Submitted (package ${pins.version}).` },

@@ -192,6 +192,27 @@ approved tool schemas until a held update goes live.
 
 ---
 
+## 2026-09-30 — The reviewer signs in by password
+
+**Decision:** the reviewer account signs in to ShipStatic with a password we
+set, and that password is the credential in Review details. Its Google login
+stays as a second way in. The fresh-device proof runs by password, through
+ChatGPT.
+
+**Why:** the entry below left one step outside our control, Google's own
+new-device verification, which is exactly the "approval" OpenAI's rule
+forbids, and a reviewer on a fresh device in another country is who meets
+it. The listing is the main channel, so the reviewer's path cannot depend on
+another company's judgement of a device. ShipStatic stays passwordless for
+everyone else: nobody can create a password, and only the reviewer address
+is shown the field.
+
+**What it supersedes:** "no password lane on the platform" in the entry
+below, and the same sentence in the 2026-09-13 and 2026-09-14 entries. The
+premise changed: those entries took Google sign-in as free of challenges.
+
+---
+
 ## 2026-09-30 — Reviewer credentials are required, and the account is permanent
 
 **Decision:** the reviewer Google account (`shipstatic.reviewer@gmail.com`)
@@ -457,10 +478,9 @@ listing flow.
 - [ ] **Record the walkthrough and pin its URL** — a reviewer-accessible
       recording of the five positive cases on the reviewer account, pinned as
       `## Demo recording URL` in `manifest.md`. Preflight is red until it is.
-- [ ] **Prove the reviewer sign-in from a fresh device** — a clean browser
-      profile, no Google session, sign in to my.shipstatic.com as the reviewer
-      account. A Google code or device approval is the question for OpenAI
-      submission support.
+- [ ] **Prove the reviewer sign-in from a fresh device**: a clean browser
+      profile, no session of any kind, through ChatGPT's Connect, by
+      password.
 - [ ] **Ask about the site password** — the question in the 2026-09-30
       entry above, to OpenAI submission support or the OpenAI contact. Until
       answered the field stays and no case exercises it.

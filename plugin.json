@@ -45,10 +45,10 @@
               "expected_behavior": "A deploy card with a live *.shipstatic.com URL, a file count matching the files the model sent (one for a self-contained page, more if it added a stylesheet or assets) with a small byte count, a tile showing the page, and a \"Claim to keep forever\" link; the reply repeats the URL and says the site expires in 3 days unless claimed. Opening the URL shows a one-page site about Paris. (Run with the account already connected, the card shows no claim link and the site belongs to the account instead.)"
             },
             {
-              "description": "Connecting the account. The account tool needs a signed-in ShipStatic account, so ChatGPT offers to connect the plugin; the reviewer signs in with the Google account provided in Review details (no MFA, no code). Once connected, the tool answers with the account the reviewer is signed in as.",
+              "description": "Connecting the account. The account tool needs a signed-in ShipStatic account, so ChatGPT offers to connect the plugin; the reviewer signs in with the address and password provided in Review details (no MFA, no code, no other company's sign-in). Once connected, the tool answers with the account the reviewer is signed in as.",
               "prompt": "Which ShipStatic account am I connected to, and what plan is it on?",
               "tools_triggered": "whoami",
-              "expected_behavior": "If not yet connected, ChatGPT offers to connect ShipStatic and opens the sign-in; Continue with Google as the account provided in Review details completes it without any code or approval step. The reply then names that account (display name ShipStatic Reviewer) on the sponsored plan, with its usage of 3 deployments, 1 platform domain and 1 custom domain against the plan's caps."
+              "expected_behavior": "If not yet connected, ChatGPT offers to connect ShipStatic and opens the sign-in; entering the address from Review details brings a password field, and the password completes it without any code or approval step. The reply then names that account (display name ShipStatic Reviewer) on the sponsored plan, with its usage of 3 deployments, 1 platform domain and 1 custom domain against the plan's caps."
             },
             {
               "description": "Reading the account: the list of everything published and the details of one deployment, found by its label. Read-only, repeatable.",

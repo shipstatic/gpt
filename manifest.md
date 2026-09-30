@@ -147,30 +147,33 @@ a signed-in account and four of the five positive test cases exercise them,
 so this server requires sign-in for review purposes whatever
 `deployments_upload` needs.
 
-The account: a Google login we own, `shipstatic.reviewer@gmail.com`,
-display name "ShipStatic Reviewer", already a ShipStatic account on the
-sponsored plan so every tool succeeds against paid-tier caps. Its Google
-password goes in the portal's credentials field and nowhere else. It holds
+The account: `shipstatic.reviewer@gmail.com`, display name "ShipStatic
+Reviewer", a ShipStatic account on the sponsored plan so every tool succeeds
+against paid-tier caps. It signs in to ShipStatic with a password of its own,
+set by us, which goes in the portal's credentials field and nowhere else.
+The address is also a Google login we own, a second way in that the reviewer
+never needs. It holds
 three labelled deployments (a hello page, a two-page site with a
 stylesheet, a page locked with the site password `hello-reviewer`), one live
 platform subdomain and one live custom domain, all safe to change or
 delete; `docs/submission-history.md` names them.
 
 Sign-in instructions for the portal, in the reviewer's order: run a test
-case that needs the account; ChatGPT offers to connect ShipStatic; choose
-Continue with Google and sign in as the reviewer account; the plugin is
-connected and the case completes. No MFA, no code, no magic link: the
-platform signs in with Google or with a magic link to an inbox, and the
-reviewer path is Google alone.
+case that needs the account; ChatGPT offers to connect ShipStatic; enter the
+reviewer address in the email field; a password field appears; enter the
+password and continue (a "Verify you are human" checkbox may appear first
+and takes one click; it asks nothing of the reviewer's identity); the plugin
+is connected and the case completes. No
+MFA, no code, no magic link, no other company's sign-in: ShipStatic itself
+is passwordless, and the reviewer account is the one kind that signs in by
+password, for exactly this rule.
 
 **Two things this arrangement owes.** The account stays as it is for every
 later review: its password is rotated only if it leaks, never on approval,
 and the portal is updated the day it changes. And the sign-in must be proven
-from a fresh device before submission (a clean browser profile, no Google
-session), because Google's own new-device verification is the one step in
-this path that would be an "approval" the rule forbids; if it fires, that is
-the question for OpenAI's submission support, not a reason to build a
-password lane.
+from a fresh device before submission (a clean browser profile, no session
+of any kind), by password, through ChatGPT itself: the path the reviewer
+walks, with nothing in it that another company can challenge.
 
 The server states its posture in the two places OpenAI's auth guide names,
 both of which the scan imports:
