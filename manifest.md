@@ -155,7 +155,7 @@ The address is also a Google login we own, a second way in that the reviewer
 never needs. It holds
 three labelled deployments (a hello page, a two-page site with a
 stylesheet, a page locked with the site password `hello-reviewer`), one live
-platform subdomain and one live custom domain, all safe to change or
+platform domain and one live custom domain, all safe to change or
 delete; `docs/submission-history.md` names them.
 
 Sign-in instructions for the portal, in the reviewer's order: run a test
