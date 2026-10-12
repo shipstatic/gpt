@@ -21,7 +21,7 @@ pnpm preflight    # the live /gpt door and the listing's links; must pass
 | Path | Purpose |
 |---|---|
 | `.codex-plugin/plugin.json` | The listing: name, descriptions, capabilities, category, starter prompts, links, logo and version. It names the MCP declaration and the skills beside it. |
-| `skills/publish-a-site/SKILL.md` | The skill: how to put what the user asked for online with `deployments_upload`, with no account, what to tell them, and how to handle a password, changes and refusals. |
+| `skills/publish-online/SKILL.md` | The skill: how to put a report, page, dashboard or small app online with `deployments_upload`, with no account, what to tell the user, and how to handle a password, changes and refusals. |
 | `.mcp.json` | The one MCP server, the `/gpt` door, and how ChatGPT connects to it: `mixed`, public and OAuth-protected access. |
 | `assets/icon-1024.png`, `assets/icon-480.png` | The logo and the composer icon the manifest names. |
 | `scripts/preflight.mjs` | Checks the door (tools, hints, output schemas, the card, both halves of sign-in) and the listing (its links answer, its version against the door's, its connection mode against what the door's tools declare, and every tool its skills name). |
@@ -105,11 +105,12 @@ Review details and nowhere else.
   came from in the console. `status` is the deploy's state. Neither is
   telemetry.
 - **Developer Tools only, English only.**
-- **One skill, publishing a site.** The server's instructions say what an
+- **One skill, publishing online.** The server's instructions say what an
   agent should do in a sentence; the skill is the workflow around
-  `deployments_upload`: complete static files, one publish, the links and
-  the password told back, a change published as a new site, a server-side
-  request declined. It ships in the package rather than from the server,
+  `deployments_upload` for anything that can be HTML (a report, a page, a
+  dashboard, a small app): complete static files, one publish, the links and
+  the password told back, a change published again, a server-side request
+  declined. It ships in the package rather than from the server,
   because OpenAI imports a server's skills as a snapshot at scan time and
   does not read them at runtime, so serving them adds machinery and no
   freshness. The estate's other `SKILL.md` teaches the `ship` CLI, which
