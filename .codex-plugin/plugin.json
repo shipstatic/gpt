@@ -2,16 +2,24 @@
   "author": {
     "name": "ShipStatic"
   },
-  "description": "ShipStatic publishes static websites from files created in ChatGPT. Users can deploy anonymously to an instant live URL, optionally protect a deployment with a password, and connect an account to inspect or manage deployments and custom domains.",
+  "description": "Ask ChatGPT to make a page, a report or a small app, and ShipStatic puts it online. You get a link you can share right away. You don't need an account. A site published without one stays up for 3 days, and its claim link lets you keep it. Want it private? Ask for built-in password protection, and visitors have to type the password before they see anything. If you have a ShipStatic account, connect it to keep every site, see them all and use your own domain.",
   "interface": {
-    "capabilities": [],
+    "capabilities": [
+      "Publish a site with no account",
+      "Get a link to share right away",
+      "Keep a site with its claim link",
+      "Protect a site with a password",
+      "Connect an account to keep every site and use your own domain"
+    ],
     "category": "Developer Tools",
     "defaultPrompt": [
-      "Create a Paris destination page and put it online."
+      "Create a Paris destination page and put it online.",
+      "Make a one-page site for my bakery and give me a link I can share.",
+      "Make a sales report page and publish it with ShipStatic's built-in password protection."
     ],
     "developerName": "ShipStatic",
     "displayName": "ShipStatic",
-    "longDescription": "ShipStatic publishes static websites from files created in ChatGPT. Users can deploy anonymously to an instant live URL, optionally protect a deployment with a password, and connect an account to inspect or manage deployments and custom domains.",
+    "longDescription": "Ask ChatGPT to make a page, a report or a small app, and ShipStatic puts it online. You get a link you can share right away. You don't need an account. A site published without one stays up for 3 days, and its claim link lets you keep it. Want it private? Ask for built-in password protection, and visitors have to type the password before they see anything. If you have a ShipStatic account, connect it to keep every site, see them all and use your own domain.",
     "privacyPolicyURL": "https://www.shipstatic.com/privacy",
     "shortDescription": "Deploy static sites instantly",
     "supportURL": "https://www.shipstatic.com/support",
