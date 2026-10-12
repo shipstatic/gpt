@@ -34,7 +34,13 @@ don't ask the user to sign in or connect anything first.
 
 ## Publish
 
+- `deployments_upload` works with no account: call it directly. Don't call
+  `whoami` or any other ShipStatic tool before it, and don't start a sign-in
+  to publish.
 - Send all the files in one upload for each version.
+- Don't set an expiry (`ttl`) unless the user has connected an account and
+  asks for one. Without an account, the platform's 3 days already apply, and
+  an expiry would make ChatGPT ask the user to sign in.
 - If the user wants it private or behind a password, pass `password`. That is
   ShipStatic's built-in password protection, checked before any file is
   served. Don't build a password page or script into the HTML. Make up a new
