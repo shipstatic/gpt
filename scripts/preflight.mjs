@@ -3,8 +3,10 @@
 // and the listing's package. OpenAI scans the door daily and takes tool
 // changes live on its own, holding any it flags, and the door moves in
 // another repo (`cloudflare/mcp`). So this runs after every hosted MCP
-// release, before every upload, and weekly (`.github/workflows/ci.yml`): a
-// change the scan would hold is found here first. Any red is a blocker.
+// release, before every upload, and weekly (`.github/workflows/ci.yml`). It
+// checks the live wire and the package against what we know OpenAI reads; a
+// green run is not the portal's scan or a reviewer's judgement. Any red is a
+// blocker.
 //
 //   pnpm preflight                          # checks against prod
 //   PREFLIGHT_MCP=... pnpm preflight        # override the MCP endpoint
@@ -14,6 +16,10 @@
 
 import { existsSync, readdirSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
+
+// Every request is bounded, so a hung endpoint fails the run instead of
+// holding it until the job's own timeout.
+const fetch = (url, init = {}) => globalThis.fetch(url, { signal: AbortSignal.timeout(15_000), ...init });
 
 const MCP = process.env.PREFLIGHT_MCP ?? process.env.PREFLIGHT_HOST ?? 'https://mcp.shipstatic.com';
 const SITE = process.env.PREFLIGHT_SITE ?? 'https://shipstatic.com';
@@ -200,6 +206,9 @@ let liveVersion;
   issuer && as?.issuer === issuer
     ? pass(`  The resource document names the authorization server's issuer exactly (${issuer})`)
     : fail('  Resource document / issuer', `authorization_servers[0]=${issuer} issuer=${as?.issuer}`);
+  as?.code_challenge_methods_supported?.includes('S256')
+    ? pass('  The authorization server advertises PKCE with S256')
+    : fail('  PKCE', JSON.stringify(as?.code_challenge_methods_supported));
 }
 
 // What the daily scan evaluates on every tool. Restated here as a literal
@@ -277,6 +286,35 @@ if (listing) {
     ? pass(`The listing's version is the door's (${liveVersion})`)
     : info(`The listing shows ${listing.version}, the door runs ${liveVersion}: tools follow through the daily scan, the version moves with the next listing upload`);
 
+  // The limits the portal enforces on the listing's own fields, checked
+  // before an upload rather than after it.
+  const ui = listing.interface;
+  const prompts = ui.defaultPrompt ?? [];
+  const tooLong = [
+    ['shortDescription', ui.shortDescription, 30],
+    ['longDescription', ui.longDescription, 4000],
+    ...(ui.capabilities ?? []).map((c) => ['a capability', c, 120]),
+    ...prompts.map((p) => ['a starter prompt', p, 128]),
+  ].filter(([, v, max]) => typeof v !== 'string' || v.length > max);
+  const listingOk =
+    tooLong.length === 0 &&
+    (ui.capabilities ?? []).length <= 20 &&
+    prompts.length <= 3 &&
+    new Set(prompts).size === prompts.length &&
+    !prompts.some((p) => p.includes('@'));
+  listingOk
+    ? pass(`The listing's fields are within the portal's limits (${prompts.length} starter prompts, ${(ui.capabilities ?? []).length} capabilities)`)
+    : fail('Listing limits', tooLong.map(([k, v]) => `${k} (${String(v).length})`).join(', ') || 'counts, repeats or an @mention');
+
+  // Every tool a review case expects is one the door serves.
+  const cases = listing.extensions?.['com.openai']?.review?.test_cases ?? {};
+  const liveNames = new Set(liveTools.map((t) => t.name));
+  const expected = (cases.positive ?? []).flatMap((c) => c.tools_triggered.split(',').map((t) => t.trim()));
+  const missingTools = expected.filter((t) => !liveNames.has(t));
+  (cases.positive ?? []).length > 0 && (cases.negative ?? []).length > 0 && missingTools.length === 0
+    ? pass(`Review cases: ${cases.positive.length} positive and ${cases.negative.length} negative, every expected tool live`)
+    : fail('Review cases', missingTools.length ? `not live: ${missingTools.join(', ')}` : 'positive or negative cases missing');
+
   // Every image the manifest names ships in the ZIP, so it must exist here.
   const images = [listing.interface.logo, listing.interface.composerIcon];
   const missing = images.filter((p) => typeof p !== 'string' || !existsSync(new URL(`../${p}`, import.meta.url)));
@@ -298,9 +336,13 @@ if (listing) {
       const described = front.match(/^description:\s*(.+)$/m)?.[1]?.trim();
       const tools = [...new Set(text.match(/\b(?:deployments|domains)_[a-z]+\b|\bwhoami\b/g) ?? [])];
       const unknown = tools.filter((t) => !live.has(t));
-      named === name && described && tools.length > 0 && unknown.length === 0
+      const identity = `${listing.name}:${named}`;
+      named === name && described && described.length <= 1024 && identity.length <= 64 && tools.length > 0 && unknown.length === 0
         ? pass(`Skill ${name}: named for its folder, described, and every tool it names is live (${tools.join(', ')})`)
-        : fail(`Skill ${name}`, `name=${named} described=${Boolean(described)} tools=${tools.join(',') || 'none'} unknown=${unknown.join(',')}`);
+        : fail(
+            `Skill ${name}`,
+            `name=${named} description=${described?.length ?? 0} chars identity=${identity.length} chars tools=${tools.join(',') || 'none'} unknown=${unknown.join(',')}`,
+          );
     }
     if (folders.length === 0) fail('Skills', `${listing.skills} holds no skill`);
   } catch (err) {

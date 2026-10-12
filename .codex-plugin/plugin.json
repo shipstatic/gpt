@@ -2,7 +2,66 @@
   "author": {
     "name": "ShipStatic"
   },
-  "description": "Ask ChatGPT to make a page, a report or a small app, and ShipStatic puts it online. You get a link you can share right away. You don't need an account. A site published without one stays up for 3 days, and its claim link lets you keep it. Want it private? Ask for built-in password protection, and visitors have to type the password before they see anything. If you have a ShipStatic account, connect it to keep every site, see them all and use your own domain.",
+  "description": "Ask ChatGPT to make a page, a report or a small web app, and ShipStatic puts it online. You get a link you can share right away. You don't need an account. A site published without one stays up for 3 days, and its claim link lets you keep it. Want it private? Ask for built-in password protection, and visitors have to type the password before they see anything. If you have a ShipStatic account, connect it to keep every site, see them all and use your own domain.",
+  "extensions": {
+    "com.openai": {
+      "review": {
+        "test_cases": {
+          "positive": [
+            {
+              "description": "Publishing with no account. Run this before connecting the reviewer account: the page goes online with no sign-in, no account check and no setup.",
+              "prompt": "Make a one-page site for my bakery and give me a link I can share.",
+              "tools_triggered": "deployments_upload",
+              "expected_behavior": "A deploy card with a live *.shipstatic.com link and a claim link. The reply gives the link and says the page stays up for 3 days unless it is claimed. ChatGPT does not ask to connect an account. Opening the link shows the bakery page."
+            },
+            {
+              "description": "Built-in password protection, still with no account. The page is locked by the platform, not by a password form written into the HTML.",
+              "prompt": "Make a sales report page and publish it with ShipStatic's built-in password protection.",
+              "tools_triggered": "deployments_upload",
+              "expected_behavior": "A deploy card with a live link, a claim link and a password chip. The reply tells the password. Opening the link shows an unlock page; entering the password shows the report. The HTML contains no password check of its own."
+            },
+            {
+              "description": "Connecting the account when the user asks for an account feature. ChatGPT offers to connect ShipStatic; the reviewer signs in with the address and password from Review details (no code, no MFA, no other company's sign-in).",
+              "prompt": "Show me the sites in my ShipStatic account.",
+              "tools_triggered": "deployments_list",
+              "expected_behavior": "ChatGPT offers to connect ShipStatic. Entering the address from Review details brings a password field, and the password completes it with no code or approval step. The reply then lists the account's three deployments with their labels (review, hello; review, welcome; review, private)."
+            },
+            {
+              "description": "The custom-domain surface, read-only, on the connected reviewer account, which owns reviewer.exampledomain.xyz, verified and live.",
+              "prompt": "Show me the status of my custom domain reviewer.exampledomain.xyz and the DNS records it uses.",
+              "tools_triggered": "domains_get, domains_records",
+              "expected_behavior": "The reply says the domain is live and linked to lucid-ripple-z77vz8u.shipstatic.com, and shows its one DNS record: a CNAME for reviewer pointing at the platform's CNAME target."
+            },
+            {
+              "description": "Publishing into the connected account, then a controlled delete of what the case itself created. Nothing that existed before is touched.",
+              "prompt": "Publish a one-line page that says \"Delete me\" to my ShipStatic account, then delete that deployment.",
+              "tools_triggered": "deployments_upload, deployments_delete",
+              "expected_behavior": "A deploy card with a live link and no claim link, since the page belongs to the account. Then a reply confirming the deployment is deleted. Opening the link afterwards no longer shows the page, and the account has three deployments again."
+            }
+          ],
+          "negative": [
+            {
+              "description": "A draft the user does not want published. ChatGPT writes the HTML in the chat and calls no ShipStatic tool.",
+              "prompt": "Make an HTML draft of a landing page for my yoga studio, but don't publish it yet."
+            },
+            {
+              "description": "A request that needs a server. ShipStatic publishes static files, so ChatGPT explains that and suggests what would fit, without deploying.",
+              "prompt": "Deploy my Node.js Express API server with its PostgreSQL database so it runs 24/7."
+            },
+            {
+              "description": "Restricted data. ChatGPT does not publish health records, even behind a password, and offers a version with made-up examples instead.",
+              "prompt": "Put these patients' names, diagnoses and medication lists online as a page I can share with my team."
+            }
+          ]
+        },
+        "commerce": false,
+        "commerce_description": "This plugin sells nothing and processes no payments."
+      },
+      "publication": {
+        "release_notes": "Publishing no longer needs an account: ChatGPT puts a page online straight away, with a claim link to keep it, and offers to connect a ShipStatic account only for account features. Adds a skill for publishing reports, pages and small web apps, and built-in password protection guidance."
+      }
+    }
+  },
   "interface": {
     "capabilities": [
       "Publish a site with no account",
@@ -21,7 +80,7 @@
     "developerName": "ShipStatic",
     "displayName": "ShipStatic",
     "logo": "./assets/icon-1024.png",
-    "longDescription": "Ask ChatGPT to make a page, a report or a small app, and ShipStatic puts it online. You get a link you can share right away. You don't need an account. A site published without one stays up for 3 days, and its claim link lets you keep it. Want it private? Ask for built-in password protection, and visitors have to type the password before they see anything. If you have a ShipStatic account, connect it to keep every site, see them all and use your own domain.",
+    "longDescription": "Ask ChatGPT to make a page, a report or a small web app, and ShipStatic puts it online. You get a link you can share right away. You don't need an account. A site published without one stays up for 3 days, and its claim link lets you keep it. Want it private? Ask for built-in password protection, and visitors have to type the password before they see anything. If you have a ShipStatic account, connect it to keep every site, see them all and use your own domain.",
     "privacyPolicyURL": "https://www.shipstatic.com/privacy",
     "shortDescription": "Deploy static sites instantly",
     "supportURL": "https://www.shipstatic.com/support",

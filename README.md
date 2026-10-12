@@ -20,11 +20,11 @@ pnpm preflight    # the live /gpt door and the listing's links; must pass
 
 | Path | Purpose |
 |---|---|
-| `.codex-plugin/plugin.json` | The listing: name, descriptions, capabilities, category, starter prompts, links, logo and version. It names the MCP declaration and the skills beside it. |
+| `.codex-plugin/plugin.json` | The listing: name, descriptions, capabilities, category, starter prompts, links, logo and version, and under `extensions.com.openai` the review cases and release notes. It names the MCP declaration and the skills beside it. |
 | `skills/publish-online/SKILL.md` | The skill: how to put a report, page, dashboard or small app online with `deployments_upload`, with no account, what to tell the user, and how to handle a password, changes and refusals. |
 | `.mcp.json` | The one MCP server, the `/gpt` door, and how ChatGPT connects to it: `mixed`, public and OAuth-protected access. |
 | `assets/icon-1024.png`, `assets/icon-480.png` | The logo and the composer icon the manifest names. |
-| `scripts/preflight.mjs` | Checks the door (tools, hints, output schemas, the card, both halves of sign-in) and the listing (its links answer, its version against the door's, its connection mode against what the door's tools declare, and every tool its skills name). |
+| `scripts/preflight.mjs` | Checks the live door (tools, hints, output schemas, the card, both halves of sign-in, PKCE) and the package (the portal's field limits, its links, its version against the door's, its connection mode against what the door's tools declare, and every tool its review cases and skills name). A green run is not the portal's scan or a reviewer's judgement. |
 | `.github/workflows/ci.yml` | Runs preflight on every push and weekly, against production. A failure reaches the alerts channel. |
 
 ## How updates reach ChatGPT
@@ -32,16 +32,22 @@ pnpm preflight    # the live /gpt door and the listing's links; must pass
 **Tools follow the server.** OpenAI scans the door every day. Tool changes go
 live once its checks pass, with no new listing version and no publish step.
 A change it flags is held, and that tool keeps its last approved definition.
-So the server has to stay compatible with the approved schemas until the
-held update is live.
+The server's instructions are checked with the tools they affect, so they
+can be held too. So the server has to stay compatible with the approved
+schemas until the held update is live. ChatGPT may keep the card's HTML for
+up to an hour after a compatible change, so a card change that would break
+an older host needs a new resource URI.
 
 **After every hosted MCP release:**
 
-1. Run `pnpm preflight`. A failure here is a change the scan would hold.
+1. Run `pnpm preflight`. A failure here is likely a change the scan would
+   flag.
 2. In the management page, open **MCPs**, then the server, then **Issues**,
    and select **Rescan**. Waiting for the daily scan also works.
 3. Read the result. A held tool shows its **Held update** beside its **Live
    definition**. Fix it on the server and rescan, or appeal.
+4. Check what ChatGPT actually got in a new conversation, not the version
+   the server reports.
 
 **The listing's version is the MCP version it was published with.** Between
 listing uploads the door runs ahead of it, and preflight says so without
@@ -55,7 +61,19 @@ failing.
    `zip -r -X shipstatic.zip .codex-plugin .mcp.json assets skills`.
 3. In the management page, select **Upload plugin to make changes**, upload
    the ZIP, and resolve what **Metadata & Skills** reports.
-4. Submit for review. Once approved, publish it.
+4. Open **MCPs** and check the saved connection: the URL is the `/gpt` door
+   and the authentication mode is the one `.mcp.json` declares. Don't select
+   **Reconnect**, and never delete or rotate the OAuth client: every account
+   already connected in ChatGPT signs in through it. If the mode isn't shown,
+   ask OpenAI support to confirm it before submitting.
+5. Submit for review. Once approved, publish it.
+6. In a ChatGPT account that has never connected ShipStatic, publish with no
+   account, then ask for an account feature and connect. A sign-in failing
+   there with an invalid redirect means ChatGPT moved to its stable redirect
+   URI (`https://chatgpt.com/connector_platform_oauth_redirect`), which our
+   authorization server's issuer identification makes it entitled to: the
+   connection then needs a client that allows it, which is a support
+   question, never a deleted client.
 
 The MCP server's URL can't change in this flow. Changing it means asking
 OpenAI support.
@@ -97,10 +115,20 @@ Review details and nowhere else.
   without signing in. `mixed` lets a person publish straight away and connect
   only when they ask for something an account holds. Preflight holds
   `.mcp.json` to the mode the door's tools imply.
-- **The site password stays.** `deployments_upload` takes an optional
-  `password` that locks the site it publishes. It's a setting for the
-  user's own site, not their credential to another service, and the
-  published listing says it.
+- **The site password stays, on our reading of the policy.** OpenAI's data
+  rules name "passwords" among the credentials a plugin must not collect, and
+  don't carve out this case. Our reading: a password the user chooses, or the
+  agent makes up, to lock a site they are publishing is a setting for that
+  site, sent only to ShipStatic and stored hashed, not their credential to
+  any service. The 2.3.3 review approved the listing with the feature named
+  in its description. The skill never asks for a password the user uses
+  elsewhere. If a review rules otherwise, the field leaves the `/gpt` door
+  and the feature stays a console setting.
+- **The screenshot of a protected site shows the site.** The card's tile is
+  the deployment's screenshot, rendered unlocked, at a URL derived from a
+  secret and returned only to whoever published it or holds the account, who
+  already have the content. It is a capability URL, like the claim link,
+  which grants more.
 - **`via` and `status` stay in results.** `via` tells people where a deploy
   came from in the console. `status` is the deploy's state. Neither is
   telemetry.
@@ -108,13 +136,27 @@ Review details and nowhere else.
 - **One skill, publishing online.** The server's instructions say what an
   agent should do in a sentence; the skill is the workflow around
   `deployments_upload` for anything that can be HTML (a report, a page, a
-  dashboard, a small app): complete static files, one publish, the links and
-  the password told back, a change published again, a server-side request
+  dashboard, a small web app): the user's own instructions first, complete
+  static files, one upload per version, the links and the password told
+  back, a change published again, a server-side request and restricted data
   declined. It ships in the package rather than from the server,
   because OpenAI imports a server's skills as a snapshot at scan time and
   does not read them at runtime, so serving them adds machinery and no
   freshness. The estate's other `SKILL.md` teaches the `ship` CLI, which
   ChatGPT can't run, so it isn't one of these.
+- **Refused, each until the thing named happens:**
+  - **`openai/subject` as the rate-limit caller.** Anonymous deploys on `/gpt`
+    are metered per OpenAI egress address, and the busiest address peaked at
+    8 deploys in an hour against a budget of 100, so nobody is throttled.
+    Trusting a per-user value needs ChatGPT's client verified (mTLS) at the
+    edge. Reopen when a ChatGPT user is refused by the per-caller budget; the
+    mechanism belongs to the root backlog's "authenticate `X-Caller`".
+  - **A profile tool** (`openai/profile`). ChatGPT connects accounts without
+    one; `whoami` stays as it is. Reopen when people connect more than one
+    ShipStatic account in ChatGPT and need to tell them apart.
+  - **`agents/openai.yaml` for the skill.** OpenAI marks it optional, and a
+    dependency on the server the plugin already bundles could add a second
+    connection. Reopen when the skill scan asks for it.
 - **OpenAI's words.** This repo says plugin, Plugins Directory and MCP
   server URL, as OpenAI does. The repo name `gpt` and the `/gpt` door are
   ours.
