@@ -20,9 +20,8 @@ pnpm preflight    # the live /gpt door and the listing's links; must pass
 
 | Path | Purpose |
 |---|---|
-| `.codex-plugin/plugin.json` | The listing: name, descriptions, capabilities, category, starter prompts, links, logo and version, and under `extensions.com.openai` the review cases and release notes. It names the MCP declaration and the skills beside it. |
+| `.codex-plugin/plugin.json` | The listing: name, descriptions, capabilities, category, starter prompts, links, logo and version, and under `extensions.com.openai` the review cases and release notes. It names the skills beside it. The MCP connection is the app's, held in the portal, so the package declares none. |
 | `skills/publish-online/SKILL.md` | The skill: how to put a report, page, dashboard or small app online with `deployments_upload`, with no account, what to tell the user, and how to handle a password, changes and refusals. |
-| `.mcp.json` | The one MCP server, the `/gpt` door, and how ChatGPT connects to it: `mixed`, public and OAuth-protected access. |
 | `assets/icon-1024.png`, `assets/icon-480.png` | The logo and the composer icon the manifest names. |
 | `scripts/preflight.mjs` | Checks the live door (tools, hints, output schemas, the card, both halves of sign-in, PKCE) and the package (the portal's field limits, its links, its version against the door's, its connection mode against what the door's tools declare, and every tool its review cases and skills name). A green run is not the portal's scan or a reviewer's judgement. |
 | `.github/workflows/ci.yml` | Runs preflight on every push and weekly, against production. A failure reaches the alerts channel. |
@@ -55,14 +54,17 @@ failing.
 
 **To change the listing** (its text, starter prompts, links, logo, skills or connection):
 
-1. Edit `.codex-plugin/plugin.json`, `.mcp.json` or a skill, and set
+1. Edit `.codex-plugin/plugin.json` or a skill, and set
    `version` to the version the door reports now. Run `pnpm preflight`.
 2. Zip the package from the repo root, every file the manifest names included:
-   `zip -r -X shipstatic.zip .codex-plugin .mcp.json assets skills`.
+   `zip -r -X shipstatic.zip .codex-plugin assets skills`.
 3. In the management page, select **Upload plugin to make changes**, upload
    the ZIP, and resolve what **Metadata & Skills** reports.
 4. Open **MCPs** and check the saved connection: the URL is the `/gpt` door
-   and the authentication mode is the one `.mcp.json` declares. Don't select
+   and the authentication mode is `mixed`, which preflight names from the
+   door's tools. A change of mode is made there, through the app, never in
+   the package: the portal refuses a package that overrides an existing
+   app's authentication. Don't select
    **Reconnect**, and never delete or rotate the OAuth client: every account
    already connected in ChatGPT signs in through it. If the mode isn't shown,
    ask OpenAI support to confirm it before submitting.
@@ -110,11 +112,14 @@ Review details and nowhere else.
   other fourteen tools need an account (`oauth2`). ChatGPT offers its sign-in
   only when both halves are there: the tool's `securitySchemes`, and a
   refusal carrying `_meta["mcp/www_authenticate"]`.
-- **The connection is `mixed`.** Under `oauth`, ChatGPT links the account
-  before the first call, whatever each tool declares, so nobody publishes
-  without signing in. `mixed` lets a person publish straight away and connect
-  only when they ask for something an account holds. Preflight holds
-  `.mcp.json` to the mode the door's tools imply.
+- **The connection is `mixed`, set in the portal.** Under `oauth`, ChatGPT
+  links the account before the first call, whatever each tool declares, so
+  nobody publishes without signing in. `mixed` lets a person publish straight
+  away and connect only when they ask for something an account holds. The
+  mode belongs to the app in the portal: a package may not override an
+  existing app's authentication, so the package declares no MCP server at
+  all, as the release ZIP OpenAI exports doesn't. Preflight names the mode
+  the door's tools need, and a person checks it under MCPs.
 - **The site password stays, on our reading of the policy.** OpenAI's data
   rules name "passwords" among the credentials a plugin must not collect, and
   don't carve out this case. Our reading: a password the user chooses, or the

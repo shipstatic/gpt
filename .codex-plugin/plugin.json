@@ -87,7 +87,6 @@
     "termsOfServiceURL": "https://www.shipstatic.com/terms",
     "websiteURL": "https://shipstatic.com"
   },
-  "mcpServers": "./.mcp.json",
   "name": "app-6a06f62b2f50819181136d58192063d1",
   "skills": "./skills/",
   "version": "2.4.2"
