@@ -1,14 +1,13 @@
 # The listing's clock.
 #
-# This repo holds no product code: it holds the sources of the plugin package
-# OpenAI's directory takes, and `scripts/preflight.mjs` compares the package
-# to its owners and the live `/gpt` door to what OpenAI's scan evaluates. The
-# door moves in ANOTHER repo (`cloudflare/mcp`), on its own cadence, and once
-# the plugin is published OpenAI scans it daily and HOLDS a tool whose
-# annotations, description or schema it flags, so a release there can change
-# what users get without anyone here touching anything. A check that only
-# runs when somebody is about to submit is a check that runs once. So it runs
-# on a schedule as well as on push, and names the hold before the scan does.
+# This repo holds no product code: it holds the published ChatGPT listing as
+# OpenAI holds it, and `scripts/preflight.mjs` compares the live `/gpt` door to
+# what OpenAI's scan evaluates. The door moves in ANOTHER repo
+# (`cloudflare/mcp`), on its own cadence, and OpenAI scans it daily and HOLDS
+# a tool whose annotations, description or schema it flags, so a release there
+# can change what users get without anyone here touching anything. So the
+# check runs on a schedule as well as on push, and names the hold before the
+# scan does.
 #
 # Tests-only, main-only: nothing here publishes anything, and the repo keeps
 # its `main`-only exemption from the development-branch model (root
@@ -16,7 +15,7 @@
 # the public production door from an outside vantage point, the same reason
 # `edge-reachability.yml` stays hosted.
 #
-# No pnpm setup step: the manifest declares no dependencies and no
+# No pnpm setup step: package.json declares no dependencies and no
 # packageManager, and preflight is a plain Node script, so `node` runs it
 # directly. Adding pnpm here would install nothing and pin nothing.
 name: CI

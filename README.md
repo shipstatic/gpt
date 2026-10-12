@@ -1,67 +1,110 @@
-# ShipStatic ChatGPT plugin: the listing
+# ShipStatic in ChatGPT
 
-This repo is ShipStatic's listing in OpenAI's Plugins Directory (shared by
-ChatGPT and Codex), kept as its sources. OpenAI takes a plugin as a ZIP:
-`plugin.json` (the manifest, with the listing text, the review cases and
-the release notes under `extensions.com.openai`), `mcp.json` (the one MCP
-server) and the images they name. Both JSON files are built here from
-`manifest.md` and `submission/test-cases.json`, never written by hand, and
-the tools themselves are not in the package at all: OpenAI scans the hosted
-MCP server for them, daily once the plugin is published, and takes eligible
-changes live on its own.
+ShipStatic's plugin in OpenAI's Plugins Directory, shared by ChatGPT and
+Codex. It connects one MCP server, the hosted door at
+`https://mcp.shipstatic.com/gpt`.
 
-## Quick start
+- **The listing:** https://chatgpt.com/plugins/plugin_asdk_app_6a06f62b2f50819181136d58192063d1
+- **Where it's managed:** https://platform.openai.com/plugins/manage/plugin_asdk_app_6a06f62b2f50819181136d58192063d1
+
+This repo holds no product code. The door is served by the hosted MCP in
+`cloudflare/mcp`. This repo holds the listing as OpenAI holds it, and a
+preflight that checks the door against what OpenAI checks.
 
 ```bash
-pnpm preflight    # The live door, the four listing URLs, the package: must be all-green
-pnpm package      # Build plugin.json, mcp.json and dist/shipstatic-plugin.zip
-pnpm checklist    # The human steps, before, in and after the portal
+pnpm preflight    # the live /gpt door and the listing's links; must pass
 ```
-
-Then upload `dist/shipstatic-plugin.zip` at https://platform.openai.com/plugins
-and walk the checklist. The reviewer credentials are the one thing typed into
-the portal by hand; everything else arrives in the ZIP.
 
 ## What lives where
 
 | Path | Purpose |
 |---|---|
-| `manifest.md` | Every listing fact, once: the package name and version, the plugin name, subtitle, long description, developer name, category, capabilities, default prompts, the four URLs, the MCP server URL, the authentication posture and the reviewer arrangement, the demo recording URL, the release notes. Pinned headers (`## Name: \`value\``) are read by the build; sections are its prose. |
-| `submission/test-cases.json` | Five positive and three negative cases the review team runs against the live plugin on the reviewer account. Together the positives walk the product: an anonymous deploy, connecting the account, reading it, a domain read, a deploy the case deletes. |
-| `plugin.json`, `mcp.json` | The package's two files, BUILT by `pnpm package` and committed so the diff between uploads is the review record; preflight refuses a stale one. |
-| `dist/` | The ZIP, rebuilt on demand and not committed. |
-| `assets/` | The icon in two sizes (the listing's `logo` and `composerIcon`) and the card screenshots. The directory no longer shows screenshots; `assets/in-context/` keeps the captures as review evidence. |
-| `policy/` | Drafts for `shipstatic.com/privacy`, `/terms`, and the content-moderation stance. The live pages carry the anonymous-deploy disclosures since the first submission; the drafts stay as the record of what was added. |
-| `scripts/` | `preflight.mjs` runs every automated check: the live door (the auth halves, the hints, the schemas, a malformed credential's answer), the four URLs, the package against its owners. `package.mjs` builds the package (`lib/plugin.mjs` is the derivation both share). `checklist.mjs` prints the human steps, reading the manifest's pins and the open decisions from `docs/decisions.md`. |
-| `docs/` | `decisions.md` is the record of choices made and open. `submission-history.md` logs each upload, review outcome and publish. |
-| `.github/workflows/ci.yml` | Preflight on every push and weekly, against production: the clock that finds a change the daily scan would hold before the scan does. |
+| `.codex-plugin/plugin.json` | The published listing: name, descriptions, category, starter prompt, links and version. It's the one file in OpenAI's release ZIP, committed as downloaded. |
+| `assets/icon-1024.png`, `assets/icon-480.png` | The plugin's logo, in the two sizes the portal takes. |
+| `scripts/preflight.mjs` | Checks the door (tools, hints, output schemas, the card, both halves of sign-in) and the listing (its links answer, and its version against the door's). |
+| `.github/workflows/ci.yml` | Runs preflight on every push and weekly, against production. A failure reaches the alerts channel. |
 
-## Why this shape
+## How updates reach ChatGPT
 
-- **One product, and the hosted endpoint is the door.** The listing leads
-  with the hosted endpoint (no install, no signup, no API key) and never
-  mentions the hosted MCP's implementation, only its user-facing surface.
-- **Verify our half, don't automate theirs.** OpenAI's portal is
-  interactive and changes faster than we can keep up with. What we control
-  (the door, the auth posture on the wire, the URLs, the package) is checked
-  by machine; what they control is a checklist.
-- **`manifest.md` is the only place a listing fact is written.** The
-  package is derived from it and fenced to it, so there is no second copy of
-  the text to keep aligned, and the portal's own fields are read-only for a
-  packaged plugin by design.
-- **Two clocks, kept apart.** The package moves when a listing fact changes,
-  with a new version and a new ZIP. The tools move with the server in
-  another repo, and OpenAI's daily scan carries them; a release there owes
-  no upload here, only a rescan if the change should land today.
+**Tools follow the server.** OpenAI scans the door every day. Tool changes go
+live once its checks pass, with no new listing version and no publish step.
+A change it flags is held, and that tool keeps its last approved definition.
+So the server has to stay compatible with the approved schemas until the
+held update is live.
 
-## When `pnpm preflight` runs
+**After every hosted MCP release:**
 
-1. **Before every upload**: the checklist opens with it.
-2. **After every hosted MCP release**, in the other repo's version-bump
-   workflow (`cloudflare/mcp/CLAUDE.md`): the scan evaluates the tools'
-   annotations, descriptions and schemas, and holds a flagged change against
-   the last approved definition, so a change the scan would hold is a change
-   preflight names first.
-3. **On a schedule**, weekly and on every push (`.github/workflows/ci.yml`),
-   against production, because a runbook step in another repo is a check that
-   runs when somebody remembers.
+1. Run `pnpm preflight`. A failure here is a change the scan would hold.
+2. In the management page, open **MCPs**, then the server, then **Issues**,
+   and select **Rescan**. Waiting for the daily scan also works.
+3. Read the result. A held tool shows its **Held update** beside its **Live
+   definition**. Fix it on the server and rescan, or appeal.
+
+**The listing's version is the MCP version it was published with.** Between
+listing uploads the door runs ahead of it, and preflight says so without
+failing.
+
+**To change the listing** (its text, starter prompt, links or logo):
+
+1. Edit `.codex-plugin/plugin.json`, and set `version` to the version the
+   door reports now.
+2. Zip it from the repo root: `zip -r -X shipstatic.zip .codex-plugin`.
+3. In the management page, select **Upload plugin to make changes**, upload
+   the ZIP, and resolve what **Metadata & Skills** reports.
+4. Submit for review. Once approved, publish it, and commit the
+   `plugin.json` that was published.
+
+The MCP server's URL can't change in this flow. Changing it means asking
+OpenAI support.
+
+## The reviewer account
+
+Each review runs on a ShipStatic account we keep for it, and OpenAI asks
+that it stay usable for later reviews. Its credentials go in the portal's
+Review details and nowhere else.
+
+- **Sign-in:** `shipstatic.reviewer@gmail.com` (display name "ShipStatic
+  Reviewer"), account `479svhttge600ru7`, on the sponsored plan. It signs in
+  with a ShipStatic password. It's the one address that's shown a password
+  field, because OpenAI's reviewers can't use codes, magic links or MFA. Its
+  password changes only if it leaks, and Review details is updated the same
+  day.
+- **What it holds** (all safe to change or delete):
+  - `surging-whirl-34s7s7d.shipstatic.com`, a hello page (`review`, `hello`)
+  - `lucid-ripple-z77vz8u.shipstatic.com`, two pages and a stylesheet
+    (`review`, `welcome`)
+  - `airy-bot-mv3w7z3.shipstatic.com`, locked with the site password
+    `hello-reviewer` (`review`, `private`)
+  - `review-team.shipstatic.com`, a platform domain on the hello page
+  - `reviewer.exampledomain.xyz`, a custom domain on the welcome site
+
+## Decisions
+
+- **One door for ChatGPT.** The `/gpt` path serves the same server as `/`.
+  It exists so deploys from ChatGPT carry `via: 'gpt'`, and so a sign-in
+  refusal takes the shape ChatGPT reads.
+- **Sign-in is per tool.** `deployments_upload` works without an account
+  (`noauth` and `oauth2`), and the other fourteen tools need one (`oauth2`).
+  ChatGPT shows its sign-in only when both halves are there: the tool's
+  `securitySchemes`, and a refusal carrying `_meta["mcp/www_authenticate"]`.
+  Preflight checks both.
+- **The site password stays.** `deployments_upload` takes an optional
+  `password` that locks the site it publishes. It's a setting for the
+  user's own site, not their credential to another service, and the
+  published listing says it.
+- **`via` and `status` stay in results.** `via` tells people where a deploy
+  came from in the console. `status` is the deploy's state. Neither is
+  telemetry.
+- **Developer Tools only, English only.**
+- **No plugin skill.** The server's instructions already carry the deploy
+  and domain steps. The estate's `SKILL.md` teaches the `ship` CLI, which
+  ChatGPT can't run, so it's never uploaded here. A skill is worth writing
+  when a review note or how people use it shows a need the instructions
+  can't meet.
+- **OpenAI's words.** This repo says plugin, Plugins Directory and MCP
+  server URL, as OpenAI does. The repo name `gpt` and the `/gpt` door are
+  ours.
+
+## License
+
+MIT

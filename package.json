@@ -1,12 +1,10 @@
 {
   "name": "@shipstatic/gpt-submission",
   "private": true,
-  "description": "ShipStatic ChatGPT plugin: the listing, derived. plugin.json and mcp.json are built from manifest.md and the test cases, and packaged as the ZIP OpenAI's directory takes; the hosted MCP server has its own version in cloudflare/mcp. This package is internal tooling and is intentionally version-less.",
+  "description": "ShipStatic in ChatGPT: the published listing as OpenAI holds it, and the preflight that holds the hosted /gpt door to what OpenAI's scan checks. The hosted MCP server lives in cloudflare/mcp. Internal tooling, intentionally version-less: the listing's version is in .codex-plugin/plugin.json.",
   "type": "module",
   "scripts": {
-    "preflight": "node scripts/preflight.mjs",
-    "package": "node scripts/package.mjs",
-    "checklist": "node scripts/checklist.mjs"
+    "preflight": "node scripts/preflight.mjs"
   },
   "license": "MIT"
 }

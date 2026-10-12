@@ -1,0 +1,23 @@
+{
+  "author": {
+    "name": "ShipStatic"
+  },
+  "description": "ShipStatic publishes static websites from files created in ChatGPT. Users can deploy anonymously to an instant live URL, optionally protect a deployment with a password, and connect an account to inspect or manage deployments and custom domains.",
+  "interface": {
+    "capabilities": [],
+    "category": "Developer Tools",
+    "defaultPrompt": [
+      "Create a Paris destination page and put it online."
+    ],
+    "developerName": "ShipStatic",
+    "displayName": "ShipStatic",
+    "longDescription": "ShipStatic publishes static websites from files created in ChatGPT. Users can deploy anonymously to an instant live URL, optionally protect a deployment with a password, and connect an account to inspect or manage deployments and custom domains.",
+    "privacyPolicyURL": "https://www.shipstatic.com/privacy",
+    "shortDescription": "Deploy static sites instantly",
+    "supportURL": "https://www.shipstatic.com/support",
+    "termsOfServiceURL": "https://www.shipstatic.com/terms",
+    "websiteURL": "https://shipstatic.com"
+  },
+  "name": "app-6a06f62b2f50819181136d58192063d1",
+  "version": "2.3.3"
+}
