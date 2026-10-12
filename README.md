@@ -20,10 +20,11 @@ pnpm preflight    # the live /gpt door and the listing's links; must pass
 
 | Path | Purpose |
 |---|---|
-| `.codex-plugin/plugin.json` | The listing: name, descriptions, capabilities, category, starter prompts, links, logo and version. It names the MCP declaration beside it. |
+| `.codex-plugin/plugin.json` | The listing: name, descriptions, capabilities, category, starter prompts, links, logo and version. It names the MCP declaration and the skills beside it. |
+| `skills/publish-a-site/SKILL.md` | The skill: how to put what the user asked for online with `deployments_upload`, with no account, what to tell them, and how to handle a password, changes and refusals. |
 | `.mcp.json` | The one MCP server, the `/gpt` door, and how ChatGPT connects to it: `mixed`, public and OAuth-protected access. |
 | `assets/icon-1024.png`, `assets/icon-480.png` | The logo and the composer icon the manifest names. |
-| `scripts/preflight.mjs` | Checks the door (tools, hints, output schemas, the card, both halves of sign-in) and the listing (its links answer, its version against the door's, and its connection mode against what the door's tools declare). |
+| `scripts/preflight.mjs` | Checks the door (tools, hints, output schemas, the card, both halves of sign-in) and the listing (its links answer, its version against the door's, its connection mode against what the door's tools declare, and every tool its skills name). |
 | `.github/workflows/ci.yml` | Runs preflight on every push and weekly, against production. A failure reaches the alerts channel. |
 
 ## How updates reach ChatGPT
@@ -46,12 +47,12 @@ held update is live.
 listing uploads the door runs ahead of it, and preflight says so without
 failing.
 
-**To change the listing** (its text, starter prompt, links, logo or connection):
+**To change the listing** (its text, starter prompts, links, logo, skills or connection):
 
-1. Edit `.codex-plugin/plugin.json` or `.mcp.json`, and set `version` to the
-   version the door reports now. Run `pnpm preflight`.
+1. Edit `.codex-plugin/plugin.json`, `.mcp.json` or a skill, and set
+   `version` to the version the door reports now. Run `pnpm preflight`.
 2. Zip the package from the repo root, every file the manifest names included:
-   `zip -r -X shipstatic.zip .codex-plugin .mcp.json assets`.
+   `zip -r -X shipstatic.zip .codex-plugin .mcp.json assets skills`.
 3. In the management page, select **Upload plugin to make changes**, upload
    the ZIP, and resolve what **Metadata & Skills** reports.
 4. Submit for review. Once approved, publish it.
@@ -104,11 +105,15 @@ Review details and nowhere else.
   came from in the console. `status` is the deploy's state. Neither is
   telemetry.
 - **Developer Tools only, English only.**
-- **No plugin skill.** The server's instructions already carry the deploy
-  and domain steps. The estate's `SKILL.md` teaches the `ship` CLI, which
-  ChatGPT can't run, so it's never uploaded here. A skill is worth writing
-  when a review note or how people use it shows a need the instructions
-  can't meet.
+- **One skill, publishing a site.** The server's instructions say what an
+  agent should do in a sentence; the skill is the workflow around
+  `deployments_upload`: complete static files, one publish, the links and
+  the password told back, a change published as a new site, a server-side
+  request declined. It ships in the package rather than from the server,
+  because OpenAI imports a server's skills as a snapshot at scan time and
+  does not read them at runtime, so serving them adds machinery and no
+  freshness. The estate's other `SKILL.md` teaches the `ship` CLI, which
+  ChatGPT can't run, so it isn't one of these.
 - **OpenAI's words.** This repo says plugin, Plugins Directory and MCP
   server URL, as OpenAI does. The repo name `gpt` and the `/gpt` door are
   ours.

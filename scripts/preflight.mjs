@@ -12,13 +12,13 @@
 //
 // Exits non-zero on any failure, which is what the scheduled run reports.
 
-import { existsSync } from 'node:fs';
+import { existsSync, readdirSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 
 const MCP = process.env.PREFLIGHT_MCP ?? process.env.PREFLIGHT_HOST ?? 'https://mcp.shipstatic.com';
 const SITE = process.env.PREFLIGHT_SITE ?? 'https://shipstatic.com';
 // The listing's package, in the Codex layout OpenAI's release ZIP uses: the
-// manifest, the one MCP server it names, and the images it names.
+// manifest, the one MCP server it names, the images it names, and its skills.
 const LISTING = new URL('../.codex-plugin/plugin.json', import.meta.url);
 const SERVERS = new URL('../.mcp.json', import.meta.url);
 const EXPECTED_TOOL = 'deployments_upload';
@@ -283,6 +283,29 @@ if (listing) {
   missing.length === 0
     ? pass(`The logo and the composer icon are in the package (${images.join(', ')})`)
     : fail('Listing images', `named but absent: ${missing.join(', ')}`);
+
+  // Every skill is a folder holding a SKILL.md whose name is the folder's, and
+  // every tool a skill names is one the door serves: a skill teaching a tool
+  // the door lost is instructions that fail.
+  try {
+    const skillsDir = new URL(`../${listing.skills}`, import.meta.url);
+    const live = new Set(liveTools.map((t) => t.name));
+    const folders = readdirSync(skillsDir, { withFileTypes: true }).filter((d) => d.isDirectory());
+    for (const { name } of folders) {
+      const text = await readFile(new URL(`${name}/SKILL.md`, skillsDir), 'utf8');
+      const front = text.match(/^---\n([\s\S]*?)\n---/)?.[1] ?? '';
+      const named = front.match(/^name:\s*(.+)$/m)?.[1]?.trim();
+      const described = front.match(/^description:\s*(.+)$/m)?.[1]?.trim();
+      const tools = [...new Set(text.match(/\b(?:deployments|domains)_[a-z]+\b|\bwhoami\b/g) ?? [])];
+      const unknown = tools.filter((t) => !live.has(t));
+      named === name && described && tools.length > 0 && unknown.length === 0
+        ? pass(`Skill ${name}: named for its folder, described, and every tool it names is live (${tools.join(', ')})`)
+        : fail(`Skill ${name}`, `name=${named} described=${Boolean(described)} tools=${tools.join(',') || 'none'} unknown=${unknown.join(',')}`);
+    }
+    if (folders.length === 0) fail('Skills', `${listing.skills} holds no skill`);
+  } catch (err) {
+    fail('Skills', String(err.message));
+  }
 
   // The connection's mode must be the one the door's own tools declare. A
   // `noauth` tool beside `oauth2` ones is the hybrid: publishing works with no
