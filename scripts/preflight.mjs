@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 // Preflight: every check that can be automated against the live `/gpt` door
-// and the published listing. OpenAI scans the door daily and takes tool
+// and the listing's package. OpenAI scans the door daily and takes tool
 // changes live on its own, holding any it flags, and the door moves in
 // another repo (`cloudflare/mcp`). So this runs after every hosted MCP
 // release, before every upload, and weekly (`.github/workflows/ci.yml`): a
@@ -12,12 +12,13 @@
 //
 // Exits non-zero on any failure, which is what the scheduled run reports.
 
+import { existsSync } from 'node:fs';
 import { readFile } from 'node:fs/promises';
 
 const MCP = process.env.PREFLIGHT_MCP ?? process.env.PREFLIGHT_HOST ?? 'https://mcp.shipstatic.com';
 const SITE = process.env.PREFLIGHT_SITE ?? 'https://shipstatic.com';
-// The listing as OpenAI holds it, in the Codex layout its release ZIP uses:
-// the manifest, and the one MCP server it names.
+// The listing's package, in the Codex layout OpenAI's release ZIP uses: the
+// manifest, the one MCP server it names, and the images it names.
 const LISTING = new URL('../.codex-plugin/plugin.json', import.meta.url);
 const SERVERS = new URL('../.mcp.json', import.meta.url);
 const EXPECTED_TOOL = 'deployments_upload';
@@ -257,8 +258,8 @@ let liveVersion;
     : fail('Instructing descriptions', instructing.join(', '));
 }
 
-// ---------- 2. The published listing ----------
-section(`[2/2] The published listing (${LISTING.pathname.split('/').slice(-2).join('/')})`);
+// ---------- 2. The listing's package ----------
+section(`[2/2] The listing's package (${LISTING.pathname.split('/').slice(-2).join('/')})`);
 
 let listing;
 try {
@@ -275,6 +276,13 @@ if (listing) {
   listing.version === liveVersion
     ? pass(`The listing's version is the door's (${liveVersion})`)
     : info(`The listing shows ${listing.version}, the door runs ${liveVersion}: tools follow through the daily scan, the version moves with the next listing upload`);
+
+  // Every image the manifest names ships in the ZIP, so it must exist here.
+  const images = [listing.interface.logo, listing.interface.composerIcon];
+  const missing = images.filter((p) => typeof p !== 'string' || !existsSync(new URL(`../${p}`, import.meta.url)));
+  missing.length === 0
+    ? pass(`The logo and the composer icon are in the package (${images.join(', ')})`)
+    : fail('Listing images', `named but absent: ${missing.join(', ')}`);
 
   // The connection's mode must be the one the door's own tools declare. A
   // `noauth` tool beside `oauth2` ones is the hybrid: publishing works with no

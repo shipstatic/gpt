@@ -1,7 +1,7 @@
 {
   "name": "@shipstatic/gpt-submission",
   "private": true,
-  "description": "ShipStatic in ChatGPT: the published listing as OpenAI holds it, and the preflight that holds the hosted /gpt door to what OpenAI's scan checks. The hosted MCP server lives in cloudflare/mcp. Internal tooling, intentionally version-less: the listing's version is in .codex-plugin/plugin.json.",
+  "description": "ShipStatic in ChatGPT: the listing's package, and the preflight that holds the hosted /gpt door to what OpenAI's scan checks. The hosted MCP server lives in cloudflare/mcp. Internal tooling, intentionally version-less: the listing's version is in .codex-plugin/plugin.json.",
   "type": "module",
   "scripts": {
     "preflight": "node scripts/preflight.mjs"

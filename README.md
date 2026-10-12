@@ -20,9 +20,9 @@ pnpm preflight    # the live /gpt door and the listing's links; must pass
 
 | Path | Purpose |
 |---|---|
-| `.codex-plugin/plugin.json` | The listing: name, descriptions, category, starter prompt, links and version. It names the MCP declaration beside it. |
+| `.codex-plugin/plugin.json` | The listing: name, descriptions, capabilities, category, starter prompts, links, logo and version. It names the MCP declaration beside it. |
 | `.mcp.json` | The one MCP server, the `/gpt` door, and how ChatGPT connects to it: `mixed`, public and OAuth-protected access. |
-| `assets/icon-1024.png`, `assets/icon-480.png` | The plugin's logo, in the two sizes the portal takes. |
+| `assets/icon-1024.png`, `assets/icon-480.png` | The logo and the composer icon the manifest names. |
 | `scripts/preflight.mjs` | Checks the door (tools, hints, output schemas, the card, both halves of sign-in) and the listing (its links answer, its version against the door's, and its connection mode against what the door's tools declare). |
 | `.github/workflows/ci.yml` | Runs preflight on every push and weekly, against production. A failure reaches the alerts channel. |
 
@@ -50,7 +50,8 @@ failing.
 
 1. Edit `.codex-plugin/plugin.json` or `.mcp.json`, and set `version` to the
    version the door reports now. Run `pnpm preflight`.
-2. Zip both from the repo root: `zip -r -X shipstatic.zip .codex-plugin .mcp.json`.
+2. Zip the package from the repo root, every file the manifest names included:
+   `zip -r -X shipstatic.zip .codex-plugin .mcp.json assets`.
 3. In the management page, select **Upload plugin to make changes**, upload
    the ZIP, and resolve what **Metadata & Skills** reports.
 4. Submit for review. Once approved, publish it.
@@ -65,9 +66,9 @@ that it stay usable for later reviews. Its credentials go in the portal's
 Review details and nowhere else.
 
 - **Sign-in:** `shipstatic.reviewer@gmail.com` (display name "ShipStatic
-  Reviewer"), account `479svhttge600ru7`, on the sponsored plan. It signs in
-  with a ShipStatic password. It's the one address that's shown a password
-  field, because OpenAI's reviewers can't use codes, magic links or MFA. Its
+  Reviewer"), the owner of a sponsored account. It signs in with a
+  ShipStatic password. It's the one address that's shown a password field,
+  because OpenAI's reviewers can't use codes, magic links or MFA. Its
   password changes only if it leaks, and Review details is updated the same
   day.
 - **What it holds** (all safe to change or delete):

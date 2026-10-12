@@ -12,6 +12,7 @@
       "Connect an account to keep every site and use your own domain"
     ],
     "category": "Developer Tools",
+    "composerIcon": "./assets/icon-480.png",
     "defaultPrompt": [
       "Create a Paris destination page and put it online.",
       "Make a one-page site for my bakery and give me a link I can share.",
@@ -19,6 +20,7 @@
     ],
     "developerName": "ShipStatic",
     "displayName": "ShipStatic",
+    "logo": "./assets/icon-1024.png",
     "longDescription": "Ask ChatGPT to make a page, a report or a small app, and ShipStatic puts it online. You get a link you can share right away. You don't need an account. A site published without one stays up for 3 days, and its claim link lets you keep it. Want it private? Ask for built-in password protection, and visitors have to type the password before they see anything. If you have a ShipStatic account, connect it to keep every site, see them all and use your own domain.",
     "privacyPolicyURL": "https://www.shipstatic.com/privacy",
     "shortDescription": "Deploy static sites instantly",
