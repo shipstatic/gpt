@@ -128,7 +128,11 @@ Review details and nowhere else.
   the deployment's screenshot, rendered unlocked, at a URL derived from a
   secret and returned only to whoever published it or holds the account, who
   already have the content. It is a capability URL, like the claim link,
-  which grants more.
+  which grants more. The listing's promise, that visitors type the password
+  before they see anything, is about the people the link is shared with, and
+  it holds. Telling the publisher about a URL only they receive would add
+  worry, not protection; if protected previews should show the lock screen
+  instead, that is a change in the screenshot worker, not in this copy.
 - **`via` and `status` stay in results.** `via` tells people where a deploy
   came from in the console. `status` is the deploy's state. Neither is
   telemetry.

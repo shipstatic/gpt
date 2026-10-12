@@ -36,7 +36,7 @@
               "description": "Publishing into the connected account, then a controlled delete of what the case itself created. Nothing that existed before is touched.",
               "prompt": "Publish a one-line page that says \"Delete me\" to my ShipStatic account, then delete that deployment.",
               "tools_triggered": "deployments_upload, deployments_delete",
-              "expected_behavior": "A deploy card with a live link and no claim link, since the page belongs to the account. Then a reply confirming the deployment is deleted. Opening the link afterwards no longer shows the page, and the account has three deployments again."
+              "expected_behavior": "A deploy card with a live link and no claim link, since the page belongs to the account. Then a reply saying the deletion was accepted: it finishes within moments rather than instantly. Shortly afterwards the link no longer shows the page, and the account holds the deployments it held before the case began."
             }
           ],
           "negative": [
