@@ -8,8 +8,9 @@ Codex. It connects one MCP server, the hosted door at
 - **Where it's managed:** https://platform.openai.com/plugins/manage/plugin_asdk_app_6a06f62b2f50819181136d58192063d1
 
 This repo holds no product code. The door is served by the hosted MCP in
-`cloudflare/mcp`. This repo holds the listing as OpenAI holds it, and a
-preflight that checks the door against what OpenAI checks.
+`cloudflare/mcp`. This repo holds the listing's package, in the Codex layout
+OpenAI's release ZIP uses, and a preflight that checks the door against what
+OpenAI checks.
 
 ```bash
 pnpm preflight    # the live /gpt door and the listing's links; must pass
@@ -19,9 +20,10 @@ pnpm preflight    # the live /gpt door and the listing's links; must pass
 
 | Path | Purpose |
 |---|---|
-| `.codex-plugin/plugin.json` | The published listing: name, descriptions, category, starter prompt, links and version. It's the one file in OpenAI's release ZIP, committed as downloaded. |
+| `.codex-plugin/plugin.json` | The listing: name, descriptions, category, starter prompt, links and version. It names the MCP declaration beside it. |
+| `.mcp.json` | The one MCP server, the `/gpt` door, and how ChatGPT connects to it: `mixed`, public and OAuth-protected access. |
 | `assets/icon-1024.png`, `assets/icon-480.png` | The plugin's logo, in the two sizes the portal takes. |
-| `scripts/preflight.mjs` | Checks the door (tools, hints, output schemas, the card, both halves of sign-in) and the listing (its links answer, and its version against the door's). |
+| `scripts/preflight.mjs` | Checks the door (tools, hints, output schemas, the card, both halves of sign-in) and the listing (its links answer, its version against the door's, and its connection mode against what the door's tools declare). |
 | `.github/workflows/ci.yml` | Runs preflight on every push and weekly, against production. A failure reaches the alerts channel. |
 
 ## How updates reach ChatGPT
@@ -44,15 +46,14 @@ held update is live.
 listing uploads the door runs ahead of it, and preflight says so without
 failing.
 
-**To change the listing** (its text, starter prompt, links or logo):
+**To change the listing** (its text, starter prompt, links, logo or connection):
 
-1. Edit `.codex-plugin/plugin.json`, and set `version` to the version the
-   door reports now.
-2. Zip it from the repo root: `zip -r -X shipstatic.zip .codex-plugin`.
+1. Edit `.codex-plugin/plugin.json` or `.mcp.json`, and set `version` to the
+   version the door reports now. Run `pnpm preflight`.
+2. Zip both from the repo root: `zip -r -X shipstatic.zip .codex-plugin .mcp.json`.
 3. In the management page, select **Upload plugin to make changes**, upload
    the ZIP, and resolve what **Metadata & Skills** reports.
-4. Submit for review. Once approved, publish it, and commit the
-   `plugin.json` that was published.
+4. Submit for review. Once approved, publish it.
 
 The MCP server's URL can't change in this flow. Changing it means asking
 OpenAI support.
@@ -83,11 +84,17 @@ Review details and nowhere else.
 - **One door for ChatGPT.** The `/gpt` path serves the same server as `/`.
   It exists so deploys from ChatGPT carry `via: 'gpt'`, and so a sign-in
   refusal takes the shape ChatGPT reads.
-- **Sign-in is per tool.** `deployments_upload` works without an account
-  (`noauth` and `oauth2`), and the other fourteen tools need one (`oauth2`).
-  ChatGPT shows its sign-in only when both halves are there: the tool's
-  `securitySchemes`, and a refusal carrying `_meta["mcp/www_authenticate"]`.
-  Preflight checks both.
+- **Publishing needs no account; everything else does.** `deployments_upload`
+  works without an account (`noauth` and `oauth2`): with none, the site gets
+  a claim link and lasts 3 days, and with one, it goes to the account. The
+  other fourteen tools need an account (`oauth2`). ChatGPT offers its sign-in
+  only when both halves are there: the tool's `securitySchemes`, and a
+  refusal carrying `_meta["mcp/www_authenticate"]`.
+- **The connection is `mixed`.** Under `oauth`, ChatGPT links the account
+  before the first call, whatever each tool declares, so nobody publishes
+  without signing in. `mixed` lets a person publish straight away and connect
+  only when they ask for something an account holds. Preflight holds
+  `.mcp.json` to the mode the door's tools imply.
 - **The site password stays.** `deployments_upload` takes an optional
   `password` that locks the site it publishes. It's a setting for the
   user's own site, not their credential to another service, and the

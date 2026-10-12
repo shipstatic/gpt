@@ -1,0 +1,17 @@
+{
+  "mcpServers": {
+    "shipstatic": {
+      "url": "https://mcp.shipstatic.com/gpt",
+      "extensions": {
+        "com.openai": {
+          "auth": {
+            "type": "mixed",
+            "client": {
+              "mode": "dcr"
+            }
+          }
+        }
+      }
+    }
+  }
+}

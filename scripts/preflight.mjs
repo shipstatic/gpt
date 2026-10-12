@@ -16,9 +16,10 @@ import { readFile } from 'node:fs/promises';
 
 const MCP = process.env.PREFLIGHT_MCP ?? process.env.PREFLIGHT_HOST ?? 'https://mcp.shipstatic.com';
 const SITE = process.env.PREFLIGHT_SITE ?? 'https://shipstatic.com';
-// The listing as OpenAI holds it: the release ZIP's one file, committed as
-// downloaded.
+// The listing as OpenAI holds it, in the Codex layout its release ZIP uses:
+// the manifest, and the one MCP server it names.
 const LISTING = new URL('../.codex-plugin/plugin.json', import.meta.url);
+const SERVERS = new URL('../.mcp.json', import.meta.url);
 const EXPECTED_TOOL = 'deployments_upload';
 const EXPECTED_WIDGET_URI = 'ui://widget/deploy-card.html';
 // The App origin is an IDENTITY fact: it names the plugin in OpenAI's
@@ -274,6 +275,30 @@ if (listing) {
   listing.version === liveVersion
     ? pass(`The listing's version is the door's (${liveVersion})`)
     : info(`The listing shows ${listing.version}, the door runs ${liveVersion}: tools follow through the daily scan, the version moves with the next listing upload`);
+
+  // The connection's mode must be the one the door's own tools declare. A
+  // `noauth` tool beside `oauth2` ones is the hybrid: publishing works with no
+  // account, everything else asks for one, and only `mixed` lets ChatGPT start
+  // without a sign-in. Under `oauth` it links the account before the first
+  // call, whatever a tool declares.
+  try {
+    listing.mcpServers === './.mcp.json'
+      ? pass('The listing names its MCP declaration (./.mcp.json)')
+      : fail('The listing mcpServers', String(listing.mcpServers));
+    const servers = Object.values(JSON.parse(await readFile(SERVERS, 'utf8')).mcpServers ?? {});
+    const server = servers[0];
+    servers.length === 1 && server.url === `${MCP}/gpt`
+      ? pass(`.mcp.json declares one server, the live door (${server.url})`)
+      : fail('.mcp.json server', JSON.stringify(servers.map((s) => s.url)));
+    const declared = new Set(liveTools.flatMap((t) => (t.securitySchemes ?? []).map((s) => s.type)));
+    const expected = declared.has('noauth') ? (declared.has('oauth2') ? 'mixed' : 'none') : 'oauth';
+    const mode = server?.extensions?.['com.openai']?.auth?.type;
+    mode === expected
+      ? pass(`The connection is declared ${mode}, as the door's tools are (${[...declared].sort().join(' + ')})`)
+      : fail('Connection auth', `.mcp.json says ${mode}; the door's tools make it ${expected}`);
+  } catch (err) {
+    fail('.mcp.json', String(err.message));
+  }
 
   const site = (url) => (SITE === 'https://shipstatic.com' ? url : url.replace(/^https:\/\/(www\.)?shipstatic\.com/, SITE));
   const urls = {
