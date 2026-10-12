@@ -24,9 +24,9 @@ const fetch = (url, init = {}) => globalThis.fetch(url, { signal: AbortSignal.ti
 const MCP = process.env.PREFLIGHT_MCP ?? process.env.PREFLIGHT_HOST ?? 'https://mcp.shipstatic.com';
 const SITE = process.env.PREFLIGHT_SITE ?? 'https://shipstatic.com';
 // The listing's package, in the Codex layout OpenAI's release ZIP uses: the
-// manifest, the images it names, and its skills. The MCP connection is the
-// app's, held in the portal, so the package declares none.
+// manifest, the one MCP server it names, the images it names, and its skills.
 const LISTING = new URL('../.codex-plugin/plugin.json', import.meta.url);
+const SERVERS = new URL('../.mcp.json', import.meta.url);
 const EXPECTED_TOOL = 'deployments_upload';
 const EXPECTED_WIDGET_URI = 'ui://widget/deploy-card.html';
 // The App origin is an IDENTITY fact: it names the plugin in OpenAI's
@@ -349,9 +349,23 @@ if (listing) {
     fail('Skills', String(err.message));
   }
 
-  // The connection's mode is the portal's: an app that already exists keeps
-  // its authentication there, and a package may not override it. What the
-  // door's tools declare says which mode the portal must hold, so say it.
+  // The package names its one server, which the portal requires for review
+  // cases, and never its authentication: an app that already exists keeps
+  // that in the portal and refuses a package that overrides it.
+  try {
+    const servers = Object.values(JSON.parse(await readFile(SERVERS, 'utf8')).mcpServers ?? {});
+    const [server] = servers;
+    listing.mcpServers === './.mcp.json' &&
+    servers.length === 1 &&
+    server.url === `${MCP}/gpt` &&
+    server.extensions?.['com.openai']?.auth === undefined
+      ? pass(`.mcp.json names one server, the live door (${server.url}), and no auth of its own`)
+      : fail('.mcp.json', JSON.stringify({ manifest: listing.mcpServers, servers }));
+  } catch (err) {
+    fail('.mcp.json', String(err.message));
+  }
+
+  // What the door's tools declare says which mode the portal must hold.
   const declared = new Set(liveTools.flatMap((t) => (t.securitySchemes ?? []).map((s) => s.type)));
   const mode = declared.has('noauth') ? (declared.has('oauth2') ? 'mixed' : 'none') : 'oauth';
   info(`The door's tools (${[...declared].sort().join(' + ')}) need the portal's connection set to ${mode}; check it under MCPs`);

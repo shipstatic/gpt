@@ -20,7 +20,8 @@ pnpm preflight    # the live /gpt door and the listing's links; must pass
 
 | Path | Purpose |
 |---|---|
-| `.codex-plugin/plugin.json` | The listing: name, descriptions, capabilities, category, starter prompts, links, logo and version, and under `extensions.com.openai` the review cases and release notes. It names the skills beside it. The MCP connection is the app's, held in the portal, so the package declares none. |
+| `.codex-plugin/plugin.json` | The listing: name, descriptions, capabilities, category, starter prompts, links, logo and version, and under `extensions.com.openai` the review cases and release notes. It names the MCP declaration and the skills beside it. |
+| `.mcp.json` | The one MCP server, by its URL, which the portal requires for the review cases. Never its authentication: that is the app's, in the portal. |
 | `skills/publish-online/SKILL.md` | The skill: how to put a report, page, dashboard or small app online with `deployments_upload`, with no account, what to tell the user, and how to handle a password, changes and refusals. |
 | `assets/icon-1024.png`, `assets/icon-480.png` | The logo and the composer icon the manifest names. |
 | `scripts/preflight.mjs` | Checks the live door (tools, hints, output schemas, the card, both halves of sign-in, PKCE) and the package (the portal's field limits, its links, its version against the door's, its connection mode against what the door's tools declare, and every tool its review cases and skills name). A green run is not the portal's scan or a reviewer's judgement. |
@@ -54,10 +55,10 @@ failing.
 
 **To change the listing** (its text, starter prompts, links, logo, skills or connection):
 
-1. Edit `.codex-plugin/plugin.json` or a skill, and set
+1. Edit `.codex-plugin/plugin.json`, `.mcp.json` or a skill, and set
    `version` to the version the door reports now. Run `pnpm preflight`.
 2. Zip the package from the repo root, every file the manifest names included:
-   `zip -r -X shipstatic.zip .codex-plugin assets skills`.
+   `zip -r -X shipstatic.zip .codex-plugin .mcp.json assets skills`.
 3. In the management page, select **Upload plugin to make changes**, upload
    the ZIP, and resolve what **Metadata & Skills** reports.
 4. Open **MCPs** and check the saved connection: the URL is the `/gpt` door
@@ -117,9 +118,10 @@ Review details and nowhere else.
   nobody publishes without signing in. `mixed` lets a person publish straight
   away and connect only when they ask for something an account holds. The
   mode belongs to the app in the portal: a package may not override an
-  existing app's authentication, so the package declares no MCP server at
-  all, as the release ZIP OpenAI exports doesn't. Preflight names the mode
-  the door's tools need, and a person checks it under MCPs.
+  existing app's authentication, so `.mcp.json` names the one server by its
+  URL (the review cases need exactly one) and carries no auth. Preflight
+  holds both halves, and names the mode the door's tools need for a person
+  to check under MCPs.
 - **The site password stays, on our reading of the policy.** OpenAI's data
   rules name "passwords" among the credentials a plugin must not collect, and
   don't carve out this case. Our reading: a password the user chooses, or the
