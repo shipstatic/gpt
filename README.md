@@ -65,10 +65,14 @@ failing.
    and the authentication mode is `mixed`, which preflight names from the
    door's tools. A change of mode is made there, through the app, never in
    the package: the portal refuses a package that overrides an existing
-   app's authentication. Don't select
-   **Reconnect**, and never delete or rotate the OAuth client: every account
-   already connected in ChatGPT signs in through it. If the mode isn't shown,
-   ask OpenAI support to confirm it before submitting.
+   app's authentication. Saving a change to the connection revokes the
+   portal's own grant, the one the daily scan signs in with, and the scan
+   then fails ("authorization is missing or no longer works") until
+   **Reconnect** or **Connect account** is selected here, which costs
+   nothing: it signs you in again through the existing client. Never delete
+   or rotate the OAuth client: every account already connected in ChatGPT
+   signs in through it. If the mode isn't shown, ask OpenAI support to
+   confirm it before submitting.
 5. Submit for review. Once approved, publish it.
 6. In a ChatGPT account that has never connected ShipStatic, publish with no
    account, then ask for an account feature and connect. A sign-in failing
