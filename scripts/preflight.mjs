@@ -9,7 +9,7 @@
 // blocker.
 //
 //   pnpm preflight                          # checks against prod
-//   PREFLIGHT_MCP=... pnpm preflight        # override the MCP endpoint
+//   PREFLIGHT_MCP=... pnpm preflight        # probe another MCP endpoint (the package still names prod)
 //   PREFLIGHT_SITE=... pnpm preflight       # override the marketing site
 //
 // Exits non-zero on any failure, which is what the scheduled run reports.
@@ -21,7 +21,12 @@ import { readFile } from 'node:fs/promises';
 // holding it until the job's own timeout.
 const fetch = (url, init = {}) => globalThis.fetch(url, { signal: AbortSignal.timeout(15_000), ...init });
 
-const MCP = process.env.PREFLIGHT_MCP ?? process.env.PREFLIGHT_HOST ?? 'https://mcp.shipstatic.com';
+// The hosted MCP's production origin is an IDENTITY fact: the package names
+// it to OpenAI, so `.mcp.json` is held to it whichever door this run probes.
+// The probe target is an ENVIRONMENT fact and follows PREFLIGHT_MCP, so a run
+// against the dev door checks the dev wire and the production package.
+const PRODUCTION_MCP = 'https://mcp.shipstatic.com';
+const MCP = process.env.PREFLIGHT_MCP ?? PRODUCTION_MCP;
 const SITE = process.env.PREFLIGHT_SITE ?? 'https://shipstatic.com';
 // The listing's package, in the Codex layout OpenAI's release ZIP uses: the
 // manifest, the one MCP server it names, the images it names, and its skills.
@@ -351,15 +356,17 @@ if (listing) {
 
   // The package names its one server, which the portal requires for review
   // cases, and never its authentication: an app that already exists keeps
-  // that in the portal and refuses a package that overrides it.
+  // that in the portal and refuses a package that overrides it. The server is
+  // the production `/gpt` door, the only value the package is ever uploaded
+  // with, whichever door this run probes.
   try {
     const servers = Object.values(JSON.parse(await readFile(SERVERS, 'utf8')).mcpServers ?? {});
     const [server] = servers;
     listing.mcpServers === './.mcp.json' &&
     servers.length === 1 &&
-    server.url === `${MCP}/gpt` &&
+    server.url === `${PRODUCTION_MCP}/gpt` &&
     server.extensions?.['com.openai']?.auth === undefined
-      ? pass(`.mcp.json names one server, the live door (${server.url}), and no auth of its own`)
+      ? pass(`.mcp.json names one server, the production door (${server.url}), and no auth of its own`)
       : fail('.mcp.json', JSON.stringify({ manifest: listing.mcpServers, servers }));
   } catch (err) {
     fail('.mcp.json', String(err.message));
