@@ -108,6 +108,12 @@ Review details and nowhere else.
 
 ## Decisions
 
+- **A dedicated connector, not the coding-agent plugin.** ShipStatic reaches
+  chat apps through connectors, each a URL submitted to that app's directory,
+  and coding agents through one plugin repo, `shipstatic/plugin`, which names
+  the plain `https://mcp.shipstatic.com`. This repo is the ChatGPT connector
+  and shares nothing with that one but the deploy skill's text. OpenAI's
+  word for the listing is plugin; ours for it is connector.
 - **One door for ChatGPT.** The `/gpt` path serves the same server as `/`.
   It exists so deploys from ChatGPT carry `via: 'gpt'`, and so a sign-in
   refusal takes the shape ChatGPT reads.
