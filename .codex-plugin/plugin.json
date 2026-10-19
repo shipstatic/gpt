@@ -58,7 +58,7 @@
         "commerce_description": "This plugin sells nothing and processes no payments."
       },
       "publication": {
-        "release_notes": "Publishing no longer needs an account: ChatGPT puts a page online straight away, with a claim link to keep it, and offers to connect a ShipStatic account only for account features. Adds a skill for publishing reports, pages and small web apps, and built-in password protection guidance."
+        "release_notes": "The publishing skill is now the same one ShipStatic ships for coding agents. In Codex, a folder on disk goes online through the ShipStatic CLI; in ChatGPT, a page goes up through the upload, as before. Either way it still needs no account, gives the claim link, and uses built-in password protection when asked."
       }
     }
   },
@@ -90,5 +90,5 @@
   "mcpServers": "./.mcp.json",
   "name": "app-6a06f62b2f50819181136d58192063d1",
   "skills": "./skills/",
-  "version": "2.4.2"
+  "version": "2.7.0"
 }

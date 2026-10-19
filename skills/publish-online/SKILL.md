@@ -1,31 +1,58 @@
 ---
 name: publish-online
-description: Publish a page, report, dashboard, slide deck, document, portfolio or small web app at a ShipStatic link anyone can open, with no account needed and optional built-in password protection. Use when the user asks to publish something, put it online or get a link others can open. Not for HTML the user only wants to see, download or keep as a file.
+description: Publish a site, page, report, dashboard, slide deck, document, portfolio or small web app at a ShipStatic link anyone can open, with no account needed and optional built-in password protection. Use when the user asks to publish something, deploy or host a static site or a build folder, put it online, or get a link others can open. Not for HTML the user only wants to see, download or keep as a file.
 ---
 
 # Publish online
 
-The user's own instructions come first. Where they say something different
-from this workflow, follow them.
+Publish when the user has asked for something to be online. If they want to
+see a draft first, show it and publish when they say so.
 
-Publish what the user wants online with `deployments_upload`: a report, a
-page, a dashboard, a slide deck, a document, a portfolio or a small web app.
-Publish when the user has asked for it to be online. If they want to see a draft
-first, show it and publish when they say so. Publishing needs no account, so
-don't ask the user to sign in or connect anything first.
+**Publishing needs no account.** Don't ask the user to sign in, connect
+anything, create an account or give a key before publishing. Most sites are
+published with no account, and that is the normal way, not a fallback.
+
+## Two separate questions
+
+1. **How the files travel: you choose.** There are two ways, and both work
+   with no account:
+   - **The CLI:** `npx -y @shipstatic/ship@3 <folder> --json`, for a folder on
+     disk.
+   - **The upload:** the ShipStatic MCP server's `deployments_upload` tool,
+     for files you send in the call.
+2. **Where the site lands: the result tells you.** The user's setup decides
+   it, and you don't check it first. With nothing set up, the site has no
+   account. If the user has set up an account for the way you used, it goes
+   into that account.
+
+## Find what to publish
+
+- **A project with a build step:** run its build, and once it succeeds,
+  publish the folder it writes. Build first even when an older build folder is
+  already there.
+- **A built site with nothing to build:** a folder with `index.html` at its
+  root, such as `dist/`, `build/` or `out/`. Publish that folder. If the user
+  names a folder, publish that one as it is.
+- **What you publish is a static site:** `index.html` at the root of the
+  folder, with the files it uses beside it. If a build makes a server app
+  instead (no `index.html`), don't publish it: say ShipStatic publishes static
+  sites, and offer to set up a static export. Don't change the project's
+  settings without asking.
+- **Something new to make:** make the files in a new folder of its own, with
+  the start page at `index.html`. Never write them into an existing folder
+  such as `dist/` or the project's own files: that overwrites the user's work
+  and publishes files that don't belong to the new site.
 
 ## Make the files
 
 - Make it as HTML, with CSS, JavaScript, images and fonts as needed. It runs in
   the browser. There is no server, so no backend code, database or server-side
   form handling.
-- Put the start page at `index.html`, at the root of the files you send. Link
+- Put the start page at `index.html`, at the root of what you publish. Link
   pages and files to each other with relative paths.
 - A report or a single page can be one `index.html` with its CSS and
   JavaScript inside it, unless the user wants separate files. Charts and
   tables can be drawn with inline SVG, HTML and CSS.
-- Send text files (HTML, CSS, JavaScript, JSON, SVG) as plain text. Use
-  `encoding: "base64"` only for binary files such as images and fonts.
 - Use only content the user gave you or that you can make yourself. Don't link
   to images or files at addresses you guessed.
 - Don't publish passwords, keys, government ID numbers, health records or
@@ -34,27 +61,69 @@ don't ask the user to sign in or connect anything first.
 
 ## Publish
 
-- `deployments_upload` works with no account: call it directly. Don't call
-  `whoami` or any other ShipStatic tool before it, and don't start a sign-in
-  to publish.
-- Send all the files in one upload for each version.
-- Don't set an expiry (`ttl`) unless the user has connected an account and
-  asks for one. Without an account, the platform's 3 days already apply, and
-  an expiry would make ChatGPT ask the user to sign in.
-- If the user wants it private or behind a password, pass `password`. That is
-  ShipStatic's built-in password protection, checked before any file is
-  served. Don't build a password page or script into the HTML. Make up a new
+Choose the way:
+
+- **A shell with Node.js 20.19 or newer: the CLI.** It reads the files from
+  disk, so nothing passes through the conversation.
+- **The CLI can't run** (no shell, no Node.js, or the shell can't reach npm
+  or ShipStatic) **and the files
+  are few and small: the upload.** Send text files (HTML, CSS, JavaScript,
+  JSON, SVG) as plain text, and binary files such as images and fonts with
+  `encoding: "base64"`.
+- **A large build the CLI can't send:** never read it into the conversation.
+  Ask the user to let the CLI reach the network, or tell them what is missing:
+  Node.js for the CLI, or the ShipStatic MCP server for the upload.
+
+Then:
+
+- Publish straight away. Before publishing, don't call `whoami` or any other
+  ShipStatic tool, don't run `ship whoami` or `ship config`, don't add
+  `--token`, and don't start a sign-in.
+- Publish all the files of a version at once.
+- Don't set an expiry (`ttl`) or a domain unless the user asks for one. Both
+  need an account.
+- If the user wants it private or behind a password, use ShipStatic's built-in
+  password protection: `--password <password>` on the CLI, or `password` on
+  the upload. It works with no account, and it is checked before any file is
+  served. Don't build a password page or script into the site. Make up a new
   password that is hard to guess, unless the user chose one. Never ask for a
   password the user already uses somewhere else.
+- If the CLI fails with `authentication_failed`, the key it used was refused.
+  Tell the user to replace it, with a new key from
+  https://my.shipstatic.com/api-key, where it is set: in `SHIP_TOKEN` if that
+  is set (it comes first), otherwise by running
+  `npx -y @shipstatic/ship@3 config`. Then stop: don't publish another way,
+  with no account or through the upload, unless the user asks. Another way can
+  put the site in another account, or in none.
+- If publishing fails otherwise, tell the user what the message says. Fix what
+  you can, for example a file type that isn't allowed, files that are too
+  large, or a project folder where its build folder was meant, and publish
+  once more.
 
 ## Tell the user
 
-Use what the upload returned:
+Both ways return the same fields for a published site. Read them; never
+decide from whether you are connected, or from which way you used. (A domain
+request returns the domain instead: report its `status` as it is.)
 
-- The link.
-- Without an account, it stays up for 3 days. Show the claim link too:
-  opening it and signing in keeps it in the user's ShipStatic account.
-- The password, if you set one. A password the user never sees locks them out.
+The `claim` link says who owns the site, and `expires` says whether it
+expires.
+
+- **The result has a `claim` link** (the usual case): the site has no account.
+  Give the link (`url`), say it stays up for 3 days, and give the claim link:
+  opening it and signing in keeps the site for good. For example:
+
+  > Your site is live: https://example-site-abc1234.shipstatic.com
+  > It stays up for 3 days. To keep it, open
+  > https://my.shipstatic.com/claim/… and sign in.
+
+- **The result has no `claim` link:** the site is already in the user's
+  ShipStatic account. Give the link. If `expires` is not null, say when it
+  expires; if it is null, it stays until they delete it. The result doesn't
+  say which account, so don't guess.
+- **The result has `password: true`:** the site asks for a password before
+  showing anything. Say so, and give the password if you set one: a password
+  the user never sees locks them out.
 
 Keep the reply short. The links matter more than a summary of the files.
 
@@ -65,18 +134,24 @@ a new link, and the earlier one keeps working until it expires. Say which link
 is the new one, and that the claim link of the version they want to keep is
 the one to open.
 
-## When to stop or decline
+## When to decline
 
-- If the request needs a server (an API, a database, sign-in for the people
-  who open the link), say that ShipStatic publishes static files such as HTML,
-  and offer a static version if one would do the job.
-- If the upload is refused, tell the user what the message says. Fix what you
-  can, for example a file type that isn't allowed or files that are too large,
-  and publish once more.
+If the request needs a server (an API, a database, sign-in for the people who
+open the link), say that ShipStatic publishes static files such as HTML, and
+offer a static version if one would do the job.
 
-## With a connected account
+## Accounts, only when the user asks
 
-If the user has connected a ShipStatic account, what they publish goes to that
-account, with no claim link and no 3-day limit. It stays until they delete it,
-unless they asked for it to expire. Bring up an account only when the user asks
-to see or manage what they have published, or to use their own domain.
+Bring up an account only when the user asks to see or manage what they have
+published, to use their own domain, or to publish into their account. The two
+ways are set up separately:
+
+- **A site already published with no account** moves into the user's account
+  through its claim link, whichever way it was sent.
+- **The upload** goes into an account once the ShipStatic MCP server is
+  connected to one. The host asks the user to sign in when an account tool is
+  first used. If an account tool is refused and no sign-in starts, the user
+  can see and manage their sites at https://my.shipstatic.com.
+- **The CLI** publishes into an account once the user runs
+  `npx -y @shipstatic/ship@3 config`, with an API key from
+  https://my.shipstatic.com/api-key.
