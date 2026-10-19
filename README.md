@@ -163,8 +163,10 @@ Review details and nowhere else.
   declined. It ships in the package rather than from the server,
   because OpenAI imports a server's skills as a snapshot at scan time and
   does not read them at runtime, so serving them adds machinery and no
-  freshness. The estate's other `SKILL.md` teaches the `ship` CLI, which
-  ChatGPT can't run, so it isn't one of these.
+  freshness. It is the estate's one skill, owned by the coding-agent plugin
+  (`shipstatic/plugin`): the monorepo's `scripts/skill.mjs` writes this copy
+  from it at the next listing upload, and in ChatGPT, with no shell, the skill
+  chooses the upload by itself.
 - **Refused, each until the thing named happens:**
   - **`openai/subject` as the rate-limit caller.** Anonymous deploys on `/gpt`
     are metered per OpenAI egress address, and the busiest address peaked at
