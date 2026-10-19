@@ -22,7 +22,7 @@ pnpm preflight    # the live /gpt door and the listing's links; must pass
 |---|---|
 | `.codex-plugin/plugin.json` | The listing: name, descriptions, capabilities, category, starter prompts, links, logo and version, and under `extensions.com.openai` the review cases and release notes. It names the MCP declaration and the skills beside it. |
 | `.mcp.json` | The one MCP server, by its URL, which the portal requires for the review cases. Never its authentication: that is the app's, in the portal. |
-| `skills/publish-online/SKILL.md` | The skill: how to put a report, page, dashboard or small app online with `deployments_upload`, with no account, what to tell the user, and how to handle a password, changes and refusals. |
+| `skills/publish-online/SKILL.md` | The skill, ShipStatic's `publish-online`: how to put a site, page, report or small app online with no account, what to tell the user, and how to handle a password, changes and refusals. A copy of the [plugin's](https://github.com/shipstatic/plugin/blob/main/skills/publish-online/SKILL.md), byte for byte: change the plugin's, never this one. |
 | `assets/icon-1024.png`, `assets/icon-480.png` | The logo and the composer icon the manifest names. |
 | `scripts/preflight.mjs` | Checks the live door (tools, hints, output schemas, the card, both halves of sign-in, PKCE) and the package (the portal's field limits, its links, its version against the door's, its connection mode against what the door's tools declare, and every tool its review cases and skills name). A green run is not the portal's scan or a reviewer's judgement. |
 | `.github/workflows/ci.yml` | Runs preflight on every push and weekly, against production. A failure reaches the alerts channel. |
