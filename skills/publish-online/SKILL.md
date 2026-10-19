@@ -12,6 +12,22 @@ see a draft first, show it and publish when they say so.
 anything, create an account or give a key before publishing. Most sites are
 published with no account, and that is the normal way, not a fallback.
 
+## Talk to the user in plain words
+
+Many people who publish with ShipStatic aren't developers. They made
+something, often with your help, and they want a link they can share.
+
+- Do the technical work yourself. Tell the user what happened, not how you
+  did it. Ask them only for what you can't decide for them, such as a
+  password or which version to keep.
+- Use their words: their site, page, link and password. Don't say deploy,
+  build, CLI, MCP, static, server, Node.js or token unless the user said it
+  first, or a step they have to do needs it.
+- If something goes wrong, say in one or two short sentences what it means
+  for them and what you'll do next. Don't paste error messages or logs.
+- If the user has to do something, give one step at a time, with exactly
+  where to click or what to type.
+
 ## Two separate questions
 
 1. **How the files travel: you choose.** There are two ways, and both work
@@ -35,9 +51,10 @@ published with no account, and that is the normal way, not a fallback.
   names a folder, publish that one as it is.
 - **What you publish is a static site:** `index.html` at the root of the
   folder, with the files it uses beside it. If a build makes a server app
-  instead (no `index.html`), don't publish it: say ShipStatic publishes static
-  sites, and offer to set up a static export. Don't change the project's
-  settings without asking.
+  instead (no `index.html`), don't publish it: say ShipStatic publishes sites
+  that run in the browser, not apps that need their own server, and offer to
+  change the project so it can be published that way. Don't change the
+  project's settings without asking.
 - **Something new to make:** make the files in a new folder of its own, with
   the start page at `index.html`. Never write them into an existing folder
   such as `dist/` or the project's own files: that overwrites the user's work
@@ -71,8 +88,9 @@ Choose the way:
   JSON, SVG) as plain text, and binary files such as images and fonts with
   `encoding: "base64"`.
 - **A large build the CLI can't send:** never read it into the conversation.
-  Ask the user to let the CLI reach the network, or tell them what is missing:
-  Node.js for the CLI, or the ShipStatic MCP server for the upload.
+  Ask the user to let the CLI reach the internet, or tell them what is
+  missing (Node.js for the CLI, or the ShipStatic MCP server for the upload)
+  and how to add it, one step at a time.
 
 Then:
 
@@ -89,16 +107,17 @@ Then:
   password that is hard to guess, unless the user chose one. Never ask for a
   password the user already uses somewhere else.
 - If the CLI fails with `authentication_failed`, the key it used was refused.
-  Tell the user to replace it, with a new key from
+  Tell the user their saved ShipStatic key didn't work, and how to replace it
+  with a new key from
   https://my.shipstatic.com/api-key, where it is set: in `SHIP_TOKEN` if that
   is set (it comes first), otherwise by running
   `npx -y @shipstatic/ship@3 config`. Then stop: don't publish another way,
   with no account or through the upload, unless the user asks. Another way can
   put the site in another account, or in none.
-- If publishing fails otherwise, tell the user what the message says. Fix what
-  you can, for example a file type that isn't allowed, files that are too
-  large, or a project folder where its build folder was meant, and publish
-  once more.
+- If publishing fails otherwise, read the message and tell the user in plain
+  words what went wrong. Fix what you can, for example a file type that
+  isn't allowed, files that are too large, or a project folder where its
+  build folder was meant, and publish once more.
 
 ## Tell the user
 
@@ -137,8 +156,9 @@ the one to open.
 ## When to decline
 
 If the request needs a server (an API, a database, sign-in for the people who
-open the link), say that ShipStatic publishes static files such as HTML, and
-offer a static version if one would do the job.
+open the link), say that ShipStatic publishes sites that run in the browser,
+and that this part needs a server it doesn't run. Offer a version that works
+without one, if one would do the job.
 
 ## Accounts, only when the user asks
 

@@ -58,7 +58,7 @@
         "commerce_description": "This plugin sells nothing and processes no payments."
       },
       "publication": {
-        "release_notes": "The publishing skill is now the same one ShipStatic ships for coding agents. In Codex, a folder on disk goes online through the ShipStatic CLI; in ChatGPT, a page goes up through the upload, as before. Either way it still needs no account, gives the claim link, and uses built-in password protection when asked."
+        "release_notes": "The publishing skill is now the same one ShipStatic ships for coding agents. In Codex, a folder on disk goes online through the ShipStatic CLI; in ChatGPT, a page goes up through the upload, as before. Either way it still needs no account, gives the claim link, and uses built-in password protection when asked. It also talks to you in plain words: what happened and what to do next, without technical terms or error logs."
       }
     }
   },
