@@ -46,17 +46,21 @@ something, often with your help, and they want a link they can share.
 - **A project with a build step:** run its build, and once it succeeds,
   publish the folder it writes. Build first even when an older build folder is
   already there.
-- **A built site with nothing to build:** a folder with `index.html` at its
-  root, such as `dist/`, `build/` or `out/`. Publish that folder. If the user
+- **A built site with nothing to build:** a folder with an `index.html` at the
+  top, such as `dist/`, `build/` or `out/`. Publish that folder. If the user
   names a folder, publish that one as it is.
-- **What you publish is a static site:** `index.html` at the root of the
-  folder, with the files it uses beside it. If a build makes a server app
+- **What you publish is a static site:** an `index.html` at the top of the
+  folder, with the files it uses beside it. It's the page visitors see first,
+  and a site without one is refused. If a build makes a server app
   instead (no `index.html`), don't publish it: say ShipStatic publishes sites
   that run in the browser, not apps that need their own server, and offer to
   change the project so it can be published that way. Don't change the
   project's settings without asking.
+- **A single file that isn't a page,** like an image or a PDF: put it in a new
+  folder with a small `index.html` that shows it or links to it, and publish
+  that folder.
 - **Something new to make:** make the files in a new folder of its own, with
-  the start page at `index.html`. Never write them into an existing folder
+  an `index.html` at the top. Never write them into an existing folder
   such as `dist/` or the project's own files: that overwrites the user's work
   and publishes files that don't belong to the new site.
 
@@ -65,8 +69,8 @@ something, often with your help, and they want a link they can share.
 - Make it as HTML, with CSS, JavaScript, images and fonts as needed. It runs in
   the browser. There is no server, so no backend code, database or server-side
   form handling.
-- Put the start page at `index.html`, at the root of what you publish. Link
-  pages and files to each other with relative paths.
+- Put an `index.html` at the top of what you publish: it's the page visitors
+  see first. Link pages and files to each other with relative paths.
 - A report or a single page can be one `index.html` with its CSS and
   JavaScript inside it, unless the user wants separate files. Charts and
   tables can be drawn with inline SVG, HTML and CSS.
