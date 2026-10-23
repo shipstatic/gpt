@@ -91,21 +91,6 @@ Each review runs on a ShipStatic account we keep for it, and OpenAI asks
 that it stay usable for later reviews. Its credentials go in the portal's
 Review details and nowhere else.
 
-- **Sign-in:** `shipstatic.reviewer@gmail.com` (display name "ShipStatic
-  Reviewer"), the owner of a sponsored account. It signs in with a
-  ShipStatic password. It's the one address that's shown a password field,
-  because OpenAI's reviewers can't use codes, magic links or MFA. Its
-  password changes only if it leaks, and Review details is updated the same
-  day.
-- **What it holds** (all safe to change or delete):
-  - `surging-whirl-34s7s7d.shipstatic.com`, a hello page (`review`, `hello`)
-  - `lucid-ripple-z77vz8u.shipstatic.com`, two pages and a stylesheet
-    (`review`, `welcome`)
-  - `airy-bot-mv3w7z3.shipstatic.com`, locked with the site password
-    `hello-reviewer` (`review`, `private`)
-  - `review-team.shipstatic.com`, a platform domain on the hello page
-  - `reviewer.exampledomain.xyz`, a custom domain on the welcome site
-
 ## Decisions
 
 - **A dedicated connector, not the coding-agent plugin.** ShipStatic reaches
@@ -168,12 +153,9 @@ Review details and nowhere else.
   from it at the next listing upload, and in ChatGPT, with no shell, the skill
   chooses the upload by itself.
 - **Refused, each until the thing named happens:**
-  - **`openai/subject` as the rate-limit caller.** Anonymous deploys on `/gpt`
-    are metered per OpenAI egress address, and the busiest address peaked at
-    8 deploys in an hour against a budget of 100, so nobody is throttled.
-    Trusting a per-user value needs ChatGPT's client verified (mTLS) at the
-    edge. Reopen when a ChatGPT user is refused by the per-caller budget; the
-    mechanism belongs to the root backlog's "authenticate `X-Caller`".
+  - **`openai/subject` as the rate-limit caller.** Trusting a per-user value
+    needs ChatGPT's client verified at the edge. Reopen when a ChatGPT user
+    is refused by the anonymous budget.
   - **A profile tool** (`openai/profile`). ChatGPT connects accounts without
     one; `whoami` stays as it is. Reopen when people connect more than one
     ShipStatic account in ChatGPT and need to tell them apart.
